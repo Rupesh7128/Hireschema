@@ -32,7 +32,7 @@ const getApiKey = (): string => {
         // @ts-ignore
         if (typeof import.meta !== 'undefined' && (import.meta as any).env) {
             // @ts-ignore
-            const fromImport = (import.meta as any).env.GEMINI_API_KEY || (import.meta as any).env.API_KEY;
+            const fromImport = (import.meta as any).env.VITE_GEMINI_API_KEY || (import.meta as any).env.GEMINI_API_KEY || (import.meta as any).env.API_KEY;
             if (fromImport) return fromImport as string;
         }
     } catch (e) {}

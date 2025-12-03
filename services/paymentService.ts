@@ -3,7 +3,7 @@ export const PRODUCT_ID = (import.meta as any).env.VITE_DODO_PRODUCT_ID || 'pdt_
 
 export const verifyDodoPayment = async (paymentId: string): Promise<boolean> => {
   // Ideally this key should be an environment variable
-  const DODO_API_KEY = (import.meta as any).env.VITE_DODO_API_KEY || "cjqzam76LbyDX8cj.rsclL18HXjWymrluMBcSI-_nmDzOJrQVV6hwiW3WsytX41HC"; 
+  const DODO_API_KEY = (import.meta as any).env.VITE_DODO_API_KEY || (import.meta as any).env.VITE_DODO_PAYMENTS_PUBLIC_KEY || "cjqzam76LbyDX8cj.rsclL18HXjWymrluMBcSI-_nmDzOJrQVV6hwiW3WsytX41HC"; 
   
   try {
     console.log(`Verifying payment: ${paymentId.substring(0, 10)}...`);
