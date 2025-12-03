@@ -3,9 +3,10 @@ import { GoogleGenerativeAI, GenerativeModel, GenerationConfig } from "@google/g
 import { AnalysisResult, FileData, GeneratorType, ContactProfile } from "../types";
 
 // --- CONFIGURATION ---
-const MODEL_STANDARD = "gemini-1.5-flash-001"; // Standard tasks, Search Grounding
-const MODEL_FAST = "gemini-1.5-flash-001"; // Low latency tasks
-const MODEL_REASONING = "gemini-2.0-flash-thinking-exp-01-21"; // Complex reasoning, Chatbot
+// Using stable, non-experimental models to prevent 404 errors
+const MODEL_STANDARD = "gemini-1.5-pro"; // High intelligence for complex tasks
+const MODEL_FAST = "gemini-1.5-flash"; // High speed for simple tasks
+const MODEL_REASONING = "gemini-1.5-pro"; // Use Pro for reasoning instead of experimental models
 
 // Singleton instance for the AI client
 let genAI: GoogleGenerativeAI | null = null;
@@ -13,22 +14,28 @@ let genAI: GoogleGenerativeAI | null = null;
 // Helper to safely get API key
 const getApiKey = (): string => {
     try {
-        // Prefer direct define replacement (Vite 'define')
+        // 1. Try Vite 'define' replacement
         // @ts-ignore
         const KEY_FROM_DEFINE = (process.env.API_KEY || process.env.GEMINI_API_KEY) as string;
         if (KEY_FROM_DEFINE) return KEY_FROM_DEFINE;
+
+        // 2. Try process.env (Node/Vercel)
         // @ts-ignore
         if (typeof process !== 'undefined' && (process as any).env) {
             // @ts-ignore
             const fromProcess = (process as any).env.API_KEY || (process as any).env.GEMINI_API_KEY;
             if (fromProcess) return fromProcess as string;
         }
+
+        // 3. Try window.process.env (Legacy)
         // @ts-ignore
         if (typeof window !== 'undefined' && window.process?.env) {
             // @ts-ignore
             const fromWindow = window.process.env.API_KEY || window.process.env.GEMINI_API_KEY;
             if (fromWindow) return fromWindow as string;
         }
+
+        // 4. Try import.meta.env (Vite Standard) - Most likely to work in Vercel + Vite
         // @ts-ignore
         if (typeof import.meta !== 'undefined' && (import.meta as any).env) {
             // @ts-ignore
@@ -44,6 +51,13 @@ const getGenAI = (): GoogleGenerativeAI => {
     if (genAI) return genAI;
     
     const apiKey = getApiKey();
+
+    // DEBUG: Log masked key to verify it's being read correctly
+    if (apiKey) {
+        console.log(`Gemini API Key loaded: ${apiKey.substring(0, 4)}...${apiKey.substring(apiKey.length - 4)}`);
+    } else {
+        console.error("Gemini API Key is MISSING! Check your Vercel Environment Variables.");
+    }
 
     // Use placeholder if key missing to allow app to load, requests will fail gracefully
     genAI = new GoogleGenerativeAI(apiKey || 'MISSING_API_KEY');
@@ -119,13 +133,14 @@ const getActionableError = (error: any): string => {
     const msg = error.message || '';
     console.error("Gemini API Error Details:", error); // Log full error for debugging
     
-    if (msg.includes('401') || msg.includes('API key')) return "Invalid API Key. Please verify your configuration.";
+    if (msg.includes('401') || msg.includes('API key')) return "Invalid API Key. Please verify your configuration in Vercel.";
     if (msg.includes('429')) return "High traffic. Retrying analysis...";
     if (msg.includes('503')) return "AI Service temporarily unavailable. Please try again later.";
     if (msg.includes('PasswordException')) return "This PDF is password protected. Please unlock it and try again.";
     
     // Show the actual network error to help debug
     if (msg.includes('NetworkError') || msg.includes('fetch')) return `Network Error: ${msg}. Check console for details.`;
+    if (msg.includes('404')) return `Model Not Found (404): The AI model is currently unavailable or the API key doesn't have access.`;
     
     return `Analysis failed: ${msg.substring(0, 100)}.`;
 };
@@ -307,7 +322,7 @@ export const extractLinkedInProfile = async (linkedinUrl: string): Promise<Parti
     try {
         const model = getGenAI().getGenerativeModel({ 
             model: MODEL_REASONING,
-            // tools: [{ googleSearch: {} } as any] 
+            // tools: [{ googleSearch: {} } as any] // Disabled for stability
         });
 
         const response = await model.generateContent(prompt);
@@ -376,7 +391,7 @@ export const analyzeResume = async (
   try {
     const model = getGenAI().getGenerativeModel({ 
         model: MODEL_STANDARD,
-        // tools: [{ googleSearch: {} } as any] // REMOVED: Can cause issues if not enabled in project
+        // tools: [{ googleSearch: {} } as any] // Disabled for stability
     });
 
     const response = await retryOperation(() => 
@@ -502,7 +517,7 @@ export const generateContent = async (
       
     case GeneratorType.MARKET_INSIGHTS:
         selectedModel = MODEL_REASONING;
-        // tools = [{ googleSearch: {} }]; // REMOVED
+        // tools = [{ googleSearch: {} }]; // Disabled for stability
         useJson = true;
         userPrompt = `
         Analyze the Job Description first using your internal knowledge.
