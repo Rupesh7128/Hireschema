@@ -1,14 +1,14 @@
 
-import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
+import { GoogleGenerativeAI, GenerativeModel, GenerationConfig } from "@google/generative-ai";
 import { AnalysisResult, FileData, GeneratorType, ContactProfile } from "../types";
 
 // --- CONFIGURATION ---
-const MODEL_STANDARD = "gemini-1.5-flash-001"; // Standard tasks, Search Grounding
-const MODEL_FAST = "gemini-1.5-flash-001"; // Low latency tasks
+const MODEL_STANDARD = "gemini-1.5-flash"; // Standard tasks, Search Grounding
+const MODEL_FAST = "gemini-1.5-flash"; // Low latency tasks
 const MODEL_REASONING = "gemini-2.0-flash-thinking-exp-01-21"; // Complex reasoning, Chatbot
 
 // Singleton instance for the AI client
-let aiInstance: GoogleGenAI | null = null;
+let genAI: GoogleGenerativeAI | null = null;
 
 // Helper to safely get API key
 const getApiKey = (): string => {
@@ -40,14 +40,14 @@ const getApiKey = (): string => {
 };
 
 // Lazy initialization of the AI client
-const getAiClient = (): GoogleGenAI => {
-    if (aiInstance) return aiInstance;
+const getGenAI = (): GoogleGenerativeAI => {
+    if (genAI) return genAI;
     
     const apiKey = getApiKey();
 
     // Use placeholder if key missing to allow app to load, requests will fail gracefully
-    aiInstance = new GoogleGenAI({ apiKey: apiKey || 'MISSING_API_KEY' });
-    return aiInstance;
+    genAI = new GoogleGenerativeAI(apiKey || 'MISSING_API_KEY');
+    return genAI;
 };
 
 // --- UTILS ---
@@ -209,16 +209,13 @@ export const calculateImprovedScore = async (
             { "score": number }
         `;
 
-        const response = await getAiClient().models.generateContent({
-            model: MODEL_REASONING, // Upgraded from FAST to REASONING
-            contents: { text: prompt },
-            config: { 
-                responseMimeType: "application/json",
-                temperature: 0.1 
-            }
+        const model = getGenAI().getGenerativeModel({ 
+            model: MODEL_REASONING,
+            generationConfig: { responseMimeType: "application/json" }
         });
-
-        const cleanJson = cleanJsonOutput(response.text || '');
+        
+        const response = await model.generateContent(prompt);
+        const cleanJson = cleanJsonOutput(response.response.text() || '');
         const result = JSON.parse(cleanJson);
         return result.score;
     } catch (e) {
@@ -244,12 +241,9 @@ export const refineContent = async (
     `;
 
     try {
-        const response = await getAiClient().models.generateContent({
-            model: MODEL_STANDARD,
-            contents: { text: prompt },
-            config: { temperature: 0.7 }
-        });
-        return cleanMarkdownOutput(response.text || currentContent);
+        const model = getGenAI().getGenerativeModel({ model: MODEL_STANDARD });
+        const response = await model.generateContent(prompt);
+        return cleanMarkdownOutput(response.response.text() || currentContent);
     } catch (error) {
          throw new Error("Unable to refine content.");
     }
@@ -280,12 +274,9 @@ export const regenerateSection = async (
     `;
     
     try {
-        const response = await getAiClient().models.generateContent({
-            model: MODEL_STANDARD,
-            contents: { text: prompt },
-            config: { temperature: 0.7 }
-        });
-        return cleanMarkdownOutput(response.text || currentContent);
+        const model = getGenAI().getGenerativeModel({ model: MODEL_STANDARD });
+        const response = await model.generateContent(prompt);
+        return cleanMarkdownOutput(response.response.text() || currentContent);
     } catch (error) {
         throw new Error("Unable to regenerate section.");
     }
@@ -309,16 +300,14 @@ export const extractLinkedInProfile = async (linkedinUrl: string): Promise<Parti
     `;
     
     try {
-        const response = await getAiClient().models.generateContent({
+        const model = getGenAI().getGenerativeModel({ 
             model: MODEL_REASONING,
-            contents: { text: prompt },
-            config: {
-                tools: [{ googleSearch: {} }],
-                // Note: responseMimeType and responseSchema are not supported with googleSearch
-            }
+            tools: [{ googleSearch: {} } as any] // Cast as any to avoid strict type check if using different version
         });
+
+        const response = await model.generateContent(prompt);
         
-        const text = response.text || '{}';
+        const text = response.response.text() || '{}';
         return JSON.parse(cleanJsonOutput(text));
     } catch (e) {
         console.warn("LinkedIn extraction failed", e);
@@ -380,27 +369,24 @@ export const analyzeResume = async (
   `;
   
   try {
+    const model = getGenAI().getGenerativeModel({ 
+        model: MODEL_STANDARD,
+        tools: [{ googleSearch: {} } as any]
+    });
+
     const response = await retryOperation(() => 
-        withTimeout<GenerateContentResponse>(
-            getAiClient().models.generateContent({
-                model: MODEL_STANDARD,
-                contents: {
-                    parts: [
-                    { inlineData: { mimeType: resumeFile.type, data: resumeFile.base64 } },
-                    { text: systemPrompt + `\n\nJob Description / Link:\n${jdText}\n\nOutput strictly valid JSON.` },
-                    ],
-                },
-                config: { 
-                    tools: [{ googleSearch: {} }], // Enable search for URL extraction and market data
-                },
-            }),
+        withTimeout(
+            model.generateContent([
+                { inlineData: { mimeType: resumeFile.type, data: resumeFile.base64 } },
+                { text: systemPrompt + `\n\nJob Description / Link:\n${jdText}\n\nOutput strictly valid JSON.` }
+            ]),
             120000, 
             "Analysis timed out."
         )
     );
 
-    if (response.text) {
-      return JSON.parse(cleanJsonOutput(response.text)) as AnalysisResult;
+    if (response.response.text()) {
+      return JSON.parse(cleanJsonOutput(response.response.text())) as AnalysisResult;
     }
     throw new Error("Empty response.");
 
@@ -436,7 +422,7 @@ export const generateContent = async (
 
   let userPrompt = "";
   let selectedModel = MODEL_STANDARD;
-  let tools = undefined;
+  let tools: any = undefined;
   let useJson = false;
 
   switch (type) {
@@ -536,45 +522,24 @@ export const generateContent = async (
   const fullPrompt = `Job Description Context: ${jobDescription}\n\nTask: ${userPrompt}`;
 
   try {
+    const model = getGenAI().getGenerativeModel({ 
+        model: selectedModel,
+        tools: tools,
+        generationConfig: useJson ? { responseMimeType: "application/json" } : undefined
+    });
+
     const response = await retryOperation(() =>
-        withTimeout<GenerateContentResponse>(
-            getAiClient().models.generateContent({
-                model: selectedModel,
-                contents: {
-                    parts: [
-                    { inlineData: { mimeType: resumeFile.type, data: resumeFile.base64 } },
-                    { text: fullPrompt },
-                    ],
-                },
-                config: {
-                    temperature: 0.4,
-                    tools: tools,
-                    responseMimeType: (useJson && !tools) ? "application/json" : undefined
-                }
-            }),
-            60000, 
-            "Generation Request Timed Out."
-        )
+        model.generateContent(fullPrompt)
     );
-
-    let text = response.text || "Failed to generate content.";
-
-    if (type === GeneratorType.MARKET_INSIGHTS && !useJson && response.candidates?.[0]?.groundingMetadata?.groundingChunks) {
-        // Fallback if not JSON
-        const chunks = response.candidates[0].groundingMetadata.groundingChunks;
-        let sourcesMd = "\n\n---\n### Sources & References\n";
-        chunks.forEach((chunk: any, index: number) => {
-            if (chunk.web?.uri) {
-                sourcesMd += `- [${chunk.web.title || 'Source ' + (index + 1)}](${chunk.web.uri})\n`;
-            }
-        });
-        text += sourcesMd;
-    }
     
-    return useJson ? cleanJsonOutput(text) : cleanMarkdownOutput(text);
+    const text = response.response.text();
+    if (useJson) {
+        return cleanJsonOutput(text);
+    }
+    return cleanMarkdownOutput(text);
 
-  } catch (primaryError: any) {
-    throw new Error(getActionableError(primaryError));
+  } catch (error) {
+      console.error("Generation failed", error);
+      throw new Error("Failed to generate content.");
   }
 };
-    
