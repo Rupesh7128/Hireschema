@@ -3,8 +3,8 @@ import { GoogleGenerativeAI, GenerativeModel, GenerationConfig } from "@google/g
 import { AnalysisResult, FileData, GeneratorType, ContactProfile } from "../types";
 
 // --- CONFIGURATION ---
-const MODEL_STANDARD = "gemini-1.5-flash"; // Standard tasks, Search Grounding
-const MODEL_FAST = "gemini-1.5-flash"; // Low latency tasks
+const MODEL_STANDARD = "gemini-1.5-flash-001"; // Standard tasks, Search Grounding
+const MODEL_FAST = "gemini-1.5-flash-001"; // Low latency tasks
 const MODEL_REASONING = "gemini-2.0-flash-thinking-exp-01-21"; // Complex reasoning, Chatbot
 
 // Singleton instance for the AI client
