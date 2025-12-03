@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>HireSchema | AI Career Architect</title>
+    
+    <!-- CRITICAL: Early Polyfill for process/global to prevent library crashes -->
+    <script>
+      window.global = window;
+      window.process = window.process || { env: { NODE_ENV: 'production' } };
+      window.Buffer = window.Buffer || { isBuffer: () => false };
+    </script>
+
+    <!-- Custom Favicon (Orange 'H' Logo) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23ea580c'/%3E%3Cpath d='M10 9v14M22 9v14M10 16h12' stroke='white' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E" />
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BX7MT5EE6E"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-BX7MT5EE6E');
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" crossorigin="anonymous"></script>
+    <!-- PDF.js for Client-Side Text Extraction -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" crossorigin="anonymous"></script>
+    <script>
+      // Initialize PDF.js worker safely
+      try {
+        if (typeof pdfjsLib !== 'undefined') {
+          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+      } catch (e) {
+        console.warn('PDF.js worker init failed', e);
+      }
+    </script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+            colors: {
+              orange: {
+                450: '#F97316',
+                500: '#F97316',
+                550: '#EA580C',
+                600: '#EA580C',
+                700: '#C2410C',
+                800: '#9A3412',
+                900: '#7C2D12',
+                950: '#431407',
+              },
+              zinc: {
+                850: '#202022',
+                900: '#18181B',
+                950: '#09090B',
+              }
+            },
+            animation: {
+              marquee: 'marquee 20s linear infinite',
+              'scan': 'scan 2s ease-in-out infinite',
+              'shimmer': 'shimmer 2s linear infinite',
+              'grid-flow': 'grid-flow 20s linear infinite',
+            },
+            keyframes: {
+              marquee: {
+                '0%': { transform: 'translateX(0%)' },
+                '100%': { transform: 'translateX(-50%)' },
+              },
+              scan: {
+                '0%, 100%': { top: '0%' },
+                '50%': { top: '100%' },
+              },
+              shimmer: {
+                '0%': { backgroundPosition: '200% 0' },
+                '100%': { backgroundPosition: '-200% 0' },
+              },
+              'grid-flow': {
+                '0%': { backgroundPosition: '0 0' },
+                '100%': { backgroundPosition: '50px 50px' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        background-color: #000000;
+        color: #e4e4e7;
+        overflow-x: hidden;
+        -webkit-tap-highlight-color: transparent;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent; 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #3f3f46; 
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #71717a; 
+      }
+      
+      /* Scroll Snap Utilities */
+      .snap-y {
+        scroll-snap-type: y mandatory;
+      }
+      .snap-start {
+        scroll-snap-align: start;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react-markdown": "https://aistudiocdn.com/react-markdown@^10.1.0",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
+    "framer-motion": "https://aistudiocdn.com/framer-motion@^12.23.24",
+    "recharts": "https://aistudiocdn.com/recharts@^3.5.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
+    

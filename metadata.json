@@ -1,0 +1,5 @@
+{
+  "name": "HireSchema",
+  "description": "An advanced AI-powered resume analyzer and career assistant. Upload your resume to get ATS scores, missing keywords, and generate tailored cover letters and interview prep materials.",
+  "requestFramePermissions": []
+}
