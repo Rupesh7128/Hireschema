@@ -117,11 +117,16 @@ const cleanMarkdownOutput = (text: string): string => {
 
 const getActionableError = (error: any): string => {
     const msg = error.message || '';
+    console.error("Gemini API Error Details:", error); // Log full error for debugging
+    
     if (msg.includes('401') || msg.includes('API key')) return "Invalid API Key. Please verify your configuration.";
     if (msg.includes('429')) return "High traffic. Retrying analysis...";
     if (msg.includes('503')) return "AI Service temporarily unavailable. Please try again later.";
     if (msg.includes('PasswordException')) return "This PDF is password protected. Please unlock it and try again.";
-    if (msg.includes('NetworkError') || msg.includes('fetch')) return "Network error. Please check your internet connection.";
+    
+    // Show the actual network error to help debug
+    if (msg.includes('NetworkError') || msg.includes('fetch')) return `Network Error: ${msg}. Check console for details.`;
+    
     return `Analysis failed: ${msg.substring(0, 100)}.`;
 };
 
@@ -302,7 +307,7 @@ export const extractLinkedInProfile = async (linkedinUrl: string): Promise<Parti
     try {
         const model = getGenAI().getGenerativeModel({ 
             model: MODEL_REASONING,
-            tools: [{ googleSearch: {} } as any] // Cast as any to avoid strict type check if using different version
+            // tools: [{ googleSearch: {} } as any] 
         });
 
         const response = await model.generateContent(prompt);
@@ -371,7 +376,7 @@ export const analyzeResume = async (
   try {
     const model = getGenAI().getGenerativeModel({ 
         model: MODEL_STANDARD,
-        tools: [{ googleSearch: {} } as any]
+        // tools: [{ googleSearch: {} } as any] // REMOVED: Can cause issues if not enabled in project
     });
 
     const response = await retryOperation(() => 
@@ -497,10 +502,10 @@ export const generateContent = async (
       
     case GeneratorType.MARKET_INSIGHTS:
         selectedModel = MODEL_REASONING;
-        tools = [{ googleSearch: {} }];
+        // tools = [{ googleSearch: {} }]; // REMOVED
         useJson = true;
         userPrompt = `
-        Analyze the Job Description first using Google Search Grounding for current data.
+        Analyze the Job Description first using your internal knowledge.
         1. **Verdict**: Is this a good job? (Based on typical salary/growth for this title).
         2. **Salary**: Find current market range for this Title/Location.
         3. **Culture**: What does the JD imply about culture/WFH?
