@@ -100,6 +100,46 @@ const isProbablyResume = (text: string): boolean => {
     return lenOk && hits >= 2;
 };
 
+const getOpenAIKey = (): string => {
+    try {
+        // @ts-ignore
+        if (typeof import.meta !== 'undefined' && (import.meta as any).env) {
+            // @ts-ignore
+            const env = (import.meta as any).env;
+            const k = env.VITE_OPENAI_API_KEY || env.OPENAI_API_KEY;
+            if (k) return k as string;
+        }
+        // @ts-ignore
+        if (typeof process !== 'undefined' && (process as any).env) {
+            // @ts-ignore
+            const k = (process as any).env.OPENAI_API_KEY;
+            if (k) return k as string;
+        }
+    } catch {}
+    return '';
+};
+
+const openaiGenerateContent = async (prompt: string, json: boolean = false): Promise<any> => {
+    const key = getOpenAIKey();
+    if (!key) throw new Error('OpenAI API key missing');
+    const body: any = {
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'user', content: prompt }]
+    };
+    if (json) body.response_format = { type: 'json_object' };
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${key}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    const text = data.choices?.[0]?.message?.content || '';
+    return { response: { text: () => text } };
+};
+
 /**
  * Executes a model request with automatic fallback if the primary model fails.
  */
@@ -117,19 +157,23 @@ const generateWithFallback = async (
         return await model.generateContent(prompt);
     } catch (error: any) {
         const msg = (error.message || '') + JSON.stringify(error);
-        
         if (msg.includes('401') || msg.includes('API key') || msg.includes('PERMISSION_DENIED')) {
             throw error;
         }
-
         const resolvedFallback = await resolveModelName([fallbackModelName, MODEL_FALLBACK, "gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"]);
         if (resolvedFallback !== resolvedPrimary) {
             try {
                 const fallbackModel = ai.getGenerativeModel({ model: resolvedFallback, ...config });
                 return await fallbackModel.generateContent(prompt);
-            } catch {
-                throw error;
-            }
+            } catch {}
+        }
+        const jsonWanted = config?.generationConfig?.responseMimeType === 'application/json';
+        const strPrompt = Array.isArray(prompt) ? JSON.stringify(prompt) : String(prompt);
+        const openaiKey = getOpenAIKey();
+        if (openaiKey) {
+            try {
+                return await openaiGenerateContent(strPrompt, jsonWanted);
+            } catch {}
         }
         throw error;
     }
