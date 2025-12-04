@@ -76,10 +76,19 @@ const resolveModelName = async (preferred: string[]): Promise<string> => {
     if (!cachedModels) {
         cachedModels = await listAvailableModels();
     }
+    if (cachedModels.length === 0) {
+        for (const base of preferred) {
+            if (base.endsWith('-001') || base.endsWith('-002')) return base;
+            if (base.includes('1.5-flash')) return 'gemini-1.5-flash-001';
+            if (base.includes('1.5-pro')) return 'gemini-1.5-pro-001';
+        }
+        return 'gemini-1.5-flash-001';
+    }
     for (const base of preferred) {
         if (cachedModels.includes(base)) return base;
         if (cachedModels.includes(`${base}-001`)) return `${base}-001`;
         if (cachedModels.includes(`${base}-002`)) return `${base}-002`;
+        if (cachedModels.includes(`${base}-latest`)) return `${base}-latest`;
     }
     return preferred[0];
 };
