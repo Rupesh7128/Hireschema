@@ -84,6 +84,22 @@ const resolveModelName = async (preferred: string[]): Promise<string> => {
     return preferred[0];
 };
 
+const NON_RESUME_MESSAGE = "That file screams 'not a resume.' Upload a real resume (PDF) and we’ll work our magic.";
+
+const isProbablyResume = (text: string): boolean => {
+    const t = (text || "").toLowerCase();
+    const lenOk = t.replace(/\s+/g, " ").length > 400;
+    let hits = 0;
+    if (/(experience|work history|employment)/i.test(t)) hits++;
+    if (/(education|degree|b\. ?tech|bachelor|master)/i.test(t)) hits++;
+    if (/(skills|technologies|tooling)/i.test(t)) hits++;
+    if (/(projects|achievements|certifications)/i.test(t)) hits++;
+    if (/[\w.-]+@[\w.-]+\.[a-z]{2,}/i.test(t)) hits++;
+    if (/(linkedin\.com\/in\/)/i.test(t)) hits++;
+    if (/(\+?\d[\d\-\s()]{7,}\d)/.test(t)) hits++;
+    return lenOk && hits >= 2;
+};
+
 /**
  * Executes a model request with automatic fallback if the primary model fails.
  */
@@ -339,6 +355,12 @@ export const analyzeResume = async (
       resumeText = await extractTextFromPdf(resumeFile.base64);
     }
   } catch {}
+  if ((resumeFile.type || '').startsWith('image/')) {
+    throw new Error(NON_RESUME_MESSAGE);
+  }
+  if (resumeText && !isProbablyResume(resumeText)) {
+    throw new Error(NON_RESUME_MESSAGE);
+  }
   
   const systemPrompt = `
     You are an impartial, evidence-based ATS Algorithm and Career Coach.
