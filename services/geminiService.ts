@@ -3,9 +3,10 @@ import { GoogleGenerativeAI, GenerativeModel, GenerationConfig } from "@google/g
 import { AnalysisResult, FileData, GeneratorType, ContactProfile } from "../types";
 
 // --- CONFIGURATION ---
-// Priority: 1.5 Pro (Advanced) -> 1.5 Flash (Fast/Fallback)
-const MODEL_ADVANCED = "gemini-1.5-pro";
-const MODEL_FAST = "gemini-1.5-flash";
+// Using "gemini-1.5-flash" as the PRIMARY model because it is the most widely available and stable.
+// "gemini-1.5-pro" was causing 404 errors for the user's API key/region.
+const MODEL_PRIMARY = "gemini-1.5-flash"; 
+const MODEL_FALLBACK = "gemini-pro"; // Legacy 1.0 Pro as absolute safety net
 
 // Singleton instance for the AI client
 let genAI: GoogleGenerativeAI | null = null;
@@ -59,13 +60,13 @@ const getGenAI = (): GoogleGenerativeAI => {
 // --- UTILS ---
 
 /**
- * Executes a model request with automatic fallback if the primary model fails (e.g. 404 or 503).
+ * Executes a model request with automatic fallback if the primary model fails.
  */
 const generateWithFallback = async (
     primaryModelName: string, 
     prompt: string | Array<any>, 
     config: any = {},
-    fallbackModelName: string = MODEL_FAST
+    fallbackModelName: string = MODEL_FALLBACK
 ): Promise<any> => {
     const ai = getGenAI();
     
@@ -74,14 +75,25 @@ const generateWithFallback = async (
         const model = ai.getGenerativeModel({ model: primaryModelName, ...config });
         return await model.generateContent(prompt);
     } catch (error: any) {
-        const msg = error.message || '';
+        const msg = (error.message || '') + JSON.stringify(error);
         console.warn(`[Gemini Service] Primary model ${primaryModelName} failed:`, msg);
 
-        // If error is 404 (Not Found) or 503 (Overloaded), try fallback
-        if ((msg.includes('404') || msg.includes('not found') || msg.includes('503')) && primaryModelName !== fallbackModelName) {
+        // Don't fallback on Auth errors
+        if (msg.includes('401') || msg.includes('API key') || msg.includes('PERMISSION_DENIED')) {
+            throw error;
+        }
+
+        // Fallback for 404 (Not Found), 503 (Service Unavailable), or any other weird model error
+        if (primaryModelName !== fallbackModelName) {
             console.log(`[Gemini Service] Falling back to model: ${fallbackModelName}`);
-            const fallbackModel = ai.getGenerativeModel({ model: fallbackModelName, ...config });
-            return await fallbackModel.generateContent(prompt);
+            try {
+                const fallbackModel = ai.getGenerativeModel({ model: fallbackModelName, ...config });
+                return await fallbackModel.generateContent(prompt);
+            } catch (fallbackError: any) {
+                console.error(`[Gemini Service] Fallback model ${fallbackModelName} ALSO failed:`, fallbackError);
+                // Throw the ORIGINAL error to show the user the primary failure reason, usually more relevant
+                throw error;
+            }
         }
         
         throw error;
@@ -216,7 +228,7 @@ export const calculateImprovedScore = async (
         `;
 
         const response = await generateWithFallback(
-            MODEL_ADVANCED, 
+            MODEL_PRIMARY, 
             prompt, 
             { generationConfig: { responseMimeType: "application/json" } }
         );
@@ -244,7 +256,7 @@ export const refineContent = async (
     `;
 
     try {
-        const response = await generateWithFallback(MODEL_ADVANCED, prompt);
+        const response = await generateWithFallback(MODEL_PRIMARY, prompt);
         return cleanMarkdownOutput(response.response.text() || currentContent);
     } catch (error) {
          throw new Error("Unable to refine content.");
@@ -267,7 +279,7 @@ export const regenerateSection = async (
     `;
     
     try {
-        const response = await generateWithFallback(MODEL_ADVANCED, prompt);
+        const response = await generateWithFallback(MODEL_PRIMARY, prompt);
         return cleanMarkdownOutput(response.response.text() || currentContent);
     } catch (error) {
         throw new Error("Unable to regenerate section.");
@@ -283,7 +295,7 @@ export const extractLinkedInProfile = async (linkedinUrl: string): Promise<Parti
     
     try {
         const response = await generateWithFallback(
-            MODEL_ADVANCED, 
+            MODEL_PRIMARY, 
             prompt, 
             // Removed tools: googleSearch to prevent 403/Network Errors
             { generationConfig: { responseMimeType: "application/json" } }
@@ -318,7 +330,7 @@ export const analyzeResume = async (
     3. Role Fit Analysis.
     4. Contact Profile (Name, Email, Phone, LinkedIn, Location).
     5. Market Insights (Salary, Verdict, Culture).
-
+    
     Return structured JSON:
     jobTitle: string, company: string, atsScore: number, relevanceScore: number, roleFitAnalysis: string,
     contactProfile: object, languages: array, missingKeywords: array, criticalIssues: array, keyStrengths: array,
@@ -328,7 +340,7 @@ export const analyzeResume = async (
   try {
     const response = await withTimeout(
         generateWithFallback(
-            MODEL_ADVANCED,
+            MODEL_PRIMARY,
             [
                 { inlineData: { mimeType: resumeFile.type, data: resumeFile.base64 } },
                 { text: systemPrompt + `\n\nJob Description / Link:\n${jdText}\n\nOutput strictly valid JSON.` }
@@ -375,12 +387,11 @@ export const generateContent = async (
     : `Write in professional English.`;
 
   let userPrompt = "";
-  let selectedModel = MODEL_ADVANCED; // Default to Advanced
+  let selectedModel = MODEL_PRIMARY; // Default to Primary
   let useJson = false;
 
   switch (type) {
     case GeneratorType.ATS_RESUME:
-      selectedModel = MODEL_ADVANCED;
       userPrompt = `
       Rewrite resume to be 100% ATS-optimized for the Job Description.
       ${langInstruction}
@@ -393,12 +404,10 @@ export const generateContent = async (
       break;
 
     case GeneratorType.RESUME_SUGGESTIONS:
-      selectedModel = MODEL_FAST;
       userPrompt = `Based on missing keywords (${analysis.missingKeywords.join(", ")}), provide concrete bullet point suggestions. ${langInstruction}`;
       break;
 
     case GeneratorType.COVER_LETTER:
-      selectedModel = MODEL_ADVANCED;
       userPrompt = `Write a persuasive Cover Letter. ${langInstruction} Tone: ${toneInstruction}. Candidate: ${profile.name}.`;
       break;
 
@@ -407,7 +416,6 @@ export const generateContent = async (
       break;
 
     case GeneratorType.EMAIL_TEMPLATE:
-      selectedModel = MODEL_FAST;
       const channel = options?.emailChannel || 'Email';
       const recipient = options?.emailRecipient || 'Recruiter';
       if (channel === 'LinkedIn') {
@@ -423,7 +431,6 @@ export const generateContent = async (
         break;
       
     case GeneratorType.MARKET_INSIGHTS:
-        selectedModel = MODEL_ADVANCED;
         useJson = true;
         userPrompt = `
         Analyze the Job Description using internal knowledge.
