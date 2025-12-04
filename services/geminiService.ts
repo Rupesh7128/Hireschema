@@ -3,10 +3,8 @@ import { GoogleGenerativeAI, GenerativeModel, GenerationConfig } from "@google/g
 import { AnalysisResult, FileData, GeneratorType, ContactProfile } from "../types";
 
 // --- CONFIGURATION ---
-// Using "gemini-1.5-flash" as the PRIMARY model because it is the most widely available and stable.
-// "gemini-1.5-pro" was causing 404 errors for the user's API key/region.
 const MODEL_PRIMARY = "gemini-1.5-flash"; 
-const MODEL_FALLBACK = "gemini-pro"; // Legacy 1.0 Pro as absolute safety net
+const MODEL_FALLBACK = "gemini-pro";
 
 // Singleton instance for the AI client
 let genAI: GoogleGenerativeAI | null = null;
@@ -59,6 +57,33 @@ const getGenAI = (): GoogleGenerativeAI => {
 
 // --- UTILS ---
 
+let cachedModels: string[] | null = null;
+
+const listAvailableModels = async (): Promise<string[]> => {
+    const key = getApiKey();
+    if (!key) return [];
+    try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+        const data = await res.json();
+        const names = (data.models || []).map((m: any) => (m.name || '').replace(/^models\//, ''));
+        return names;
+    } catch {
+        return [];
+    }
+};
+
+const resolveModelName = async (preferred: string[]): Promise<string> => {
+    if (!cachedModels) {
+        cachedModels = await listAvailableModels();
+    }
+    for (const base of preferred) {
+        if (cachedModels.includes(base)) return base;
+        if (cachedModels.includes(`${base}-001`)) return `${base}-001`;
+        if (cachedModels.includes(`${base}-002`)) return `${base}-002`;
+    }
+    return preferred[0];
+};
+
 /**
  * Executes a model request with automatic fallback if the primary model fails.
  */
@@ -69,33 +94,27 @@ const generateWithFallback = async (
     fallbackModelName: string = MODEL_FALLBACK
 ): Promise<any> => {
     const ai = getGenAI();
+    const resolvedPrimary = await resolveModelName([primaryModelName, MODEL_PRIMARY, "gemini-1.5-pro", "gemini-pro-vision", MODEL_FALLBACK]);
     
     try {
-        console.log(`[Gemini Service] Attempting generation with model: ${primaryModelName}`);
-        const model = ai.getGenerativeModel({ model: primaryModelName, ...config });
+        const model = ai.getGenerativeModel({ model: resolvedPrimary, ...config });
         return await model.generateContent(prompt);
     } catch (error: any) {
         const msg = (error.message || '') + JSON.stringify(error);
-        console.warn(`[Gemini Service] Primary model ${primaryModelName} failed:`, msg);
-
-        // Don't fallback on Auth errors
+        
         if (msg.includes('401') || msg.includes('API key') || msg.includes('PERMISSION_DENIED')) {
             throw error;
         }
 
-        // Fallback for 404 (Not Found), 503 (Service Unavailable), or any other weird model error
-        if (primaryModelName !== fallbackModelName) {
-            console.log(`[Gemini Service] Falling back to model: ${fallbackModelName}`);
+        const resolvedFallback = await resolveModelName([fallbackModelName, MODEL_FALLBACK, "gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"]);
+        if (resolvedFallback !== resolvedPrimary) {
             try {
-                const fallbackModel = ai.getGenerativeModel({ model: fallbackModelName, ...config });
+                const fallbackModel = ai.getGenerativeModel({ model: resolvedFallback, ...config });
                 return await fallbackModel.generateContent(prompt);
-            } catch (fallbackError: any) {
-                console.error(`[Gemini Service] Fallback model ${fallbackModelName} ALSO failed:`, fallbackError);
-                // Throw the ORIGINAL error to show the user the primary failure reason, usually more relevant
+            } catch {
                 throw error;
             }
         }
-        
         throw error;
     }
 };
@@ -314,6 +333,12 @@ export const analyzeResume = async (
   jobDescription: string
 ): Promise<AnalysisResult> => {
   const jdText = jobDescription?.trim() || "NO_JD_PROVIDED";
+  let resumeText = '';
+  try {
+    if ((resumeFile.type || '').includes('pdf')) {
+      resumeText = await extractTextFromPdf(resumeFile.base64);
+    }
+  } catch {}
   
   const systemPrompt = `
     You are an impartial, evidence-based ATS Algorithm and Career Coach.
@@ -338,17 +363,18 @@ export const analyzeResume = async (
   `;
   
   try {
+    const payload = resumeText
+      ? `${systemPrompt}\n\nRESUME TEXT:\n${resumeText}\n\nJob Description / Link:\n${jdText}\n\nOutput strictly valid JSON.`
+      : `${systemPrompt}\n\nJob Description / Link:\n${jdText}\n\nOutput strictly valid JSON.`;
+
     const response = await withTimeout(
-        generateWithFallback(
-            MODEL_PRIMARY,
-            [
-                { inlineData: { mimeType: resumeFile.type, data: resumeFile.base64 } },
-                { text: systemPrompt + `\n\nJob Description / Link:\n${jdText}\n\nOutput strictly valid JSON.` }
-            ],
-            { generationConfig: { responseMimeType: "application/json" } }
-        ),
-        120000, 
-        "Analysis timed out."
+      generateWithFallback(
+        MODEL_PRIMARY,
+        payload,
+        { generationConfig: { responseMimeType: "application/json" } }
+      ),
+      120000,
+      "Analysis timed out."
     );
 
     if (response.response.text()) {
