@@ -128,6 +128,46 @@ const getOpenAIKey = (): string => {
     return '';
 };
 
+const getOpenRouterKey = (): string => {
+    try {
+        // @ts-ignore
+        if (typeof import.meta !== 'undefined' && (import.meta as any).env) {
+            // @ts-ignore
+            const env = (import.meta as any).env;
+            const k = env.VITE_OPEN_ROUTER_API_KEY || env.OPEN_ROUTER_API_KEY;
+            if (k) return k as string;
+        }
+        // @ts-ignore
+        if (typeof process !== 'undefined' && (process as any).env) {
+            // @ts-ignore
+            const k = (process as any).env.OPEN_ROUTER_API_KEY;
+            if (k) return k as string;
+        }
+    } catch {}
+    return '';
+};
+
+const openrouterGenerateContent = async (prompt: string, json: boolean = false): Promise<any> => {
+    const key = getOpenRouterKey();
+    if (!key) throw new Error('OpenRouter API key missing');
+    const body: any = {
+        model: 'openai/gpt-4o-mini',
+        messages: [{ role: 'user', content: prompt }]
+    };
+    if (json) body.response_format = { type: 'json_object' };
+    const res = await fetch('https://api.openrouter.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${key}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    const text = data.choices?.[0]?.message?.content || '';
+    return { response: { text: () => text } };
+};
+
 const openaiGenerateContent = async (prompt: string, json: boolean = false): Promise<any> => {
     const key = getOpenAIKey();
     if (!key) throw new Error('OpenAI API key missing');
@@ -160,6 +200,14 @@ const generateWithFallback = async (
 ): Promise<any> => {
     const ai = getGenAI();
     const resolvedPrimary = await resolveModelName([primaryModelName, MODEL_PRIMARY, "gemini-1.5-pro", "gemini-pro-vision", MODEL_FALLBACK]);
+    const jsonWanted = config?.generationConfig?.responseMimeType === 'application/json';
+    const strPrompt = Array.isArray(prompt) ? JSON.stringify(prompt) : String(prompt);
+    const orKey = getOpenRouterKey();
+    if (orKey) {
+        try {
+            return await openrouterGenerateContent(strPrompt, jsonWanted);
+        } catch {}
+    }
     
     try {
         const model = ai.getGenerativeModel({ model: resolvedPrimary, ...config });
@@ -176,8 +224,6 @@ const generateWithFallback = async (
                 return await fallbackModel.generateContent(prompt);
             } catch {}
         }
-        const jsonWanted = config?.generationConfig?.responseMimeType === 'application/json';
-        const strPrompt = Array.isArray(prompt) ? JSON.stringify(prompt) : String(prompt);
         const openaiKey = getOpenAIKey();
         if (openaiKey) {
             try {
