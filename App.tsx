@@ -16,6 +16,31 @@ import LandingPage from './components/LandingPage';
 import LegalPages from './components/LegalPages';
 import { AnimatedLogo } from './components/AnimatedLogo';
 
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; message: string }>{
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false, message: '' };
+  }
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true, message: String(error?.message || 'Unknown error') };
+  }
+  componentDidCatch(error: any) {}
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex items-center justify-center h-screen bg-zinc-950">
+          <div className="max-w-lg p-6 rounded-xl border border-red-900/40 bg-red-950/20 text-red-300">
+            <h2 className="text-xl font-bold mb-2 text-red-400">Something went wrong</h2>
+            <p className="text-sm">{this.state.message}</p>
+            <button onClick={() => this.setState({ hasError: false, message: '' })} className="mt-4 px-4 py-2 bg-zinc-800 text-white rounded">Try again</button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children as any;
+  }
+}
+
 const AppContent: React.FC = () => {
   // --- VIEWS ---
   const [view, setView] = useState<'landing' | 'dashboard' | 'legal'>('landing');
@@ -231,6 +256,7 @@ const AppContent: React.FC = () => {
   if (view === 'legal' && legalPage) return <LegalPages page={legalPage} onBack={() => { setView('landing'); window.history.pushState({}, '', '/'); }} />;
 
   return (
+    <ErrorBoundary>
     <div className="flex h-screen bg-black text-zinc-100 overflow-hidden font-sans">
       
       {/* GLOBAL OVERLAY: Payment Verification */}
@@ -320,13 +346,32 @@ const AppContent: React.FC = () => {
                         </div>
                      </div>
                      <div className="flex-1 bg-zinc-900/30 border border-white/5 rounded-xl overflow-hidden">
-                        {resultTab === 'analysis' ? <div className="h-full overflow-y-auto p-6"><AnalysisDashboard result={analysisResult} onUpdateProfile={handleUpdateAnalysisProfile} /></div> : <ContentGenerator resumeFile={resumeFile} jobDescription={jobDescription} analysis={analysisResult} isPaid={isPaid} onPaymentSuccess={() => { setIsPaid(true); localStorage.setItem('hireSchema_isPaid', 'true'); }} appLanguage={appLanguage} setAppLanguage={setAppLanguage} />}
+                        {resultTab === 'analysis' ? (
+                          <div className="h-full overflow-y-auto p-6">
+                            <ErrorBoundary>
+                              <AnalysisDashboard result={analysisResult} onUpdateProfile={handleUpdateAnalysisProfile} />
+                            </ErrorBoundary>
+                          </div>
+                        ) : (
+                          <ErrorBoundary>
+                            <ContentGenerator 
+                              resumeFile={resumeFile} 
+                              jobDescription={jobDescription} 
+                              analysis={analysisResult} 
+                              isPaid={isPaid} 
+                              onPaymentSuccess={() => { setIsPaid(true); localStorage.setItem('hireSchema_isPaid', 'true'); }} 
+                              appLanguage={appLanguage} 
+                              setAppLanguage={setAppLanguage} 
+                            />
+                          </ErrorBoundary>
+                        )}
                      </div>
                  </div>
              )}
          </main>
       </div>
     </div>
+    </ErrorBoundary>
   );
 };
 

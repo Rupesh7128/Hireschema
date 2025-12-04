@@ -286,17 +286,16 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
               <Tooltip content={<CustomChartTooltip />} cursor={{ fill: 'transparent' }} />
             </PieChart>
           </ResponsiveContainer>
-          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            {isNoJD ? (
-                 <span className="text-xl font-bold text-zinc-600 tracking-tighter">N/A</span>
-            ) : (
-                <>
-                <span className="text-3xl font-bold text-white tracking-tighter">{result.relevanceScore || 0}</span>
-                <span className="text-3xl font-bold text-white tracking-tighter">{result.relevanceScore || 0}</span>
-                <span className="text-[9px] text-zinc-500 font-mono mt-1">/ 100</span>
-                </>
-            )}
-          </div>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    {isNoJD ? (
+                         <span className="text-xl font-bold text-zinc-600 tracking-tighter">N/A</span>
+                    ) : (
+                        <>
+                        <span className="text-3xl font-bold text-white tracking-tighter">{result.relevanceScore || 0}</span>
+                        <span className="text-[9px] text-zinc-500 font-mono mt-1">/ 100</span>
+                        </>
+                    )}
+                  </div>
         </div>
       </div>
 
