@@ -61,7 +61,7 @@ const AppContent: React.FC = () => {
   const [jobDescription, setJobDescription] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
- details.   const [analysisStartTs, setAnalysisStartTs] = useState<number | null>(null);
+  const [analysisStartTs, setAnalysisStartTs] = useState<number | null>(null);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [resultTab, setResultTab] = useState<'analysis' | 'generator'>('analysis');
