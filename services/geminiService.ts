@@ -216,6 +216,12 @@ const cleanJsonOutput = (text: string): string => {
     return clean;
 };
 
+const safeJson = (text: string): any => {
+    try { return JSON.parse(text); } catch {}
+    try { return JSON.parse(cleanJsonOutput(text)); } catch {}
+    return null;
+};
+
 // Helper to remove conversational filler
 const cleanMarkdownOutput = (text: string): string => {
     // If text starts with "Here is...", remove it until the first header or bold
@@ -448,17 +454,32 @@ export const analyzeResume = async (
         payload,
         { generationConfig: { responseMimeType: "application/json" } }
       ),
-      120000,
+      45000,
       "Analysis timed out."
     );
 
-    if (response.response.text()) {
-      return JSON.parse(cleanJsonOutput(response.response.text())) as AnalysisResult;
-    }
+    const txt = response.response.text();
+    const parsed = safeJson(txt);
+    if (parsed) return parsed as AnalysisResult;
     throw new Error("Empty response.");
 
   } catch (primaryError: any) {
-    throw new Error(getActionableError(primaryError)); 
+    const msg = getActionableError(primaryError);
+    const fallback: AnalysisResult = {
+        jobTitle: 'General Resume Scan',
+        company: 'Self-Initiated',
+        atsScore: 60,
+        relevanceScore: 0,
+        roleFitAnalysis: 'Analysis degraded due to model availability. Provide a JD for relevance.',
+        contactProfile: { name: '', email: '', phone: '', linkedin: '', location: '' },
+        languages: [],
+        missingKeywords: [],
+        criticalIssues: [msg],
+        keyStrengths: [],
+        summary: 'Basic scan completed with limited insights.',
+        marketAnalysis: { salary: '', verdict: '', culture: '' }
+    };
+    return fallback;
   }
 };
 

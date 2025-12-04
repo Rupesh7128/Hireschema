@@ -61,6 +61,7 @@ const AppContent: React.FC = () => {
   const [jobDescription, setJobDescription] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
+ details.   const [analysisStartTs, setAnalysisStartTs] = useState<number | null>(null);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [resultTab, setResultTab] = useState<'analysis' | 'generator'>('analysis');
@@ -177,6 +178,7 @@ const AppContent: React.FC = () => {
     if (!resumeFile) return setError('Please upload or select a resume first.');
     setError(null);
     setIsAnalyzing(true);
+    setAnalysisStartTs(Date.now());
     
     try {
       const result = await analyzeResume(resumeFile, jobDescription);
@@ -231,26 +233,26 @@ const AppContent: React.FC = () => {
       }
   };
 
-    useEffect(() => {
+  useEffect(() => {
     let interval: any;
     if (isAnalyzing) {
-        setAnalysisProgress(0);
-        interval = setInterval(() => {
-            setAnalysisProgress(prev => {
-                // Fast start
-                if (prev < 30) return prev + Math.random() * 10;
-                // Steady middle
-                if (prev < 70) return prev + Math.random() * 2;
-                // Slow crawl to end
-                if (prev >= 98) return prev; // Cap at 98%
-                return prev + 0.1; // Crawl
-            });
-        }, 200);
+      setAnalysisProgress(0);
+      interval = setInterval(() => {
+        const now = Date.now();
+        const start = analysisStartTs || now;
+        const elapsed = (now - start) / 1000;
+        let target = 10;
+        if (elapsed < 5) target = 35;
+        else if (elapsed < 20) target = 75;
+        else if (elapsed < 40) target = 95;
+        else target = 99;
+        setAnalysisProgress(prev => (prev < target ? prev + Math.min(2, target - prev) : prev));
+      }, 250);
     } else {
-        setAnalysisProgress(100);
+      setAnalysisProgress(100);
     }
     return () => clearInterval(interval);
-  }, [isAnalyzing]);
+  }, [isAnalyzing, analysisStartTs]);
 
   if (view === 'landing') return <LandingPage onStart={handleLandingStart} />;
   if (view === 'legal' && legalPage) return <LegalPages page={legalPage} onBack={() => { setView('landing'); window.history.pushState({}, '', '/'); }} />;
