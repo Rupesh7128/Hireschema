@@ -606,6 +606,21 @@ export const generateContent = async (
         Output strictly valid JSON: { "verdict", "salary_range", "culture_wfh", "interview_trends", "pros", "cons" }
         `;
         break;
+
+    case GeneratorType.ROAST:
+        userPrompt = `
+        Roast this resume based on the Job Description. Be ruthlessly funny, sarcastic, and "mean" but ultimately constructive. 
+        Mock the clichés, the formatting, and the generic corporate speak.
+        Structure:
+        1. **The Vibe Check** (Overall impression)
+        2. **The "Oh Honey, No" List** (Specific failures)
+        3. **Red Flag Energy** (What screams "do not hire")
+        4. **The Redeemable Part** (One nice thing)
+        5. **Final Verdict** (A funny score out of 10)
+        
+        Tone: Stand-up comedian meets hiring manager who has seen too much.
+        `;
+        break;
   }
 
   const fullPrompt = `Job Description Context: ${jobDescription}\n\nTask: ${userPrompt}`;

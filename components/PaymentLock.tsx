@@ -58,13 +58,13 @@ const PaymentLock: React.FC<PaymentLockProps> = ({ onPaymentVerified }) => {
     try {
         if (!cleanKey) throw new Error("Please enter your Payment ID.");
 
-        const isValid = await verifyDodoPayment(cleanKey);
+        const res = await verifyDodoPayment(cleanKey);
 
-        if (isValid) {
+        if (res.ok && res.isPaid) {
             logEvent('payment_verify_success', { method: 'manual' });
             onPaymentVerified();
         } else {
-             throw new Error("Invalid Payment ID or Payment not completed.");
+             throw new Error(res.reason || "Invalid Payment ID or Payment not completed.");
         }
 
     } catch (e: any) {

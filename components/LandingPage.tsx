@@ -183,13 +183,20 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
     setIsScrolled(latest > 50);
   });
   
-  const handleHeroUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleHeroUpload = (e: React.ChangeEvent<HTMLInputElement>, isRoast = false) => {
     const file = e.target.files?.[0];
     if (file && file.type === 'application/pdf') {
         const reader = new FileReader();
         reader.onloadend = () => {
             const base64String = reader.result as string;
             const base64 = base64String.split(',')[1];
+            
+            if (isRoast) {
+                 localStorage.setItem('hireSchema_roastMode', 'true');
+            } else {
+                 localStorage.removeItem('hireSchema_roastMode');
+            }
+
             onStart('scan', {
                 name: file.name,
                 type: file.type,
@@ -300,12 +307,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
           <div className="cursor-pointer" onClick={() => window.scrollTo(0, 0)}>
               <AnimatedLogo />
           </div>
-          <div className="flex items-center gap-6">
-              <div className="hidden md:flex items-center gap-6 text-sm font-medium text-zinc-400">
-                  <a href="#features" className="hover:text-white transition-colors">Features</a>
-                  <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
-                  <a href="#faq" className="hover:text-white transition-colors">FAQ</a>
-              </div>
+          <div className="flex items-center gap-3 sm:gap-6">
+              <a href="/roast" target="_blank" className="hidden sm:flex items-center gap-2 text-xs font-bold text-red-500 hover:text-red-400 transition-colors uppercase tracking-widest border border-red-500/20 px-3 py-1.5 rounded bg-red-500/5 hover:bg-red-500/10 cursor-pointer">
+                    <Zap className="w-3 h-3" /> Roast My Resume
+                 </a>
+              <a href="#how-it-works" className="hidden md:block text-xs font-bold text-zinc-400 hover:text-white uppercase tracking-widest transition-colors">How it Works</a>
               <button 
                   onClick={() => onStart('scan')}
                   className={HEADER_BUTTON_STYLE}

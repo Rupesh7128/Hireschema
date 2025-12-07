@@ -1,46 +1,23 @@
 
-export const PRODUCT_ID = (import.meta as any).env.VITE_DODO_PRODUCT_ID || 'pdt_d7rp85iimkphiaGBV5fxV';
+export const PRODUCT_ID = (import.meta as any).env.VITE_DODO_PRODUCT_ID || '';
 
-export const verifyDodoPayment = async (paymentId: string): Promise<boolean> => {
-  // Ideally this key should be an environment variable
-  const DODO_API_KEY = (import.meta as any).env.VITE_DODO_API_KEY || (import.meta as any).env.VITE_DODO_PAYMENTS_PUBLIC_KEY || "cjqzam76LbyDX8cj.rsclL18HXjWymrluMBcSI-_nmDzOJrQVV6hwiW3WsytX41HC"; 
-  
+export const verifyDodoPayment = async (paymentId: string): Promise<{ ok: boolean; isPaid: boolean; status?: string; product_id?: string | null; code?: number; reason?: string }> => {
   try {
-    console.log(`Verifying payment: ${paymentId.substring(0, 10)}...`);
-    const response = await fetch(`https://live.dodopayments.com/payments/${paymentId}`, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${DODO_API_KEY}`
-        }
+    if (!paymentId) return { ok: false, isPaid: false, reason: 'missing_payment_id' };
+    const res = await fetch('/api/verify-payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paymentId })
     });
-    
-    if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`Payment verification failed: ${response.status} ${response.statusText}`, errorText);
-        return false;
-    }
-    
-    const data = await response.json();
-    console.log("Payment data:", data);
-    const status = data.status?.toLowerCase();
-    
-    // 1. Check if status is successful
-    const isPaid = status === 'succeeded' || status === 'paid' || status === 'completed';
-    if (!isPaid) {
-        console.warn(`Payment status is '${status}', not 'succeeded'.`);
-        return false;
-    }
-
-    // 2. SECURITY CHECK: Verify this payment was actually for OUR product
-    // This prevents users from using a valid payment ID from a different product/merchant
-    if (data.product_id && data.product_id !== PRODUCT_ID) {
-        console.warn(`Security Warning: Payment ID ${paymentId} is valid but for wrong product: ${data.product_id}`);
-        return false;
-    }
-    
-    return true;
-  } catch (e) {
-    console.error("Payment check failed", e);
-    return false;
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) return { ok: false, isPaid: false, code: res.status, reason: json?.reason };
+    const ok = !!json?.ok;
+    const isPaid = !!json?.isPaid;
+    const status = json?.status;
+    const product_id = json?.product_id ?? null;
+    if (PRODUCT_ID && product_id && product_id !== PRODUCT_ID) return { ok: true, isPaid: false, status, product_id, reason: 'product_mismatch' };
+    return { ok, isPaid, status, product_id };
+  } catch (e: any) {
+    return { ok: false, isPaid: false, reason: e?.message };
   }
 }

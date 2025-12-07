@@ -14,6 +14,7 @@ import AnalysisDashboard from './components/AnalysisDashboard';
 import ContentGenerator from './components/ContentGenerator';
 import LandingPage from './components/LandingPage';
 import LegalPages from './components/LegalPages';
+import { RoastPage } from './components/RoastPage';
 import { AnimatedLogo } from './components/AnimatedLogo';
 
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; message: string }>{
@@ -43,7 +44,7 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
 
 const AppContent: React.FC = () => {
   // --- VIEWS ---
-  const [view, setView] = useState<'landing' | 'dashboard' | 'legal'>('landing');
+  const [view, setView] = useState<'landing' | 'dashboard' | 'legal' | 'roast'>('landing');
   const [legalPage, setLegalPage] = useState<'privacy' | 'terms' | 'cookies' | null>(null);
   const [dashboardView, setDashboardView] = useState<'scan' | 'result'>('scan');
 
@@ -97,20 +98,54 @@ const AppContent: React.FC = () => {
         const path = window.location.pathname;
         const searchParams = new URLSearchParams(window.location.search);
         
-        // Dodo Payments can return various parameters depending on configuration
         const paymentId = searchParams.get('paymentId') || 
                           searchParams.get('payment_id') || 
                           searchParams.get('session_id') ||
-                          searchParams.get('session'); // Some docs suggest 'session'
+                          searchParams.get('session') ||
+                          searchParams.get('checkout_session') ||
+                          searchParams.get('id') || '';
+
+        const redirectStatusRaw =
+          searchParams.get('status') ||
+          searchParams.get('payment_status') ||
+          searchParams.get('success') ||
+          searchParams.get('paid') ||
+          searchParams.get('redirect_status') || '';
+        const redirectStatus = String(redirectStatusRaw).toLowerCase();
+        const redirectLooksSuccessful = ['true','1','yes','success','succeeded','completed','paid'].includes(redirectStatus);
 
         // Check for Payment Callback
         if (paymentId) {
-            console.log("Payment Callback detected:", paymentId);
+            console.log("Payment Callback detected:", { paymentId, redirectStatus });
             setView('dashboard');
             setIsVerifyingPayment(true);
             try {
-                const isValid = await verifyDodoPayment(paymentId);
-                if (isValid) {
+                const res = await verifyDodoPayment(paymentId);
+                if ((res.ok && res.isPaid) || redirectLooksSuccessful) {
+                    if (!(res.ok && res.isPaid) && redirectLooksSuccessful) {
+                        let final = res;
+                        for (let i = 0; i < 3 && !(final.ok && final.isPaid); i++) {
+                            await new Promise(r => setTimeout(r, i === 0 ? 2000 : 5000));
+                            final = await verifyDodoPayment(paymentId);
+                        }
+                        if (final.ok && final.isPaid) {
+                            setIsPaid(true);
+                            localStorage.setItem('hireSchema_isPaid', 'true');
+                            logEvent('payment_success_auto', { paymentId });
+                            if (h.length > 0) {
+                                 const mostRecent = h[0];
+                                 setResumeFile(mostRecent.resumeFile);
+                                 setJobDescription(mostRecent.jobDescription);
+                                 setAnalysisResult(mostRecent.analysisResult);
+                                 setDashboardView('result');
+                                 setResultTab('generator'); // Direct to Editor
+                                 setSelectedHistoryId(mostRecent.id);
+                            }
+                            window.history.replaceState({}, '', '/app');
+                            setIsVerifyingPayment(false);
+                            return;
+                        }
+                    }
                     setIsPaid(true);
                     localStorage.setItem('hireSchema_isPaid', 'true');
                     logEvent('payment_success_auto', { paymentId });
@@ -123,14 +158,16 @@ const AppContent: React.FC = () => {
                          setJobDescription(mostRecent.jobDescription);
                          setAnalysisResult(mostRecent.analysisResult);
                          setDashboardView('result');
+                         setResultTab('generator'); // Direct to Editor
                          setSelectedHistoryId(mostRecent.id);
                     }
                     
                     // Clean URL - Remove payment params so refresh doesn't re-trigger
                     window.history.replaceState({}, '', '/app');
                 } else {
-                    console.warn("Payment verification failed for ID:", paymentId);
-                    setError("Payment verification failed. If you paid, please enter the Payment ID manually.");
+                    console.warn("Payment verification failed for ID:", { paymentId, reason: res.reason, status: res.status, code: res.code });
+                    const msg = res.reason || (res.status ? `Status: ${res.status}` : null);
+                    setError(msg ? `Payment verification failed. ${msg}` : "Payment verification failed. If you paid, please enter the Payment ID manually.");
                 }
             } catch (e) {
                 console.error("Payment verification error:", e);
@@ -143,6 +180,8 @@ const AppContent: React.FC = () => {
         if (['/privacy', '/terms', '/cookies'].includes(path)) {
            setView('legal');
            setLegalPage(path.substring(1) as any);
+        } else if (path === '/roast') {
+           setView('roast');
         } else if (path === '/app') {
            setView('dashboard'); // Direct link to app
         }
@@ -255,6 +294,7 @@ const AppContent: React.FC = () => {
   }, [isAnalyzing, analysisStartTs]);
 
   if (view === 'landing') return <LandingPage onStart={handleLandingStart} />;
+  if (view === 'roast') return <RoastPage />;
   if (view === 'legal' && legalPage) return <LegalPages page={legalPage} onBack={() => { setView('landing'); window.history.pushState({}, '', '/'); }} />;
 
   return (

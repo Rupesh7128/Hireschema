@@ -37,6 +37,7 @@ export enum GeneratorType {
   EMAIL_TEMPLATE = 'Cold Outreach',
   LEARNING_PATH = 'Learning Path',
   MARKET_INSIGHTS = 'Market Insights',
+  ROAST = 'Roast My Resume',
 }
 
 export interface GeneratedContent {

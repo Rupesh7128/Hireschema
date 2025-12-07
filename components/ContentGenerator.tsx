@@ -2,9 +2,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
+import { useReactToPrint } from 'react-to-print';
+import { PdfTemplate } from './PdfTemplate';
 import { FileData, AnalysisResult, GeneratorType, ContactProfile } from '../types';
 import { generateContent, calculateImprovedScore, refineContent, regenerateSection } from '../services/geminiService';
-import { MessageSquare, FileText, Mail, FileDown, FileOutput, X, Loader2, Minimize2, Maximize2, UserCircle, Camera, Wand2, Moon, Sun, Send, Youtube, GraduationCap, TrendingUp, Download, Link, Check, Linkedin, Copy, Lock, Edit2, CheckCircle2, DollarSign, RefreshCw, PenTool, Globe, ChevronDown } from 'lucide-react';
+import { MessageSquare, FileText, Mail, FileDown, FileOutput, X, Loader2, Minimize2, Maximize2, UserCircle, Camera, Wand2, Moon, Sun, Send, Youtube, GraduationCap, TrendingUp, Download, Link, Check, Linkedin, Copy, Lock, Edit2, CheckCircle2, DollarSign, RefreshCw, PenTool, Globe, ChevronDown, Printer } from 'lucide-react';
 import PaymentLock from './PaymentLock';
 
 interface ContentGeneratorProps {
@@ -164,10 +166,14 @@ const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, jobDesc
   const [activeSection, setActiveSection] = useState<string | null>(null);
   
   // PDF Generation Ref
-  const pdfRef = useRef<HTMLDivElement>(null);
+    const pdfRef = useRef<HTMLDivElement>(null);
+    const handlePrint = useReactToPrint({
+        contentRef: pdfRef,
+        documentTitle: `Resume_${analysis.contactProfile.name.replace(/\s+/g, '_')}`,
+    });
 
-  // Sharing
-  const [showCopyToast, setShowCopyToast] = useState(false);
+    // Sharing
+    const [showCopyToast, setShowCopyToast] = useState(false);
 
   // Manual Edit Mode
   const [isEditing, setIsEditing] = useState(false);
@@ -646,12 +652,20 @@ const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, jobDesc
                </div>
 
                  <div className="flex gap-1">
+                    <button onClick={handlePrint} className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 text-[10px] sm:text-xs font-bold rounded transition-colors">
+                        <Printer className="w-3.5 h-3.5" /> Print
+                    </button>
                     <button onClick={handleDownloadPDF} disabled={!!isDownloading} className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 hover:bg-white text-black text-[10px] sm:text-xs font-bold rounded transition-colors disabled:opacity-50 relative">
                         {isDownloading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />} PDF
                     </button>
                 </div>
             </div>
         </div>
+      </div>
+
+      {/* Hidden Print Template */}
+      <div style={{ display: 'none' }}>
+        <PdfTemplate ref={pdfRef} content={generatedData[activeTab] || ''} themeColor={accentColor.value} />
       </div>
 
       <div className="flex flex-1 overflow-hidden">
