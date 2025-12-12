@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
-import { useReactToPrint } from 'react-to-print';
 import { PdfTemplate } from './PdfTemplate';
 import { FileData, AnalysisResult, GeneratorType, ContactProfile } from '../types';
 import { generateContent, calculateImprovedScore, refineContent, regenerateSection } from '../services/geminiService';
@@ -179,10 +178,38 @@ const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, resumeT
   
   // PDF Generation Ref
     const pdfRef = useRef<HTMLDivElement>(null);
-    const handlePrint = useReactToPrint({
-        contentRef: pdfRef,
-        documentTitle: `Resume_${analysis.contactProfile.name.replace(/\s+/g, '_')}`,
-    });
+    
+    // Native browser print function (replaces react-to-print for React 18/19 compatibility)
+    const handlePrint = () => {
+        if (!pdfRef.current) return;
+        
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) {
+            alert('Please allow popups to print');
+            return;
+        }
+        
+        const content = pdfRef.current.innerHTML;
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Resume_${analysis.contactProfile.name.replace(/\s+/g, '_')}</title>
+                <style>
+                    body { font-family: Inter, sans-serif; margin: 0; padding: 0.5in; }
+                    * { box-sizing: border-box; }
+                </style>
+            </head>
+            <body>${content}</body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.focus();
+        setTimeout(() => {
+            printWindow.print();
+            printWindow.close();
+        }, 250);
+    };
 
     // Sharing
     const [showCopyToast, setShowCopyToast] = useState(false);
