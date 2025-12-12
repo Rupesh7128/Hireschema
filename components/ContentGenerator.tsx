@@ -6,11 +6,13 @@ import { useReactToPrint } from 'react-to-print';
 import { PdfTemplate } from './PdfTemplate';
 import { FileData, AnalysisResult, GeneratorType, ContactProfile } from '../types';
 import { generateContent, calculateImprovedScore, refineContent, regenerateSection } from '../services/geminiService';
+import { saveStateBeforePayment } from '../services/stateService';
 import { MessageSquare, FileText, Mail, FileDown, FileOutput, X, Loader2, Minimize2, Maximize2, UserCircle, Camera, Wand2, Moon, Sun, Send, Youtube, GraduationCap, TrendingUp, Download, Link, Check, Linkedin, Copy, Lock, Edit2, CheckCircle2, DollarSign, RefreshCw, PenTool, Globe, ChevronDown, Printer } from 'lucide-react';
 import PaymentLock from './PaymentLock';
 
 interface ContentGeneratorProps {
   resumeFile: FileData;
+  resumeText?: string; // Extracted text from PDF for content generation
   jobDescription: string;
   analysis: AnalysisResult;
   isPaid: boolean;
@@ -141,7 +143,17 @@ const ChatSidebar = ({
     );
 };
 
-const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, jobDescription, analysis, isPaid, onPaymentSuccess, appLanguage, setAppLanguage }) => {
+const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, resumeText = '', jobDescription, analysis, isPaid, onPaymentSuccess, appLanguage, setAppLanguage }) => {
+  
+  // Handler to save state before payment redirect
+  const handleBeforePaymentRedirect = () => {
+    saveStateBeforePayment({
+      resumeFile,
+      resumeText,
+      jobDescription,
+      analysisResult: analysis,
+    });
+  };
   const [activeTab, setActiveTab] = useState<GeneratorType>(GeneratorType.ATS_RESUME);
   const [generatedData, setGeneratedData] = useState<Record<string, string>>({});
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
@@ -674,7 +686,7 @@ const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, jobDesc
              {!isPaid ? (
                  <div className="h-full flex flex-col items-center justify-center relative min-h-[400px]">
                      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 pointer-events-none"></div>
-                     <PaymentLock onPaymentVerified={onPaymentSuccess} />
+                     <PaymentLock onPaymentVerified={onPaymentSuccess} onBeforeRedirect={handleBeforePaymentRedirect} />
                  </div>
              ) : (
                 <>

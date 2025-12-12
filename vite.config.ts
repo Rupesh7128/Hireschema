@@ -20,7 +20,6 @@ export default defineConfig(({ mode }) => {
                 if (id.includes('recharts')) return 'charts';
                 if (id.includes('framer-motion')) return 'motion';
                 if (id.includes('react-markdown')) return 'markdown';
-                if (id.includes('lucide-react')) return 'icons';
                 if (id.includes('/react')) return 'react';
                 return 'vendor';
               }

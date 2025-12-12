@@ -2,11 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence, useMotionValueEvent } from 'framer-motion';
 import { 
-  Sparkles, Upload, Search, Zap, ArrowRight, FileText, 
-  Globe, Scan, GraduationCap, BrainCircuit, ShieldCheck, 
-  ChevronDown, Quote, CheckCircle2, XCircle, ArrowUpRight, Check, Download,
-  Scale, Server, X, Award, Shield, Lock, CreditCard, Trash2, ArrowRightCircle,
-  Database, UserCheck, Activity, Terminal
+  Sparkles, Upload, Search, ArrowRight, FileText, Globe, Scan, GraduationCap, 
+  BrainCircuit, ShieldCheck, ChevronDown, Quote, CheckCircle2, XCircle, 
+  ArrowUpRight, Check, Download, Scale, Server, X, Award, Shield, Lock, 
+  CreditCard, Trash2, ArrowRightCircle, Database, UserCheck, Activity, 
+  Terminal, Zap 
 } from 'lucide-react';
 import { AnimatedLogo } from './AnimatedLogo';
 import { FileData } from '../types';

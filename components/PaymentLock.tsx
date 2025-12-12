@@ -1,15 +1,15 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Lock, CheckCircle2, ShieldCheck, ExternalLink, KeyRound, AlertTriangle, Loader2, XCircle, HelpCircle } from 'lucide-react';
+import { Lock, ExternalLink, KeyRound, AlertTriangle, Loader2, XCircle, HelpCircle, RefreshCw } from 'lucide-react';
 import { logEvent } from '../services/analytics';
-import { verifyDodoPayment, PRODUCT_ID } from '../services/paymentService';
+import { verifyDodoPayment, buildCheckoutUrl, PRODUCT_ID } from '../services/paymentService';
 
 interface PaymentLockProps {
   onPaymentVerified: () => void;
+  onBeforeRedirect?: () => void; // Called before redirecting to save state
 }
 
-const PaymentLock: React.FC<PaymentLockProps> = ({ onPaymentVerified }) => {
+const PaymentLock: React.FC<PaymentLockProps> = ({ onPaymentVerified, onBeforeRedirect }) => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [licenseKey, setLicenseKey] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -22,15 +22,23 @@ const PaymentLock: React.FC<PaymentLockProps> = ({ onPaymentVerified }) => {
     // Determine the return URL based on current environment
     const returnUrl = `${window.location.origin}/app`;
     
-    // Use window.location.href to redirect the current tab. 
-    // This ensures the user comes back to this exact context after payment.
-    // Dodo Payments uses 'redirect_url' as the standard parameter for Static Payment Links.
+    // Build checkout URL using the payment service helper
+    const checkoutUrl = buildCheckoutUrl(PRODUCT_ID, returnUrl);
     
-    const checkoutUrl = `https://checkout.dodopayments.com/buy/${PRODUCT_ID}?quantity=1&redirect_url=${encodeURIComponent(returnUrl)}`;
+    if (!checkoutUrl) {
+      setError('Payment configuration error. Please contact support.');
+      logEvent('payment_config_error', { reason: 'missing_product_id' });
+      return;
+    }
     
-    console.log("Redirecting to Dodo Checkout:", checkoutUrl);
+    // Save state before redirect so it can be restored after payment
+    if (onBeforeRedirect) {
+      onBeforeRedirect();
+    }
     
-    // Redirect
+    console.log('Redirecting to Dodo Checkout:', checkoutUrl);
+    
+    // Redirect to Dodo checkout
     window.location.href = checkoutUrl;
   };
 
@@ -39,40 +47,49 @@ const PaymentLock: React.FC<PaymentLockProps> = ({ onPaymentVerified }) => {
 
     const cleanKey = licenseKey.trim();
 
-    // Dev backdoor for testing (optional, can be removed)
-    if (cleanKey.toLowerCase() === 'rupesh') {
-        logEvent('payment_bypass_used');
-        onPaymentVerified();
-        return;
-    }
+    // Dev backdoor removed for security - payment verification is now required
 
     if (attempts >= 5) {
-        setIsLocked(true);
-        setError("Too many failed attempts. Please refresh the page to try again.");
-        return;
+      setIsLocked(true);
+      setError('Too many failed attempts. Please refresh the page to try again.');
+      return;
     }
 
     setIsVerifying(true);
     setError(null);
     
     try {
-        if (!cleanKey) throw new Error("Please enter your Payment ID.");
+      if (!cleanKey) {
+        throw new Error('Please enter your Payment ID.');
+      }
 
-        const res = await verifyDodoPayment(cleanKey);
+      const res = await verifyDodoPayment(cleanKey);
 
-        if (res.ok && res.isPaid) {
-            logEvent('payment_verify_success', { method: 'manual' });
-            onPaymentVerified();
-        } else {
-             throw new Error(res.reason || "Invalid Payment ID or Payment not completed.");
-        }
+      if (res.ok && res.isPaid) {
+        logEvent('payment_verify_success', { method: 'manual' });
+        onPaymentVerified();
+      } else {
+        // Use the descriptive reason from the API
+        throw new Error(res.reason || 'Invalid Payment ID or payment not completed.');
+      }
 
     } catch (e: any) {
-        setAttempts(prev => prev + 1);
-        setError(e.message || "Verification failed.");
-        logEvent('payment_verify_failed', { error: e.message });
+      setAttempts(prev => prev + 1);
+      setError(e.message || 'Verification failed. Please try again.');
+      logEvent('payment_verify_failed', { error: e.message, attempts: attempts + 1 });
     } finally {
-        setIsVerifying(false);
+      setIsVerifying(false);
+    }
+  };
+
+  const handleRetry = () => {
+    setError(null);
+    setLicenseKey('');
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && licenseKey && !isVerifying && !isLocked) {
+      handleVerify();
     }
   };
 
@@ -91,83 +108,96 @@ const PaymentLock: React.FC<PaymentLockProps> = ({ onPaymentVerified }) => {
         <div className="h-1.5 w-full bg-gradient-to-r from-orange-600 via-red-500 to-orange-600"></div>
         
         <div className="p-6 sm:p-8">
-            <div className="flex justify-center mb-6">
-                <div className="relative">
-                    <div className="absolute inset-0 bg-orange-500 blur-xl opacity-20 rounded-full"></div>
-                    <div className="bg-zinc-950 border border-zinc-800 p-4 rounded-2xl shadow-lg relative">
-                        <Lock className="w-8 h-8 text-orange-500" />
-                    </div>
-                </div>
+          <div className="flex justify-center mb-6">
+            <div className="relative">
+              <div className="absolute inset-0 bg-orange-500 blur-xl opacity-20 rounded-full"></div>
+              <div className="bg-zinc-950 border border-zinc-800 p-4 rounded-2xl shadow-lg relative">
+                <Lock className="w-8 h-8 text-orange-500" />
+              </div>
             </div>
+          </div>
 
-            <div className="text-center mb-6">
+          <div className="text-center mb-6">
             <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Unlock Downloads</h2>
             <p className="text-zinc-400 text-sm leading-relaxed">
-                Download your optimized resume PDF for just $1. 
+              Download your optimized resume PDF for just $1. 
             </p>
+          </div>
+
+          {/* Actions */}
+          <div className="space-y-6">
+            <div className="bg-zinc-950/50 p-4 rounded-xl border border-zinc-800/50 space-y-3">
+              <div className="flex items-center gap-3">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-zinc-800 text-orange-500 text-xs font-bold border border-zinc-700">1</span>
+                <p className="text-sm text-zinc-300">Secure payment via Dodo.</p>
+              </div>
+              <button 
+                onClick={handlePaymentClick}
+                className="w-full group flex items-center justify-center gap-2 py-3 bg-white hover:bg-zinc-200 text-zinc-950 rounded-lg font-bold text-sm transition-all shadow-lg"
+              >
+                <span>Pay $1 & Unlock</span>
+                <ExternalLink className="w-3.5 h-3.5 opacity-60 group-hover:translate-x-0.5 transition-transform" />
+              </button>
             </div>
 
-            {/* Actions */}
-            <div className="space-y-6">
-                <div className="bg-zinc-950/50 p-4 rounded-xl border border-zinc-800/50 space-y-3">
-                     <div className="flex items-center gap-3">
-                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-zinc-800 text-orange-500 text-xs font-bold border border-zinc-700">1</span>
-                        <p className="text-sm text-zinc-300">Secure payment via Dodo.</p>
-                     </div>
-                     <button 
-                        onClick={handlePaymentClick}
-                        className="w-full group flex items-center justify-center gap-2 py-3 bg-white hover:bg-zinc-200 text-zinc-950 rounded-lg font-bold text-sm transition-all shadow-lg"
+            <div className="bg-zinc-950/50 p-4 rounded-xl border border-zinc-800/50 space-y-3 relative">
+              <div className="flex items-center gap-3">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-zinc-800 text-orange-500 text-xs font-bold border border-zinc-700">2</span>
+                <p className="text-sm text-zinc-300">Or enter Payment ID manually.</p>
+              </div>
+              
+              <div className="relative group">
+                <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600 group-focus-within:text-orange-500 transition-colors" />
+                <input 
+                  type="text" 
+                  value={licenseKey}
+                  onChange={(e) => setLicenseKey(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="paste_payment_id_here"
+                  disabled={isVerifying || isLocked}
+                  className={`w-full bg-zinc-900 border ${error ? 'border-red-500/50 focus:border-red-500' : 'border-zinc-700 focus:border-orange-500'} rounded-lg py-2.5 pl-10 pr-24 text-sm text-white focus:outline-none transition-all placeholder:text-zinc-700 font-mono disabled:opacity-50`}
+                />
+                <button 
+                  onClick={handleVerify}
+                  disabled={isVerifying || !licenseKey || isLocked}
+                  className="absolute right-1 top-1 bottom-1 px-4 rounded-md font-bold text-xs transition-all bg-zinc-800 hover:bg-zinc-700 text-zinc-300 disabled:opacity-50 disabled:cursor-not-allowed border border-zinc-700"
+                >
+                  {isVerifying ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    'VERIFY'
+                  )}
+                </button>
+              </div>
+
+              {error && (
+                <div className="flex items-start gap-2 text-xs text-red-400 bg-red-950/20 p-2 rounded border border-red-900/30">
+                  {isLocked ? (
+                    <XCircle className="w-4 h-4 shrink-0" />
+                  ) : (
+                    <AlertTriangle className="w-4 h-4 shrink-0" />
+                  )}
+                  <span className="leading-tight flex-1">{error}</span>
+                  {!isLocked && (
+                    <button 
+                      onClick={handleRetry}
+                      className="text-zinc-400 hover:text-white transition-colors"
+                      title="Clear and retry"
                     >
-                        <span>Pay $1 & Unlock</span>
-                        <ExternalLink className="w-3.5 h-3.5 opacity-60 group-hover:translate-x-0.5 transition-transform" />
+                      <RefreshCw className="w-3.5 h-3.5" />
                     </button>
+                  )}
                 </div>
-
-                <div className="bg-zinc-950/50 p-4 rounded-xl border border-zinc-800/50 space-y-3 relative">
-                     <div className="flex items-center gap-3">
-                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-zinc-800 text-orange-500 text-xs font-bold border border-zinc-700">2</span>
-                        <p className="text-sm text-zinc-300">Or enter Payment ID manually.</p>
-                     </div>
-                    
-                    <div className="relative group">
-                        <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600 group-focus-within:text-orange-500 transition-colors" />
-                        <input 
-                            type="text" 
-                            value={licenseKey}
-                            onChange={(e) => setLicenseKey(e.target.value)}
-                            placeholder="paste_payment_id_here"
-                            disabled={isVerifying || isLocked}
-                            className={`w-full bg-zinc-900 border ${error ? 'border-red-500/50 focus:border-red-500' : 'border-zinc-700 focus:border-orange-500'} rounded-lg py-2.5 pl-10 pr-24 text-sm text-white focus:outline-none transition-all placeholder:text-zinc-700 font-mono disabled:opacity-50`}
-                        />
-                         <button 
-                            onClick={handleVerify}
-                            disabled={isVerifying || !licenseKey || isLocked}
-                            className="absolute right-1 top-1 bottom-1 px-4 rounded-md font-bold text-xs transition-all bg-zinc-800 hover:bg-zinc-700 text-zinc-300 disabled:opacity-50 disabled:cursor-not-allowed border border-zinc-700"
-                        >
-                            {isVerifying ? (
-                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                            ) : (
-                                'VERIFY'
-                            )}
-                        </button>
-                    </div>
-
-                    {error && (
-                        <div className="flex items-start gap-2 text-xs text-red-400 bg-red-950/20 p-2 rounded border border-red-900/30">
-                            {isLocked ? <XCircle className="w-4 h-4 shrink-0" /> : <AlertTriangle className="w-4 h-4 shrink-0" />} 
-                            <span className="leading-tight">{error}</span>
-                        </div>
-                    )}
-                </div>
+              )}
             </div>
-            
-            <div className="mt-6 text-center">
-                 <p className="text-[10px] text-zinc-600 flex items-center justify-center gap-1">
-                    <HelpCircle className="w-3 h-3" /> 
-                    Payment ID is in your Dodo Payments email receipt.
-                 </p>
-            </div>
-
+          </div>
+          
+          <div className="mt-6 text-center">
+            <p className="text-[10px] text-zinc-600 flex items-center justify-center gap-1">
+              <HelpCircle className="w-3 h-3" /> 
+              Payment ID is in your Dodo Payments email receipt.
+            </p>
+          </div>
         </div>
       </motion.div>
     </div>

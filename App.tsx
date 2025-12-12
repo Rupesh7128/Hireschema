@@ -8,7 +8,8 @@ import { FileData, AnalysisResult, HistoryItem, ContactProfile } from './types';
 import { analyzeResume } from './services/geminiService';
 import { db } from './services/db';
 import { logEvent, logPageView } from './services/analytics';
-import { verifyDodoPayment } from './services/paymentService';
+import { verifyDodoPayment, savePaymentState, readPaymentState } from './services/paymentService';
+import { restoreStateAfterPayment, clearPersistedState } from './services/stateService';
 import ResumeUploader from './components/ResumeUploader';
 import AnalysisDashboard from './components/AnalysisDashboard';
 import ContentGenerator from './components/ContentGenerator';
@@ -59,6 +60,7 @@ const AppContent: React.FC = () => {
   const [inputWizardStep, setInputWizardStep] = useState<0 | 1>(0);
   const [jobInputMode, setJobInputMode] = useState<'link' | 'text'>('link');
   const [resumeFile, setResumeFile] = useState<FileData | null>(null);
+  const [resumeText, setResumeText] = useState<string>(''); // Extracted text for content generation
   const [jobDescription, setJobDescription] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
@@ -69,11 +71,8 @@ const AppContent: React.FC = () => {
 
   // --- PERSISTENCE ---
   const [isPaid, setIsPaid] = useState(() => {
-      // Persist payment state across refreshes
-      if (typeof window !== 'undefined') {
-          return localStorage.getItem('hireSchema_isPaid') === 'true';
-      }
-      return false;
+      // Read payment state from localStorage using the payment service
+      return readPaymentState();
   });
   const [isVerifyingPayment, setIsVerifyingPayment] = useState(false);
   const [appLanguage, setAppLanguage] = useState("English");
@@ -116,62 +115,87 @@ const AppContent: React.FC = () => {
 
         // Check for Payment Callback
         if (paymentId) {
-            console.log("Payment Callback detected:", { paymentId, redirectStatus });
+            console.log('Payment Callback detected:', { paymentId, redirectStatus });
             setView('dashboard');
             setIsVerifyingPayment(true);
+            
             try {
-                const res = await verifyDodoPayment(paymentId);
-                if ((res.ok && res.isPaid) || redirectLooksSuccessful) {
-                    if (!(res.ok && res.isPaid) && redirectLooksSuccessful) {
-                        let final = res;
-                        for (let i = 0; i < 3 && !(final.ok && final.isPaid); i++) {
-                            await new Promise(r => setTimeout(r, i === 0 ? 2000 : 5000));
-                            final = await verifyDodoPayment(paymentId);
-                        }
-                        if (final.ok && final.isPaid) {
-                            setIsPaid(true);
-                            localStorage.setItem('hireSchema_isPaid', 'true');
-                            logEvent('payment_success_auto', { paymentId });
-                            if (h.length > 0) {
-                                 const mostRecent = h[0];
-                                 setResumeFile(mostRecent.resumeFile);
-                                 setJobDescription(mostRecent.jobDescription);
-                                 setAnalysisResult(mostRecent.analysisResult);
-                                 setDashboardView('result');
-                                 setResultTab('generator'); // Direct to Editor
-                                 setSelectedHistoryId(mostRecent.id);
-                            }
-                            window.history.replaceState({}, '', '/app');
-                            setIsVerifyingPayment(false);
-                            return;
-                        }
+                // Helper to restore user state after successful payment
+                const restoreUserState = () => {
+                    // First try to restore from persisted state (saved before redirect)
+                    const persistedState = restoreStateAfterPayment();
+                    if (persistedState) {
+                        setResumeFile(persistedState.resumeFile);
+                        setResumeText(persistedState.resumeText);
+                        setJobDescription(persistedState.jobDescription);
+                        setAnalysisResult(persistedState.analysisResult);
+                        setDashboardView('result');
+                        setResultTab('generator');
+                        clearPersistedState(); // Clean up after restore
+                        return;
                     }
-                    setIsPaid(true);
-                    localStorage.setItem('hireSchema_isPaid', 'true');
-                    logEvent('payment_success_auto', { paymentId });
                     
-                    // RESTORE STATE: If we just came back from paying, the user likely wants to see their result immediately.
-                    // Load the most recent history item if active state is empty
+                    // Fallback to history if no persisted state
                     if (h.length > 0) {
-                         const mostRecent = h[0];
-                         setResumeFile(mostRecent.resumeFile);
-                         setJobDescription(mostRecent.jobDescription);
-                         setAnalysisResult(mostRecent.analysisResult);
-                         setDashboardView('result');
-                         setResultTab('generator'); // Direct to Editor
-                         setSelectedHistoryId(mostRecent.id);
+                        const mostRecent = h[0];
+                        setResumeFile(mostRecent.resumeFile);
+                        setJobDescription(mostRecent.jobDescription);
+                        setAnalysisResult(mostRecent.analysisResult);
+                        setDashboardView('result');
+                        setResultTab('generator');
+                        setSelectedHistoryId(mostRecent.id);
+                    }
+                };
+
+                // Helper to mark payment as successful
+                const markPaymentSuccess = () => {
+                    setIsPaid(true);
+                    savePaymentState(true);
+                    logEvent('payment_success_auto', { paymentId });
+                    restoreUserState();
+                    window.history.replaceState({}, '', '/app');
+                };
+
+                // Initial verification attempt
+                let res = await verifyDodoPayment(paymentId);
+                
+                if (res.ok && res.isPaid) {
+                    markPaymentSuccess();
+                } else if (redirectLooksSuccessful) {
+                    // Redirect looks successful but API hasn't caught up yet
+                    // Use exponential backoff for retries
+                    const retryDelays = [2000, 4000, 8000]; // Exponential backoff
+                    let verified = false;
+                    
+                    for (let i = 0; i < retryDelays.length && !verified; i++) {
+                        console.log(`Retry ${i + 1}/${retryDelays.length} after ${retryDelays[i]}ms...`);
+                        await new Promise(r => setTimeout(r, retryDelays[i]));
+                        res = await verifyDodoPayment(paymentId);
+                        
+                        if (res.ok && res.isPaid) {
+                            verified = true;
+                            markPaymentSuccess();
+                        }
                     }
                     
-                    // Clean URL - Remove payment params so refresh doesn't re-trigger
-                    window.history.replaceState({}, '', '/app');
+                    if (!verified) {
+                        // All retries failed, but redirect looked successful
+                        // Show a helpful message
+                        console.warn('Payment verification failed after retries:', { paymentId, lastResult: res });
+                        setError(
+                            'Payment is being processed. If you completed payment, please wait a moment and enter your Payment ID manually, ' +
+                            'or check your email for the receipt.'
+                        );
+                    }
                 } else {
-                    console.warn("Payment verification failed for ID:", { paymentId, reason: res.reason, status: res.status, code: res.code });
-                    const msg = res.reason || (res.status ? `Status: ${res.status}` : null);
-                    setError(msg ? `Payment verification failed. ${msg}` : "Payment verification failed. If you paid, please enter the Payment ID manually.");
+                    // Verification failed and redirect doesn't look successful
+                    console.warn('Payment verification failed:', { paymentId, reason: res.reason, status: res.status });
+                    const msg = res.reason || 'Payment verification failed.';
+                    setError(`${msg} If you paid, please enter the Payment ID manually.`);
                 }
             } catch (e) {
-                console.error("Payment verification error:", e);
-                setError("Network error verifying payment. Please enter Payment ID manually.");
+                console.error('Payment verification error:', e);
+                setError('Network error verifying payment. Please check your connection and try again, or enter Payment ID manually.');
             } finally {
                 setIsVerifyingPayment(false);
             }
@@ -333,6 +357,18 @@ const AppContent: React.FC = () => {
          <main className="flex-1 overflow-y-auto custom-scrollbar p-6">
              
              {/* --- SCAN WIZARD & RESULTS --- */}
+             {isVerifyingPayment && (
+                <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center">
+                    <div className="flex flex-col items-center gap-4">
+                        <Loader2 className="w-12 h-12 text-orange-500 animate-spin" />
+                        <div className="text-center">
+                            <h3 className="text-xl font-bold text-white mb-1">Verifying Payment...</h3>
+                            <p className="text-zinc-400 text-sm">Please do not close this window.</p>
+                        </div>
+                    </div>
+                </div>
+             )}
+
              {dashboardView === 'scan' && (
                  <div className="max-w-4xl mx-auto h-full flex flex-col items-center justify-center">
                      {isAnalyzing ? (
@@ -397,11 +433,12 @@ const AppContent: React.FC = () => {
                         ) : (
                           <ErrorBoundary>
                             <ContentGenerator 
-                              resumeFile={resumeFile} 
+                              resumeFile={resumeFile}
+                              resumeText={resumeText}
                               jobDescription={jobDescription} 
                               analysis={analysisResult} 
                               isPaid={isPaid} 
-                              onPaymentSuccess={() => { setIsPaid(true); localStorage.setItem('hireSchema_isPaid', 'true'); }} 
+                              onPaymentSuccess={() => { setIsPaid(true); savePaymentState(true); }} 
                               appLanguage={appLanguage} 
                               setAppLanguage={setAppLanguage} 
                             />

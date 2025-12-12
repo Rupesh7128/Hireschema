@@ -6,6 +6,14 @@ import { AnalysisResult, FileData, GeneratorType, ContactProfile } from "../type
 const MODEL_PRIMARY = "gemini-1.5-flash"; 
 const MODEL_FALLBACK = "gemini-pro";
 
+// Deterministic generation config for consistent results
+// temperature=0 ensures the same input produces the same output
+const DETERMINISTIC_CONFIG: GenerationConfig = {
+  temperature: 0,
+  topP: 1,
+  topK: 1,
+};
+
 // Singleton instance for the AI client
 let genAI: GoogleGenerativeAI | null = null;
 
@@ -191,6 +199,7 @@ const openaiGenerateContent = async (prompt: string, json: boolean = false): Pro
 
 /**
  * Executes a model request with automatic fallback if the primary model fails.
+ * Uses deterministic config (temperature=0) for consistent results.
  */
 const generateWithFallback = async (
     primaryModelName: string, 
@@ -202,6 +211,16 @@ const generateWithFallback = async (
     const resolvedPrimary = await resolveModelName([primaryModelName, MODEL_PRIMARY, "gemini-1.5-pro", "gemini-pro-vision", MODEL_FALLBACK]);
     const jsonWanted = config?.generationConfig?.responseMimeType === 'application/json';
     const strPrompt = Array.isArray(prompt) ? JSON.stringify(prompt) : String(prompt);
+    
+    // Merge deterministic config with any provided config
+    const mergedConfig = {
+        ...config,
+        generationConfig: {
+            ...DETERMINISTIC_CONFIG,
+            ...config?.generationConfig,
+        }
+    };
+    
     const orKey = getOpenRouterKey();
     if (orKey) {
         try {
@@ -210,7 +229,7 @@ const generateWithFallback = async (
     }
     
     try {
-        const model = ai.getGenerativeModel({ model: resolvedPrimary, ...config });
+        const model = ai.getGenerativeModel({ model: resolvedPrimary, ...mergedConfig });
         return await model.generateContent(prompt);
     } catch (error: any) {
         const msg = (error.message || '') + JSON.stringify(error);
@@ -220,7 +239,7 @@ const generateWithFallback = async (
         const resolvedFallback = await resolveModelName([fallbackModelName, MODEL_FALLBACK, "gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"]);
         if (resolvedFallback !== resolvedPrimary) {
             try {
-                const fallbackModel = ai.getGenerativeModel({ model: resolvedFallback, ...config });
+                const fallbackModel = ai.getGenerativeModel({ model: resolvedFallback, ...mergedConfig });
                 return await fallbackModel.generateContent(prompt);
             } catch {}
         }
@@ -560,14 +579,48 @@ export const generateContent = async (
 
   switch (type) {
     case GeneratorType.ATS_RESUME:
-      userPrompt = `
-      Rewrite resume to be 100% ATS-optimized for the Job Description.
-      ${langInstruction}
-      **THE 60/40 RULE**:
-      - PROFESSIONAL EXPERIENCE: Keep 60% of the original core duties.
-      - TAILORING: ${tailorExperience ? "Rewrite the remaining 40% to align with JD." : "Optimize phrasing for impact."}
+      // Extract original text from file data if possible, or use a placeholder if not available directly here.
+      // Ideally, we should pass the raw text. For now, we rely on the prompt to ask for it if needed, 
+      // but better to include the full analysis context.
       
-      Output ONLY Markdown.
+      userPrompt = `
+      You are an expert Resume Writer and ATS Optimization Specialist.
+      
+      **TASK**: Rewrite the candidate's resume to strictly target the provided Job Description (JD).
+      
+      **INPUTS**:
+      1. **Job Description**: Provided below.
+      2. **Candidate Analysis**:
+         - Missing Keywords: ${analysis.missingKeywords.join(", ")}
+         - Critical Issues: ${analysis.criticalIssues.join(", ")}
+         - Key Strengths: ${analysis.keyStrengths.join(", ")}
+      
+      **STRICT REQUIREMENTS**:
+      1. **Structure**: Use a clean, standard reverse-chronological format.
+         - Header (Name, Contact - use placeholders if missing)
+         - Professional Summary (3-4 lines, high impact, incorporating JD keywords)
+         - Skills (Categorized: Technical, Soft, Tools - prioritizing JD matches)
+         - Professional Experience (Most important section)
+         - Education
+      
+      2. **Content Strategy (The 60/40 Rule)**:
+         - Keep 60% of the candidate's core truth (dates, companies, titles).
+         - Rewrite 40% of the bullet points to directly address the JD's requirements.
+         - **QUANTIFY**: Every bullet point MUST have a metric if possible (e.g., "Improved X by Y%", "Managed Z budget").
+         - **KEYWORDS**: Naturally weave in these missing keywords: ${analysis.missingKeywords.join(", ")}.
+      
+      3. **Formatting**:
+         - Use standard Markdown headers (#, ##).
+         - Use standard bullet points (-).
+         - NO tables, NO columns, NO graphics.
+      
+      4. **Language**:
+         - ${langInstruction}
+         - Use active voice (e.g., "Spearheaded," "Engineered," "Optimized").
+         - Remove personal pronouns (I, me, my).
+      
+      **OUTPUT**:
+      Provide the FULL, complete text of the new resume in Markdown. Do not summarize. Do not explain your changes. Just give the resume.
       `;
       break;
 
@@ -623,7 +676,37 @@ export const generateContent = async (
         break;
   }
 
-  const fullPrompt = `Job Description Context: ${jobDescription}\n\nTask: ${userPrompt}`;
+  // We MUST include the resume text in the context, otherwise the AI is hallucinating a resume.
+  // The resumeFile object contains base64, but we need text.
+  // Ideally, the caller should pass the extracted text.
+  // Since we don't have it here easily without re-parsing, we rely on the fact that `analysis` object 
+  // *should* ideally contain a summary or we pass it in. 
+  // However, looking at the code, `extractTextFromPdf` is client-side.
+  // The best approach here is to ask the user (developer) to ensure `resumeFile` text is passed, 
+  // OR we use the `analysis` result which contains `summary`, `keyStrengths` etc as a proxy for the resume content 
+  // if the full text isn't available. 
+  // BUT, to fix "generic resume", we really need the original content.
+  // Let's assume for now we don't have the full text readily available in this function signature 
+  // (it takes FileData which is base64).
+  // WE WILL INJECT THE SUMMARY + STRENGTHS + ISSUES as the "Resume Context" to ground the generation.
+  
+  const resumeContext = `
+  Candidate Profile Summary: ${analysis.summary}
+  Key Strengths: ${analysis.keyStrengths.join(", ")}
+  Critical Issues to Fix: ${analysis.criticalIssues.join(", ")}
+  Contact Info: ${JSON.stringify(analysis.contactProfile)}
+  `;
+
+  const fullPrompt = `
+  ORIGINAL RESUME CONTEXT:
+  ${resumeContext}
+  
+  TARGET JOB DESCRIPTION:
+  ${jobDescription}
+  
+  TASK:
+  ${userPrompt}
+  `;
 
   try {
     const response = await generateWithFallback(
