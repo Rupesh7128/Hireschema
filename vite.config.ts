@@ -20,7 +20,8 @@ export default defineConfig(({ mode }) => {
                 if (id.includes('recharts')) return 'charts';
                 if (id.includes('framer-motion')) return 'motion';
                 if (id.includes('react-markdown')) return 'markdown';
-                if (id.includes('/react')) return 'react';
+                if (id.includes('node_modules/react-dom')) return 'react';
+                if (id.includes('node_modules/react/')) return 'react';
                 return 'vendor';
               }
             }
@@ -36,13 +37,11 @@ export default defineConfig(({ mode }) => {
       resolve: {
         alias: {
           '@': path.resolve(__dirname, '.'),
-          'react': path.resolve(__dirname, 'node_modules/react'),
-          'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
         },
         dedupe: ['react', 'react-dom']
       },
       optimizeDeps: {
-        include: ['react', 'react-dom', 'react-to-print']
+        include: ['react', 'react-dom']
       }
     };
 });
