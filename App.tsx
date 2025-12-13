@@ -1,5 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { 
     Plus, Link as LinkIcon, FileText, AlertCircle, Radar, 
     ChevronDown, Settings, LogOut, CheckCircle, Loader2

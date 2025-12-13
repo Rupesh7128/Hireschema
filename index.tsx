@@ -1,6 +1,11 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom/client';
 import App from './App';
+
+// Ensure React is available globally for libraries that might need it
+if (typeof window !== 'undefined') {
+  (window as any).React = React;
+}
 
 const rootElement = document.getElementById('root');
 
