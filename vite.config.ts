@@ -14,16 +14,12 @@ export default defineConfig(({ mode }) => {
         chunkSizeWarningLimit: 1200,
         rollupOptions: {
           output: {
-            manualChunks(id) {
-              if (id.includes('node_modules')) {
-                if (id.includes('@google/generative-ai')) return 'ai-sdk';
-                if (id.includes('recharts')) return 'charts';
-                if (id.includes('framer-motion')) return 'motion';
-                if (id.includes('react-markdown')) return 'markdown';
-                if (id.includes('node_modules/react-dom')) return 'react';
-                if (id.includes('node_modules/react/')) return 'react';
-                return 'vendor';
-              }
+            manualChunks: {
+              'react-vendor': ['react', 'react-dom'],
+              'motion': ['framer-motion'],
+              'charts': ['recharts'],
+              'ai-sdk': ['@google/generative-ai'],
+              'markdown': ['react-markdown']
             }
           }
         }
