@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { motion } from 'framer-motion';
 
 export const AnimatedLogo = ({ className = "" }: { className?: string }) => (

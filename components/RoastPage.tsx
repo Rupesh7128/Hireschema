@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { Upload, Zap, AlertCircle, Loader2, ArrowRight, Share2, Flame, Skull, TrendingDown, Trophy, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';

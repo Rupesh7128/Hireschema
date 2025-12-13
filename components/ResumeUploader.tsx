@@ -1,5 +1,6 @@
 
-import React, { useCallback, useState, useRef } from 'react';
+import * as React from 'react';
+import { useCallback, useState, useRef } from 'react';
 import { Upload, FileText, X, CheckCircle2, Eye, AlertCircle, FileUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FileData } from '../types';

@@ -1,5 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AnalysisResult, ContactProfile } from '../types';
 import { AlertTriangle, CheckCircle, Target, FileSearch, TrendingUp, Download, ShieldAlert, Info, User, BrainCircuit, Globe, Briefcase, DollarSign, Pencil, X, Check, Camera, Mail, Phone, Linkedin, MapPin } from 'lucide-react';

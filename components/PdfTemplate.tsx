@@ -1,4 +1,5 @@
-import React from 'react';
+import * as React from 'react';
+import { forwardRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 interface PdfTemplateProps {
@@ -6,7 +7,7 @@ interface PdfTemplateProps {
   themeColor?: string;
 }
 
-export const PdfTemplate = React.forwardRef<HTMLDivElement, PdfTemplateProps>(({ content, themeColor = '#ea580c' }, ref) => {
+export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ content, themeColor = '#ea580c' }, ref) => {
   return (
     <div className="hidden">
       <div ref={ref} className="pdf-container bg-white text-black p-[40px] max-w-[210mm] mx-auto min-h-[297mm]" style={{ fontFamily: 'Arial, sans-serif', fontSize: '11pt', lineHeight: '1.5' }}>

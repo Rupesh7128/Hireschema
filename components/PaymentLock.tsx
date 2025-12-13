@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import * as React from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Lock, ExternalLink, KeyRound, AlertTriangle, Loader2, XCircle, HelpCircle, RefreshCw } from 'lucide-react';
 import { logEvent } from '../services/analytics';
