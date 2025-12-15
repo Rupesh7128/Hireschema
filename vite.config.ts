@@ -13,12 +13,12 @@ export default defineConfig(({ mode }) => {
       build: {
         chunkSizeWarningLimit: 1500,
         target: 'es2020',
-        // CRITICAL: Disable manual chunking to prevent React forwardRef issues
-        // Manual chunking can cause React to load after libraries that depend on it
         rollupOptions: {
           output: {
-            // Let Vite handle chunking automatically - this is more reliable
-            // for libraries like framer-motion and recharts that use forwardRef
+            // Ensure React is in a single chunk to prevent forwardRef issues
+            manualChunks: {
+              'react-vendor': ['react', 'react-dom'],
+            }
           }
         }
       },
@@ -31,12 +31,15 @@ export default defineConfig(({ mode }) => {
       resolve: {
         alias: {
           '@': path.resolve(__dirname, '.'),
+          // Force all React imports to use the same instance
+          'react': path.resolve(__dirname, 'node_modules/react'),
+          'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
         },
-        // Critical: dedupe React to prevent multiple instances
         dedupe: ['react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime']
       },
       optimizeDeps: {
-        include: ['react', 'react-dom', 'framer-motion', 'recharts'],
+        include: ['react', 'react-dom', 'framer-motion', 'recharts', 'lucide-react'],
+        force: true, // Force re-optimization
         esbuildOptions: {
           target: 'es2020'
         }

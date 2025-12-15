@@ -21,6 +21,8 @@
   },
   "devDependencies": {
     "@types/node": "^22.19.2",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
     "@vercel/node": "^5.5.15",
     "@vitejs/plugin-react": "^5.0.0",
     "fast-check": "^4.4.0",
