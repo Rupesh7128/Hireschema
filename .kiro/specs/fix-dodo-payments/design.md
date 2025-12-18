@@ -1,234 +1,153 @@
-# Design Document: Fix Dodo Payments Integration
+# Design Document: Fix Dodo Payments Verification Flow
 
 ## Overview
 
-This design addresses the broken Dodo Payments integration in HireSchema. The current implementation has several critical issues:
+This design addresses the critical issue where successful Dodo payments always show "Payment is being processed" instead of confirming success. 
 
-1. **Webhook signature verification uses incorrect algorithm** - Dodo uses base64-encoded HMAC-SHA256 signatures with a specific format
-2. **In-memory payment store** - The `_paymentsStore.ts` uses a Map that resets on serverless cold starts
-3. **Checkout URL construction** - May use incorrect parameter names for the return URL
+### Root Cause
 
-The solution focuses on:
-- Fixing the webhook signature verification to match Dodo's format
-- Removing the unreliable in-memory store and relying on direct API verification
-- Ensuring the checkout URL uses correct Dodo parameters
-- Improving error handling and user feedback
+After thorough code analysis, the root cause is a **combination of issues**:
+
+1. **Redirect Parameter Extraction**: The app looks for `payment_id` in URL params, but Dodo may use different parameter names or URL structures
+2. **Insufficient Retry Logic**: Current 3 retries (2s, 4s, 8s = 14s total) may not be enough for Dodo's payment propagation
+3. **No Fallback for Empty Payment ID**: When no payment ID is found in URL, the user gets stuck
+
+### Solution Approach
+
+1. **Robust Parameter Extraction**: Check all possible Dodo redirect parameter names
+2. **Extended Polling**: Up to 30 seconds with smarter backoff
+3. **Better UX**: Show payment ID for manual entry if auto-verification fails
+4. **Debug Logging**: Add comprehensive logging to diagnose issues in production
 
 ## Architecture
 
 ```mermaid
 sequenceDiagram
     participant User
-    participant Frontend
+    participant Frontend as App.tsx
+    participant PaymentService as paymentService.ts
     participant VerifyAPI as /api/verify-payment
-    participant WebhookAPI as /api/dodo-webhook
     participant DodoAPI as Dodo Payments API
     participant LocalStorage
 
     User->>Frontend: Click "Pay $1"
-    Frontend->>DodoAPI: Redirect to checkout
-    DodoAPI->>Frontend: Redirect back with payment_id
-    Frontend->>VerifyAPI: POST /api/verify-payment
-    VerifyAPI->>DodoAPI: GET /payments/{id}
-    DodoAPI->>VerifyAPI: Payment status
-    VerifyAPI->>Frontend: {ok, isPaid, status}
-    Frontend->>LocalStorage: Store isPaid=true
-    Frontend->>User: Show premium features
-
-    Note over WebhookAPI: Async webhook (backup)
-    DodoAPI->>WebhookAPI: POST webhook event
-    WebhookAPI->>WebhookAPI: Verify signature
-    WebhookAPI->>DodoAPI: 200 OK
+    Frontend->>Frontend: Save state before redirect
+    Frontend->>DodoAPI: Redirect to checkout.dodopayments.com
+    
+    Note over DodoAPI: User completes payment
+    
+    DodoAPI->>Frontend: Redirect to /app?payment_id=xxx
+    Frontend->>Frontend: Extract payment_id from URL
+    Frontend->>Frontend: Show "Verifying Payment..." overlay
+    
+    loop Retry up to 30 seconds
+        Frontend->>VerifyAPI: POST /api/verify-payment
+        VerifyAPI->>DodoAPI: GET /payments/{id}
+        DodoAPI->>VerifyAPI: {status: "pending" | "succeeded"}
+        VerifyAPI->>Frontend: {ok, isPaid, status}
+        
+        alt isPaid = true
+            Frontend->>LocalStorage: Save isPaid=true
+            Frontend->>Frontend: Restore state, show success
+        else isPaid = false & retries remaining
+            Frontend->>Frontend: Wait with backoff, retry
+        end
+    end
+    
+    alt All retries failed
+        Frontend->>Frontend: Show manual verification with pre-filled ID
+    end
 ```
 
 ## Components and Interfaces
 
-### 1. Payment Service (Frontend)
+### 1. Payment Verification Flow (Frontend)
+
+**File:** `App.tsx`
+
+Changes needed:
+- Extract payment ID using comprehensive parameter list
+- Implement extended retry logic (30 seconds total)
+- Pre-fill payment ID in manual verification if auto fails
+- Add debug logging for production troubleshooting
+
+```typescript
+// Extended parameter extraction
+const DODO_PAYMENT_PARAMS = [
+  'payment_id',
+  'paymentId', 
+  'id',
+  'checkout_id',
+  'session_id',
+  'order_id'
+];
+
+// Extended retry configuration
+const RETRY_CONFIG = {
+  maxDuration: 30000,  // 30 seconds total
+  delays: [1000, 2000, 3000, 4000, 5000, 5000, 5000, 5000]  // 8 retries
+};
+```
+
+### 2. Payment Service (Frontend)
 
 **File:** `services/paymentService.ts`
 
-```typescript
-interface VerifyPaymentResult {
-  ok: boolean;
-  isPaid: boolean;
-  status?: string;
-  product_id?: string | null;
-  code?: number;
-  reason?: string;
-}
+No major changes needed - current implementation is correct.
 
-// Verify payment via backend API
-function verifyDodoPayment(paymentId: string): Promise<VerifyPaymentResult>
-
-// Build checkout URL with correct parameters
-function buildCheckoutUrl(productId: string, returnUrl: string): string
-```
-
-### 2. Verify Payment API (Backend)
+### 3. Verify Payment API (Backend)
 
 **File:** `api/verify-payment.ts`
 
-```typescript
-// POST /api/verify-payment
-// Body: { paymentId: string }
-// Response: { ok: boolean, isPaid: boolean, status?: string, product_id?: string }
+Current implementation is correct. The API:
+- Validates payment ID format
+- Calls Dodo API with proper authentication
+- Falls back to alternate environment if needed
+- Returns clear error reasons
 
-interface DodoPaymentResponse {
-  payment_id: string;
-  status: 'succeeded' | 'pending' | 'failed' | 'cancelled';
-  product_id?: string;
-  customer_id?: string;
-  amount?: number;
-  currency?: string;
-}
-```
-
-### 3. Webhook Handler (Backend)
-
-**File:** `api/dodo-webhook.ts`
-
-```typescript
-// POST /api/dodo-webhook
-// Headers: webhook-id, webhook-signature, webhook-timestamp
-// Body: Dodo webhook payload
-
-interface DodoWebhookPayload {
-  type: string;
-  data: {
-    payment_id: string;
-    status: string;
-    product_id?: string;
-  };
-}
-
-// Signature format: "v1,<base64-signature>"
-function verifyWebhookSignature(
-  payload: string,
-  signature: string,
-  timestamp: string,
-  webhookId: string,
-  secret: string
-): boolean
-```
-
-### 4. Payment Lock Component (Frontend)
+### 4. PaymentLock Component
 
 **File:** `components/PaymentLock.tsx`
 
-No interface changes needed, but implementation updates for:
-- Correct checkout URL construction
-- Better error messages
-- Retry logic improvements
+Changes needed:
+- Accept pre-filled payment ID prop
+- Show payment ID when passed from failed auto-verification
 
 ## Data Models
 
-### Payment Verification Response
+### Verification State
 
 ```typescript
-interface VerifyPaymentResponse {
-  ok: boolean;           // API call succeeded
-  isPaid: boolean;       // Payment is confirmed
-  status?: string;       // Raw status from Dodo
-  product_id?: string;   // Product ID for validation
-  reason?: string;       // Error reason if failed
-  code?: number;         // HTTP status code if error
+interface VerificationState {
+  isVerifying: boolean;
+  attemptCount: number;
+  lastError: string | null;
+  extractedPaymentId: string | null;  // For pre-filling manual input
 }
 ```
 
-### Webhook Event Types
+### Retry Configuration
 
 ```typescript
-type DodoEventType = 
-  | 'payment.succeeded'
-  | 'payment.failed'
-  | 'payment.pending'
-  | 'refund.succeeded';
+interface RetryConfig {
+  maxDuration: number;      // Maximum total time to retry (ms)
+  delays: number[];         // Delay between each retry (ms)
+  onRetry?: (attempt: number, elapsed: number) => void;
+}
 ```
 
 ## Correctness Properties
 
 *A property is a characteristic or behavior that should hold true across all valid executions of a system-essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees.*
 
-### Property 1: Checkout URL contains required parameters
-*For any* product ID and return URL, the constructed checkout URL SHALL contain the product ID in the path and the return URL as an encoded query parameter.
-**Validates: Requirements 1.1**
+### Property 1: Payment ID extraction covers all Dodo parameters
+*For any* redirect URL from Dodo containing a payment identifier, the extraction function SHALL return the payment ID regardless of which parameter name Dodo uses.
+**Validates: Requirements 1.2**
 
-### Property 2: Successful payment verification updates state
-*For any* payment verification response where status is "succeeded", the isPaid flag SHALL be set to true and localStorage SHALL contain "hireSchema_isPaid" = "true".
-**Validates: Requirements 1.3, 2.2**
+### Property 2: Retry logic respects maximum duration
+*For any* verification attempt, the total retry duration SHALL NOT exceed the configured maximum (30 seconds), and each retry SHALL use the configured delay.
+**Validates: Requirements 2.2**
 
-### Property 3: Failed verification returns appropriate error
-*For any* payment verification response where status is not "succeeded" or API returns error, the result SHALL contain isPaid=false and a descriptive reason.
-**Validates: Requirements 2.3**
-
-### Property 4: Webhook signature verification round-trip
-*For any* valid webhook payload, signing it with the secret and then verifying with the same secret SHALL return true. Verifying with a different secret SHALL return false.
-**Validates: Requirements 3.1**
-
-### Property 5: Invalid webhook signatures are rejected
-*For any* webhook request with an invalid or missing signature, the handler SHALL return a 400 status code.
-**Validates: Requirements 3.3**
-
-### Property 6: Environment-based URL construction
-*For any* DODO_ENV value, the API base URL SHALL be "test.dodopayments.com" when env is "test", and "live.dodopayments.com" otherwise.
-**Validates: Requirements 4.1, 4.2**
-
-### Property 7: Payment state persistence round-trip
-*For any* successful payment verification, storing the state and then reading it back SHALL return the same isPaid value.
-**Validates: Requirements 5.1, 5.3**
-
-## Error Handling
-
-### Frontend Errors
-
-| Error Condition | User Message | Action |
-|----------------|--------------|--------|
-| Missing payment_id in URL | "Payment verification failed. Please enter Payment ID manually." | Show manual input |
-| API returns isPaid=false | "Payment not completed. Please complete payment or try again." | Show retry option |
-| Network error | "Network error. Please check your connection and try again." | Show retry button |
-| Too many attempts | "Too many failed attempts. Please refresh the page." | Lock form |
-
-### Backend Errors
-
-| Error Condition | HTTP Status | Response |
-|----------------|-------------|----------|
-| Missing paymentId | 400 | `{ ok: false, error: "Missing paymentId" }` |
-| Missing API key | 500 | `{ ok: false, reason: "Server misconfiguration" }` |
-| Dodo API error | 502 | `{ ok: false, reason: "Payment service unavailable" }` |
-| Invalid webhook signature | 400 | `{ error: "Invalid signature" }` |
-
-## Testing Strategy
-
-### Unit Tests
-
-1. **Checkout URL Builder**
-   - Test URL contains product ID
-   - Test return URL is properly encoded
-   - Test with special characters in return URL
-
-2. **Webhook Signature Verification**
-   - Test valid signature passes
-   - Test invalid signature fails
-   - Test missing headers handled
-
-3. **Environment URL Selection**
-   - Test "test" env uses test URL
-   - Test "live" env uses live URL
-   - Test default (undefined) uses live URL
-
-### Property-Based Tests
-
-The project will use **fast-check** for property-based testing in TypeScript.
-
-Each property-based test MUST:
-- Run a minimum of 100 iterations
-- Be tagged with a comment referencing the correctness property: `**Feature: fix-dodo-payments, Property {number}: {property_text}**`
-- Test the property across randomly generated valid inputs
-
-**Property Tests to Implement:**
-
-1. **Property 1**: Generate random product IDs and URLs, verify checkout URL structure
-2. **Property 4**: Generate random payloads and secrets, verify sign-then-verify succeeds
-3. **Property 5**: Generate random invalid signatures, verify all are rejected
-4. **Property 6**: Generate random env values, verify correct URL selection
-5. **Property 7**: Generate random payment states, verify localStorage round-trip
+### Property 3: Successful payment always navigates to premium state
+*For any* successful payment verification, the application SHALL navigate to a state where premium features are accessible, regardless of whether previous analysis state exists.
+**Validates: Requirements 1.5, 1.6**

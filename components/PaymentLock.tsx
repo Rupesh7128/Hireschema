@@ -34,7 +34,11 @@ const PaymentLock: React.FC<PaymentLockProps> = ({ onPaymentVerified, onBeforeRe
     
     // Save state before redirect so it can be restored after payment
     if (onBeforeRedirect) {
+      console.log('Calling onBeforeRedirect to save state...');
       onBeforeRedirect();
+      console.log('State saved, now redirecting...');
+    } else {
+      console.warn('No onBeforeRedirect callback provided!');
     }
     
     console.log('Redirecting to Dodo Checkout:', checkoutUrl);

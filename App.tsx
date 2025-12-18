@@ -88,6 +88,7 @@ const AppContent: React.FC = () => {
       return readPaymentState();
   });
   const [isVerifyingPayment, setIsVerifyingPayment] = useState(false);
+  const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
   const [appLanguage, setAppLanguage] = useState("English");
 
   // --- INIT ---
@@ -135,29 +136,51 @@ const AppContent: React.FC = () => {
             try {
                 // Helper to restore user state after successful payment
                 const restoreUserState = () => {
+                    console.log('=== restoreUserState called ===');
+                    
                     // First try to restore from persisted state (saved before redirect)
                     const persistedState = restoreStateAfterPayment();
+                    console.log('Persisted state:', persistedState ? JSON.stringify({
+                        hasResumeFile: !!persistedState.resumeFile,
+                        hasAnalysisResult: !!persistedState.analysisResult,
+                        jobDescLength: persistedState.jobDescription?.length || 0
+                    }) : 'null');
+                    
                     if (persistedState) {
+                        console.log('Restoring from persisted state, navigating to editor...');
+                        // Set all state in sequence to ensure proper updates
                         setResumeFile(persistedState.resumeFile);
                         setResumeText(persistedState.resumeText);
                         setJobDescription(persistedState.jobDescription);
                         setAnalysisResult(persistedState.analysisResult);
+                        // CRITICAL: Set dashboard view to 'result' and tab to 'generator' (Editor)
                         setDashboardView('result');
                         setResultTab('generator');
                         clearPersistedState(); // Clean up after restore
+                        console.log('State restored - dashboardView=result, resultTab=generator');
                         return;
                     }
                     
                     // Fallback to history if no persisted state
+                    console.log('No persisted state, checking history. Length:', h.length);
                     if (h.length > 0) {
                         const mostRecent = h[0];
+                        console.log('Restoring from history item:', mostRecent.id);
                         setResumeFile(mostRecent.resumeFile);
                         setJobDescription(mostRecent.jobDescription);
                         setAnalysisResult(mostRecent.analysisResult);
+                        // CRITICAL: Set dashboard view to 'result' and tab to 'generator' (Editor)
                         setDashboardView('result');
                         setResultTab('generator');
                         setSelectedHistoryId(mostRecent.id);
+                        console.log('State restored from history - dashboardView=result, resultTab=generator');
+                        return;
                     }
+                    
+                    // No state to restore - user paid but has no previous analysis
+                    // Show scan view with success message - premium features are now unlocked
+                    console.log('No state to restore, showing scan view with premium unlocked');
+                    setDashboardView('scan');
                 };
 
                 // Helper to mark payment as successful
@@ -167,14 +190,20 @@ const AppContent: React.FC = () => {
                     logEvent('payment_success_auto', { paymentId });
                     restoreUserState();
                     window.history.replaceState({}, '', '/app');
+                    // Show success toast
+                    setShowPaymentSuccess(true);
+                    setTimeout(() => setShowPaymentSuccess(false), 4000);
                 };
 
                 // Initial verification attempt
                 let res = await verifyDodoPayment(paymentId);
+                console.log('Initial verification result:', res);
                 
                 if (res.ok && res.isPaid) {
+                    console.log('Payment verified successfully on first attempt!');
                     markPaymentSuccess();
                 } else if (redirectLooksSuccessful) {
+                    console.log('Redirect looks successful but verification returned:', res);
                     // Redirect looks successful but API hasn't caught up yet
                     // Use exponential backoff for retries
                     const retryDelays = [2000, 4000, 8000]; // Exponential backoff
@@ -186,8 +215,11 @@ const AppContent: React.FC = () => {
                         res = await verifyDodoPayment(paymentId);
                         
                         if (res.ok && res.isPaid) {
+                            console.log('Payment verified successfully on retry!');
                             verified = true;
                             markPaymentSuccess();
+                        } else {
+                            console.log(`Retry ${i + 1} result:`, res);
                         }
                     }
                     
@@ -344,6 +376,14 @@ const AppContent: React.FC = () => {
               <Loader2 className="w-12 h-12 text-orange-500 animate-spin mb-4" />
               <h2 className="text-xl font-bold text-white">Verifying Payment...</h2>
               <p className="text-zinc-500 text-sm mt-2">Please wait while we confirm your transaction.</p>
+          </div>
+      )}
+      
+      {/* Payment Success Toast */}
+      {showPaymentSuccess && (
+          <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-2 px-4 py-3 bg-green-600 text-white text-sm font-bold rounded-lg shadow-lg animate-in fade-in slide-in-from-top-2">
+              <CheckCircle className="w-5 h-5" />
+              <span>Payment successful! Premium features unlocked.</span>
           </div>
       )}
 

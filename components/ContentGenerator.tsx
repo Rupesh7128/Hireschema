@@ -147,6 +147,13 @@ const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, resumeT
   
   // Handler to save state before payment redirect
   const handleBeforePaymentRedirect = () => {
+    console.log('=== handleBeforePaymentRedirect called ===');
+    console.log('Saving state:', {
+      hasResumeFile: !!resumeFile,
+      resumeTextLength: resumeText?.length || 0,
+      jobDescriptionLength: jobDescription?.length || 0,
+      hasAnalysisResult: !!analysis
+    });
     saveStateBeforePayment({
       resumeFile,
       resumeText,
