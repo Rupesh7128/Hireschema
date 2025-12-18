@@ -22,6 +22,7 @@ const PAYMENT_ID_PATTERN = /^[a-zA-Z0-9_-]{10,60}$/;
 /**
  * Validates the format of a payment ID.
  * Returns false for obviously invalid IDs to prevent unnecessary API calls.
+ * Note: This validates the raw input - trimming should be done by the caller if needed.
  * 
  * @param paymentId - The payment ID to validate
  * @returns true if the format is valid
@@ -30,11 +31,12 @@ export function isValidPaymentIdFormat(paymentId: string): boolean {
   if (!paymentId || typeof paymentId !== 'string') {
     return false;
   }
-  const trimmed = paymentId.trim();
-  if (trimmed.length < 10 || trimmed.length > 60) {
+  // Check length on raw input (no trimming - whitespace is invalid)
+  if (paymentId.length < 10 || paymentId.length > 60) {
     return false;
   }
-  return PAYMENT_ID_PATTERN.test(trimmed);
+  // Pattern already rejects whitespace since it only allows alphanumeric, hyphens, underscores
+  return PAYMENT_ID_PATTERN.test(paymentId);
 }
 
 /**

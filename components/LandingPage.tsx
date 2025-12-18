@@ -3,11 +3,9 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence, useMotionValueEvent } from 'framer-motion';
 import { 
-  Sparkles, Upload, Search, ArrowRight, FileText, Globe, Scan, GraduationCap, 
-  BrainCircuit, ShieldCheck, ChevronDown, Quote, CheckCircle2, XCircle, 
-  ArrowUpRight, Check, Download, Scale, Server, X, Award, Shield, Lock, 
-  CreditCard, Trash2, ArrowRightCircle, Database, UserCheck, Activity, 
-  Terminal, Zap 
+  Sparkles, Upload, Search, ArrowRight, FileText, Globe, GraduationCap, 
+  BrainCircuit, ShieldCheck, ChevronDown, CheckCircle2, XCircle, 
+  Check, Award, Lock, CreditCard, Database, Activity, Zap 
 } from 'lucide-react';
 import { AnimatedLogo } from './AnimatedLogo';
 import { FileData } from '../types';
@@ -17,9 +15,9 @@ interface LandingPageProps {
   onStart: (intent: 'scan' | 'optimize' | 'launch', file?: FileData) => void;
 }
 
-// Consistent Global Button Styles
-const ORANGE_BUTTON_STYLE = "px-8 sm:px-10 py-4 bg-orange-600 hover:bg-orange-500 text-white font-mono font-bold text-sm sm:text-base tracking-wide flex items-center justify-center gap-3 shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-sm cursor-pointer border-none";
-const HEADER_BUTTON_STYLE = "px-6 py-2.5 bg-orange-600 hover:bg-orange-500 text-white font-mono font-bold text-xs uppercase tracking-wide flex items-center gap-2 shadow-[3px_3px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all rounded-sm cursor-pointer border-none";
+// Consistent Global Button Styles - Mobile optimized with active states
+const ORANGE_BUTTON_STYLE = "px-6 sm:px-10 py-3.5 sm:py-4 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 sm:gap-3 shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[2px] active:translate-y-[2px] transition-all rounded-sm cursor-pointer border-none touch-target";
+const HEADER_BUTTON_STYLE = "px-4 sm:px-6 py-2 sm:py-2.5 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-xs uppercase tracking-wide flex items-center gap-1.5 sm:gap-2 shadow-[3px_3px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none active:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] active:translate-x-[1px] active:translate-y-[1px] transition-all rounded-sm cursor-pointer border-none touch-target";
 
 // --- MOUSE TRAIL COMPONENT ---
 const MouseTrail = () => {
@@ -68,9 +66,9 @@ const MouseTrail = () => {
 // --- FEATURE MARQUEE ---
 const FeatureMarquee = () => {
     const items = [
-        "ATS Optimization", "Keyword Analysis", "Gap Detection", "Cover Letter Generator", 
-        "Interview Prep", "Skill Bridge", "Global Translation", "Secure Processing",
-        "PDF Export", "Real-time Scoring"
+        "Find Missing Keywords", "Get Your ATS Score", "Fix Resume Gaps", "Generate Cover Letters", 
+        "Prepare for Interviews", "Learn Missing Skills", "Translate to 8 Languages", "100% Secure",
+        "Download as PDF", "Instant Results"
     ];
 
     return (
@@ -212,38 +210,38 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
 
   const features = [
     {
-      title: "ATS Simulation",
-      desc: "Run logic modeled on Fortune 500 parsers.",
-      micro: "Keyword match, sections, entities.",
+      title: "See What's Missing",
+      desc: "We compare your resume to the job posting and show exactly which keywords you're missing.",
+      micro: "Like spell-check, but for job applications.",
       icon: Search
     },
     {
-      title: "Smart Optimization",
-      desc: "Rewrite bullets with relevant keywords.",
-      micro: "No fluff, measurable outcomes.",
+      title: "Fix It Automatically",
+      desc: "We rewrite your bullet points to include the right keywords naturally.",
+      micro: "Your experience, better words.",
       icon: Sparkles
     },
     {
-      title: "Cover Letter Engine",
-      desc: "Tailored letters that sound like you.",
-      micro: "Role-specific hooks.",
+      title: "Cover Letter Included",
+      desc: "Get a personalized cover letter that matches the job you're applying for.",
+      micro: "No more blank page anxiety.",
       icon: FileText
     },
     {
-      title: "Interview Prep",
-      desc: "Predicted questions with STAR drafts.",
-      micro: "Editable scripts.",
+      title: "Interview Questions",
+      desc: "See likely interview questions based on the job description, with sample answers.",
+      micro: "Be prepared, not surprised.",
       icon: BrainCircuit
     },
     {
-      title: "Skill Gap Bridge",
-      desc: "Mini-courses for missing skills.",
-      micro: "Quick primers.",
+      title: "Learn What You're Missing",
+      desc: "If you're missing a skill, we show you free resources to learn it quickly.",
+      micro: "Turn weaknesses into strengths.",
       icon: GraduationCap
     },
     {
-      title: "Global Translation",
-      desc: "Instantly translate your application.",
+      title: "Works in 8 Languages",
+      desc: "Applying for jobs abroad? Translate your resume and cover letter instantly.",
       micro: "English, Spanish, French, German, Hindi, Portuguese, Japanese, Korean.",
       icon: Globe,
     }
@@ -262,8 +260,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
   ];
 
   const faqs = [
+      { q: "What is ATS and why does it matter?", a: "ATS (Applicant Tracking System) is software that companies use to filter resumes before a human sees them. It scans for specific keywords from the job description. If your resume doesn't match, it gets auto-rejected — even if you're qualified. About 75% of resumes are rejected this way." },
       { q: "Is my data safe?", a: "Yes. We use TLS encryption, temporary in-session processing, and zero data retention. You can close the app to end processing immediately. Payments handled securely by Dodo Payments." },
-      { q: "How does the ATS scoring work?", a: "We evaluate keyword match to the job description, section parsing (Experience/Education/Skills), entity/tool detection (e.g., Terraform, Snowflake), and formatting risks (tables, headers). Scores vary by ATS; we align to common parsers." },
+      { q: "How does the ATS scoring work?", a: "We compare your resume against the job description to find missing keywords, check if your sections are properly labeled (Experience, Education, Skills), detect tools and technologies mentioned, and flag formatting issues that confuse ATS parsers. Your score shows how likely you are to pass the ATS filter." },
       { q: "Can I download the optimized resume?", a: "Yes. Pay $1 per download for the optimized resume PDF. Tailored cover letter PDF is included." },
       { q: "Does it work for all industries?", a: "Best for roles with explicit skills (engineering, product, design, marketing, ops). Generalist roles supported, but scoring predictiveness varies." },
       { q: "Is this free to use?", a: "Analysis is free. Pay only when you download." },
@@ -303,32 +302,32 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               position: 'fixed',
               zIndex: 50
           }}
-          className="h-20 flex items-center justify-between px-6 md:px-8 border-b"
+          className="h-16 sm:h-20 flex items-center justify-between px-4 sm:px-6 md:px-8 border-b safe-area-inset"
       >
-          <div className="cursor-pointer" onClick={() => window.scrollTo(0, 0)}>
+          <div className="cursor-pointer touch-target" onClick={() => window.scrollTo(0, 0)}>
               <AnimatedLogo />
           </div>
-          <div className="flex items-center gap-3 sm:gap-6">
-              <a href="/roast" target="_blank" className="hidden sm:flex items-center gap-2 text-xs font-bold text-red-500 hover:text-red-400 transition-colors uppercase tracking-widest border border-red-500/20 px-3 py-1.5 rounded bg-red-500/5 hover:bg-red-500/10 cursor-pointer">
+          <div className="flex items-center gap-2 sm:gap-6">
+              <a href="/roast" target="_blank" className="hidden sm:flex items-center gap-2 text-xs font-bold text-red-500 hover:text-red-400 active:text-red-300 transition-colors uppercase tracking-widest border border-red-500/20 px-3 py-1.5 rounded bg-red-500/5 hover:bg-red-500/10 cursor-pointer touch-target">
                     <Zap className="w-3 h-3" /> Roast My Resume
                  </a>
-              <a href="#how-it-works" className="hidden md:block text-xs font-bold text-zinc-400 hover:text-white uppercase tracking-widest transition-colors">How it Works</a>
+              <a href="#how-it-works" className="hidden md:block text-xs font-bold text-zinc-400 hover:text-white uppercase tracking-widest transition-colors touch-target py-2">How it Works</a>
               <button 
                   onClick={() => onStart('scan')}
                   className={HEADER_BUTTON_STYLE}
               >
-                  Start Analysis
+                  <span className="hidden xs:inline">Start</span> Analysis
               </button>
           </div>
       </motion.nav>
 
       {/* --- HERO SECTION --- */}
-      <section className="relative min-h-[90vh] flex flex-col items-center justify-center pt-24 px-6 border-b border-white/10 overflow-hidden bg-zinc-950">
+      <section className="relative min-h-[85vh] sm:min-h-[90vh] min-h-[85dvh] sm:min-h-[90dvh] flex flex-col items-center justify-center pt-20 sm:pt-24 px-4 sm:px-6 border-b border-white/10 overflow-hidden bg-zinc-950">
         
-        {/* Live Animated Gradient Background */}
+        {/* Live Animated Gradient Background - Reduced on mobile for performance */}
         <div className="absolute inset-0 bg-zinc-950 overflow-hidden pointer-events-none">
-            {/* Dynamic Moving Orbs/Mesh */}
-            <div className="absolute top-[-50%] left-[-20%] w-[80%] h-[80%] rounded-full bg-orange-600/20 blur-[150px] animate-[spin_40s_linear_infinite]" />
+            {/* Dynamic Moving Orbs/Mesh - Simplified on mobile */}
+            <div className="absolute top-[-50%] left-[-20%] w-[80%] h-[80%] rounded-full bg-orange-600/20 blur-[100px] sm:blur-[150px] sm:animate-[spin_40s_linear_infinite]" />
             <div className="absolute bottom-[-30%] right-[-10%] w-[60%] h-[60%] rounded-full bg-indigo-900/20 blur-[150px] animate-[spin_50s_linear_infinite_reverse]" />
             <div className="absolute top-[30%] right-[20%] w-[50%] h-[50%] rounded-full bg-orange-900/10 blur-[100px] animate-pulse" />
             
@@ -347,24 +346,57 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 HireSchema is built by <span className="text-white font-bold">KoK Labs</span>
             </p>
 
+            {/* Problem Statement - What ATS is */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="mb-6 px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-full inline-flex items-center gap-2"
+            >
+                <XCircle className="w-4 h-4 text-red-500" />
+                <span className="text-red-400 text-xs sm:text-sm font-medium">75% of resumes are rejected by robots before a human sees them</span>
+            </motion.div>
+
             <motion.h1 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
                 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tighter text-white mb-6 leading-[1.1] sm:leading-[1]"
             >
-                Beat the ATS. <br/>
-                <span className="text-transparent bg-clip-text bg-gradient-to-br from-orange-400 to-orange-700">Get interviews faster.</span>
+                Your resume gets filtered out<br/>
+                <span className="text-transparent bg-clip-text bg-gradient-to-br from-orange-400 to-orange-700">before recruiters see it.</span>
             </motion.h1>
 
             <motion.p 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
-                className="max-w-3xl text-lg sm:text-xl text-zinc-400 mb-10 leading-relaxed font-light"
+                className="max-w-3xl text-lg sm:text-xl text-zinc-400 mb-6 leading-relaxed font-light"
             >
-               Tailor your resume to each job in seconds with transparent scoring and keyword fixes.
+               Companies use <span className="text-white font-semibold">ATS (Applicant Tracking Systems)</span> to auto-reject resumes missing specific keywords. 
+               We scan your resume against the job description and show you exactly what's missing.
             </motion.p>
+
+            {/* Clear Value Prop */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+                className="flex flex-wrap justify-center gap-3 mb-10 text-sm"
+            >
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-full">
+                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                    <span className="text-zinc-300">See your ATS score</span>
+                </div>
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-full">
+                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                    <span className="text-zinc-300">Find missing keywords</span>
+                </div>
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-full">
+                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                    <span className="text-zinc-300">Fix & download optimized resume</span>
+                </div>
+            </motion.div>
 
             <motion.div 
                 initial={{ opacity: 0, y: 20 }}
@@ -376,7 +408,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                   onClick={() => { logEvent('cta_click', { type: 'optimize' }); onStart('optimize'); }}
                   className={ORANGE_BUTTON_STYLE + " w-full sm:w-auto"}
                 >
-                    Optimize my resume
+                    Scan My Resume — Free in 30 Seconds
                 </button>
             </motion.div>
 
@@ -386,11 +418,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 transition={{ delay: 0.8 }}
                 className="flex flex-wrap justify-center gap-4 sm:gap-6 text-[10px] sm:text-xs text-zinc-500 font-mono items-center px-4"
             >
-                <span className="flex items-center gap-2 whitespace-nowrap"><ShieldCheck className="w-3.5 h-3.5 text-zinc-400" /> No subscription</span>
+                <span className="flex items-center gap-2 whitespace-nowrap"><ShieldCheck className="w-3.5 h-3.5 text-green-500" /> 50,000+ resumes scanned</span>
                 <span className="w-1 h-1 rounded-full bg-zinc-800 hidden sm:block"></span>
-                <span className="flex items-center gap-2 whitespace-nowrap"><CreditCard className="w-3.5 h-3.5 text-zinc-400" /> Pay $1 per download</span>
+                <span className="flex items-center gap-2 whitespace-nowrap"><CreditCard className="w-3.5 h-3.5 text-zinc-400" /> Free scan • $1 to download fix</span>
                 <span className="w-1 h-1 rounded-full bg-zinc-800 hidden sm:block"></span>
-                <span className="flex items-center gap-2 whitespace-nowrap"><Lock className="w-3.5 h-3.5 text-zinc-400" /> Secure via Dodo Payments</span>
+                <span className="flex items-center gap-2 whitespace-nowrap"><Lock className="w-3.5 h-3.5 text-zinc-400" /> Your data stays yours</span>
             </motion.div>
         </motion.div>
       </section>
@@ -404,36 +436,37 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             
             <div className="space-y-10">
                 <div className="space-y-6">
-                    <h2 className="text-3xl font-bold text-white">Why manual edits fail.</h2>
+                    <h2 className="text-3xl font-bold text-white">Why your resume gets rejected</h2>
+                    <p className="text-zinc-400 text-sm mb-4">ATS software scans for specific keywords from the job description. If your resume doesn't match, it's auto-rejected — even if you're qualified.</p>
                     <ul className="space-y-6">
                         <li className="flex gap-4 items-start">
                             <div className="w-8 h-8 rounded bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0 text-orange-500 font-bold font-mono">1</div>
                             <div>
-                                <h3 className="text-lg font-bold text-white mb-1">Tailored to each JD in seconds</h3>
+                                <h3 className="text-lg font-bold text-white mb-1">Missing keywords = instant rejection</h3>
                                 <p className="text-zinc-500 text-sm">Don’t spend hours tweaking. We match context instantly.</p>
                             </div>
                         </li>
                          <li className="flex gap-4 items-start">
                             <div className="w-8 h-8 rounded bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0 text-orange-500 font-bold font-mono">2</div>
                             <div>
-                                <h3 className="text-lg font-bold text-white mb-1">Raise ATS match score</h3>
-                                <p className="text-zinc-500 text-sm">We find and fix the missing keywords that block you.</p>
+                                <h3 className="text-lg font-bold text-white mb-1">Wrong format = unreadable</h3>
+                                <p className="text-zinc-500 text-sm">Tables, columns, and fancy designs confuse ATS parsers. We flag formatting issues.</p>
                             </div>
                         </li>
                          <li className="flex gap-4 items-start">
                             <div className="w-8 h-8 rounded bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0 text-orange-500 font-bold font-mono">3</div>
                             <div>
-                                <h3 className="text-lg font-bold text-white mb-1">Human-ready bullets</h3>
-                                <p className="text-zinc-500 text-sm">Real metrics, active voice, no robotic fluff.</p>
+                                <h3 className="text-lg font-bold text-white mb-1">We fix it for you</h3>
+                                <p className="text-zinc-500 text-sm">Upload your resume + job description. Get a score, missing keywords, and an optimized version.</p>
                             </div>
                         </li>
                     </ul>
                 </div>
                 
-                <div className="p-6 bg-zinc-900/50 border border-white/10 rounded-xl inline-block">
-                    <div className="text-3xl font-bold text-white mb-1">80–90+</div>
-                    <p className="text-sm text-zinc-300 font-medium">Average ATS Score after optimization</p>
-                    <p className="text-[10px] text-zinc-600 mt-2 font-mono">Based on last 5,000 analyses (Jan–Nov 2025). Results vary by ATS.</p>
+                <div className="p-6 bg-zinc-900/50 border border-green-500/20 rounded-xl inline-block">
+                    <div className="text-3xl font-bold text-green-500 mb-1">80–90+</div>
+                    <p className="text-sm text-zinc-300 font-medium">Average score after our fix</p>
+                    <p className="text-[10px] text-zinc-500 mt-2 font-mono">Most users start at 40-60. We get you interview-ready.</p>
                 </div>
             </div>
 
@@ -488,7 +521,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
           <div className="max-w-7xl mx-auto relative z-10">
                <div className="text-center mb-20">
                   <h2 className="text-3xl font-bold text-white mb-4">How it works</h2>
-                  <p className="text-zinc-500">From upload to offer in 3 simple steps.</p>
+                  <p className="text-zinc-500">Get a better resume in under 2 minutes.</p>
               </div>
 
               <div className="relative grid grid-cols-1 md:grid-cols-3 gap-12">
@@ -502,25 +535,25 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                       <StepGraphic step={1} />
                       <h4 className="text-lg font-bold text-white mb-3">Upload & Scan</h4>
                       <p className="text-zinc-400 text-sm leading-relaxed max-w-[280px]">
-                          Upload your PDF resume and paste the job description. We extract text and identify sections instantly.
+                          Drop your resume (PDF) and copy-paste the job posting you want to apply for. Takes 10 seconds.
                       </p>
                   </div>
 
                   {/* Step 2 */}
                   <div className="flex flex-col items-center text-center relative group">
                       <StepGraphic step={2} />
-                      <h4 className="text-lg font-bold text-white mb-3">Gap Analysis</h4>
+                      <h4 className="text-lg font-bold text-white mb-3">See What's Wrong</h4>
                       <p className="text-zinc-400 text-sm leading-relaxed max-w-[280px]">
-                          Find missing tools, skills, and formatting risks. See Top 5 missing keywords.
+                          We show you your score (0-100) and list the exact keywords the job wants that your resume is missing.
                       </p>
                   </div>
 
                   {/* Step 3 */}
                   <div className="flex flex-col items-center text-center relative group">
                       <StepGraphic step={3} />
-                      <h4 className="text-lg font-bold text-white mb-3">Optimize & Export</h4>
+                      <h4 className="text-lg font-bold text-white mb-3">Fix & Download</h4>
                       <p className="text-zinc-400 text-sm leading-relaxed max-w-[280px]">
-                          Inject missing keywords and rewrite bullets naturally. Export to PDF.
+                          We rewrite your resume with the right keywords. Download the fixed version as a PDF. Done.
                       </p>
                   </div>
               </div>
@@ -531,8 +564,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
       <section id="features" className="py-24 px-6 bg-zinc-900/50 relative scroll-mt-20">
         <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
-                <h2 className="text-3xl font-bold text-white mb-4">Complete Career Arsenal</h2>
-                <p className="text-zinc-500">Everything you need to bypass the robots.</p>
+                <h2 className="text-3xl font-bold text-white mb-4">Everything You Need to Get Hired</h2>
+                <p className="text-zinc-500">Not just a resume checker — a complete job application toolkit.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -711,9 +744,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
       </section>
 
       {/* --- FAQ SECTION --- */}
-      <section id="faq" className="py-24 px-6 bg-zinc-950 border-t border-white/10 scroll-mt-20">
+      <section id="faq" className="py-16 sm:py-24 px-4 sm:px-6 bg-zinc-950 border-t border-white/10 scroll-mt-20">
           <div className="max-w-3xl mx-auto">
-              <h2 className="text-3xl font-bold text-white mb-12 text-center">Frequently Asked Questions</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-8 sm:mb-12 text-center">Frequently Asked Questions</h2>
               <div className="space-y-2">
                   {faqs.map((item, i) => (
                       <FAQItem key={i} question={item.q} answer={item.a} />
@@ -723,26 +756,26 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
       </section>
       
       {/* --- FOOTER --- */}
-      <footer className="bg-gradient-to-b from-zinc-950 via-zinc-900 to-orange-900 border-t border-orange-900/30 pt-20 pb-10 px-6 w-full relative overflow-hidden">
+      <footer className="bg-gradient-to-b from-zinc-950 via-zinc-900 to-orange-900 border-t border-orange-900/30 pt-12 sm:pt-20 pb-8 sm:pb-10 px-4 sm:px-6 w-full relative overflow-hidden safe-area-inset-bottom">
          {/* Subtle overlay */}
          <div className="absolute inset-0 bg-black/20 pointer-events-none"></div>
          
          <div className="max-w-7xl mx-auto w-full relative z-10">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-                <div className="col-span-1 md:col-span-1">
-                    <AnimatedLogo className="mb-6" />
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 mb-12 sm:mb-16">
+                <div className="col-span-2 sm:col-span-2 md:col-span-1">
+                    <AnimatedLogo className="mb-4 sm:mb-6" />
                     <p className="text-zinc-400 text-sm leading-relaxed max-w-xs">
                         HireSchema is built by KoK Labs.
                     </p>
                 </div>
                 
                 <div>
-                    <h4 className="text-orange-100 font-bold mb-6 text-sm uppercase tracking-wider">Product</h4>
-                    <ul className="space-y-3 text-sm text-zinc-400">
-                        <li><span className="hover:text-white transition-colors cursor-pointer">Resume Scanner</span></li>
-                        <li><span className="hover:text-white transition-colors cursor-pointer">Cover Letter Engine</span></li>
-                        <li><span className="hover:text-white transition-colors cursor-pointer">Interview Prep</span></li>
-                        <li><span className="hover:text-white transition-colors cursor-pointer">$1 per download</span></li>
+                    <h4 className="text-orange-100 font-bold mb-4 sm:mb-6 text-sm uppercase tracking-wider">Product</h4>
+                    <ul className="space-y-2 sm:space-y-3 text-sm text-zinc-400">
+                        <li><span className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">Resume Scanner</span></li>
+                        <li><span className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">Cover Letter Engine</span></li>
+                        <li><span className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">Interview Prep</span></li>
+                        <li><span className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">$1 per download</span></li>
                     </ul>
                 </div>
 

@@ -1,9 +1,9 @@
 
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { 
     Plus, Link as LinkIcon, FileText, AlertCircle, Radar, 
-    ChevronDown, Settings, LogOut, CheckCircle, Loader2
+    CheckCircle, Loader2
 } from 'lucide-react';
 import { FileData, AnalysisResult, HistoryItem, ContactProfile } from './types';
 import { analyzeResume } from './services/geminiService';
@@ -11,13 +11,25 @@ import { db } from './services/db';
 import { logEvent, logPageView } from './services/analytics';
 import { verifyDodoPayment, savePaymentState, readPaymentState } from './services/paymentService';
 import { restoreStateAfterPayment, clearPersistedState } from './services/stateService';
-import ResumeUploader from './components/ResumeUploader';
-import AnalysisDashboard from './components/AnalysisDashboard';
-import ContentGenerator from './components/ContentGenerator';
-import LandingPage from './components/LandingPage';
-import LegalPages from './components/LegalPages';
-import { RoastPage } from './components/RoastPage';
 import { AnimatedLogo } from './components/AnimatedLogo';
+
+// Lazy load heavy components for better initial load performance
+const ResumeUploader = lazy(() => import('./components/ResumeUploader'));
+const AnalysisDashboard = lazy(() => import('./components/AnalysisDashboard'));
+const ContentGenerator = lazy(() => import('./components/ContentGenerator'));
+const LandingPage = lazy(() => import('./components/LandingPage'));
+const LegalPages = lazy(() => import('./components/LegalPages'));
+const RoastPage = lazy(() => import('./components/RoastPage').then(m => ({ default: m.RoastPage })));
+
+// Loading fallback component
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center h-screen bg-zinc-950">
+    <div className="flex flex-col items-center gap-4">
+      <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
+      <p className="text-zinc-500 text-sm font-mono">Loading...</p>
+    </div>
+  </div>
+);
 
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; message: string }>{
   constructor(props: any) {
@@ -318,9 +330,9 @@ const AppContent: React.FC = () => {
     return () => clearInterval(interval);
   }, [isAnalyzing, analysisStartTs]);
 
-  if (view === 'landing') return <LandingPage onStart={handleLandingStart} />;
-  if (view === 'roast') return <RoastPage />;
-  if (view === 'legal' && legalPage) return <LegalPages page={legalPage} onBack={() => { setView('landing'); window.history.pushState({}, '', '/'); }} />;
+  if (view === 'landing') return <Suspense fallback={<LoadingFallback />}><LandingPage onStart={handleLandingStart} /></Suspense>;
+  if (view === 'roast') return <Suspense fallback={<LoadingFallback />}><RoastPage /></Suspense>;
+  if (view === 'legal' && legalPage) return <Suspense fallback={<LoadingFallback />}><LegalPages page={legalPage} onBack={() => { setView('landing'); window.history.pushState({}, '', '/'); }} /></Suspense>;
 
   return (
     <ErrorBoundary>
@@ -338,18 +350,18 @@ const AppContent: React.FC = () => {
       {/* MAIN CONTENT */}
       <div className="flex-1 flex flex-col min-w-0 bg-zinc-950">
          {/* HEADER */}
-         <header className="h-16 border-b border-white/5 bg-zinc-950 flex items-center justify-between px-6 shrink-0">
-             <div className="cursor-pointer" onClick={() => { setView('landing'); window.history.pushState({}, '', '/'); }}><AnimatedLogo /></div>
+         <header className="h-14 sm:h-16 border-b border-white/5 bg-zinc-950 flex items-center justify-between px-3 sm:px-6 shrink-0 safe-area-inset">
+             <div className="cursor-pointer touch-target flex items-center" onClick={() => { setView('landing'); window.history.pushState({}, '', '/'); }}><AnimatedLogo /></div>
              
-             <div className="flex items-center gap-4">
+             <div className="flex items-center gap-2 sm:gap-4">
                  {isPaid && (
-                     <div className="flex items-center gap-2 px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full">
+                     <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full">
                          <CheckCircle className="w-3.5 h-3.5 text-green-500" />
-                         <span className="text-xs font-bold text-green-500 uppercase tracking-wider">Premium Unlocked</span>
+                         <span className="text-xs font-bold text-green-500 uppercase tracking-wider">Premium</span>
                      </div>
                  )}
-                 <button onClick={startNewScan} className="flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold rounded shadow-lg shadow-orange-900/20 transition-all hover:translate-y-[-1px]">
-                     <Plus className="w-3.5 h-3.5" /> <span className="hidden sm:inline">New Scan</span>
+                 <button onClick={startNewScan} className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white text-xs font-bold rounded shadow-lg shadow-orange-900/20 transition-all touch-target">
+                     <Plus className="w-3.5 h-3.5" /> <span className="hidden xs:inline">New Scan</span>
                  </button>
              </div>
          </header>
@@ -371,46 +383,48 @@ const AppContent: React.FC = () => {
              )}
 
              {dashboardView === 'scan' && (
-                 <div className="max-w-4xl mx-auto h-full flex flex-col items-center justify-center">
+                 <div className="max-w-4xl mx-auto h-full flex flex-col items-center justify-center px-2 sm:px-0">
                      {isAnalyzing ? (
-                        <div className="text-center">
-                            <div className="relative w-32 h-32 mx-auto mb-8">
+                        <div className="text-center px-4">
+                            <div className="relative w-24 sm:w-32 h-24 sm:h-32 mx-auto mb-6 sm:mb-8">
                                 <div className="absolute inset-0 bg-orange-500 rounded-full animate-ping opacity-20"></div>
                                 <div className="relative w-full h-full bg-zinc-900 border border-zinc-700 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(249,115,22,0.3)]">
-                                    <Radar className="w-16 h-16 text-orange-500 animate-[spin_3s_linear_infinite]" />
+                                    <Radar className="w-12 sm:w-16 h-12 sm:h-16 text-orange-500 animate-[spin_3s_linear_infinite]" />
                                 </div>
                             </div>
-                            <h2 className="text-2xl font-bold text-white mb-2">
-                                {analysisProgress < 30 ? "Analyzing Resume Structure..." : 
-                                 analysisProgress < 60 ? "Extracting Skills & Experience..." :
-                                 analysisProgress < 85 ? "Comparing with Job Description..." : 
-                                 "Finalizing Strategic Insights..."}
+                            <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
+                                {analysisProgress < 30 ? "Analyzing Resume..." : 
+                                 analysisProgress < 60 ? "Extracting Skills..." :
+                                 analysisProgress < 85 ? "Comparing with Job..." : 
+                                 "Finalizing Insights..."}
                             </h2>
                             <p className="text-zinc-500 font-mono text-xs">{Math.round(analysisProgress)}% COMPLETE</p>
                         </div>
                      ) : (
-                         <div className="w-full space-y-8">
-                            <div className="text-center"><h1 className="text-3xl font-bold text-white mb-2">New Analysis</h1><p className="text-zinc-400">Step {inputWizardStep + 1} of 2</p></div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-[400px]">
+                         <div className="w-full space-y-6 sm:space-y-8">
+                            <div className="text-center"><h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">New Analysis</h1><p className="text-zinc-400 text-sm">Step {inputWizardStep + 1} of 2</p></div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 min-h-[350px] sm:h-[400px]">
                                 <div className={`flex flex-col h-full ${inputWizardStep === 1 ? 'hidden md:flex' : ''}`}>
                                     <h3 className="text-xs font-bold text-zinc-500 uppercase mb-3">1. Select Resume</h3>
-                                    <div className="flex-1 overflow-hidden h-full">
-                                        <ResumeUploader onFileUpload={setResumeFile} currentFile={resumeFile} />
+                                    <div className="flex-1 overflow-hidden h-full min-h-[250px]">
+                                        <Suspense fallback={<div className="h-full flex items-center justify-center"><Loader2 className="w-6 h-6 text-orange-500 animate-spin" /></div>}>
+                                          <ResumeUploader onFileUpload={setResumeFile} currentFile={resumeFile} />
+                                        </Suspense>
                                     </div>
-                                    <div className="md:hidden mt-4"><button onClick={() => setInputWizardStep(1)} disabled={!resumeFile} className="w-full py-3 bg-zinc-800 text-white rounded font-bold">Next</button></div>
+                                    <div className="md:hidden mt-4"><button onClick={() => setInputWizardStep(1)} disabled={!resumeFile} className="w-full py-3.5 bg-zinc-800 text-white rounded font-bold touch-target active:bg-zinc-700 disabled:opacity-50">Next</button></div>
                                 </div>
                                 <div className={`flex flex-col h-full ${inputWizardStep === 0 ? 'hidden md:flex' : ''}`}>
-                                     <div className="md:hidden mb-2"><button onClick={() => setInputWizardStep(0)} className="text-zinc-500">Back</button></div>
+                                     <div className="md:hidden mb-2"><button onClick={() => setInputWizardStep(0)} className="text-zinc-500 py-2 touch-target">← Back</button></div>
                                      <h3 className="text-xs font-bold text-zinc-500 uppercase mb-3">2. Job Details</h3>
                                      <div className="flex gap-2 mb-3 bg-zinc-900 p-1 rounded-lg border border-zinc-800 self-start">
-                                        <button onClick={() => setJobInputMode('link')} className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-bold transition-colors ${jobInputMode === 'link' ? 'bg-orange-600 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}><LinkIcon className="w-3 h-3" /> Link</button>
-                                        <button onClick={() => setJobInputMode('text')} className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-bold transition-colors ${jobInputMode === 'text' ? 'bg-zinc-700 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}><FileText className="w-3 h-3" /> Text</button>
+                                        <button onClick={() => setJobInputMode('link')} className={`flex items-center gap-2 px-3 py-2 rounded text-xs font-bold transition-colors touch-target ${jobInputMode === 'link' ? 'bg-orange-600 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}><LinkIcon className="w-3 h-3" /> Link</button>
+                                        <button onClick={() => setJobInputMode('text')} className={`flex items-center gap-2 px-3 py-2 rounded text-xs font-bold transition-colors touch-target ${jobInputMode === 'text' ? 'bg-zinc-700 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}><FileText className="w-3 h-3" /> Text</button>
                                      </div>
-                                     <div className="flex-1">{jobInputMode === 'link' ? (<div className="h-full bg-zinc-900 border border-zinc-800 rounded-xl p-6 flex flex-col justify-center gap-4"><div className="text-center"><div className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-3"><LinkIcon className="w-6 h-6 text-orange-500" /></div><h4 className="text-white font-bold text-sm">Paste Job URL</h4><p className="text-zinc-500 text-xs">LinkedIn, Indeed, etc.</p></div><input type="text" value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} placeholder="https://..." className="w-full bg-zinc-950 border border-zinc-700 rounded-lg p-3 text-sm text-white focus:border-orange-500 outline-none" /></div>) : (<textarea value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} placeholder="Paste job description..." className="w-full h-full bg-zinc-900 border border-zinc-800 rounded-xl p-5 text-sm text-zinc-300 focus:outline-none focus:border-zinc-600 resize-none font-mono" />)}</div>
+                                     <div className="flex-1 min-h-[200px]">{jobInputMode === 'link' ? (<div className="h-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 sm:p-6 flex flex-col justify-center gap-4"><div className="text-center"><div className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-3"><LinkIcon className="w-6 h-6 text-orange-500" /></div><h4 className="text-white font-bold text-sm">Paste Job URL</h4><p className="text-zinc-500 text-xs">LinkedIn, Indeed, etc.</p></div><input type="url" inputMode="url" value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} placeholder="https://..." className="w-full bg-zinc-950 border border-zinc-700 rounded-lg p-3 text-sm text-white focus:border-orange-500 outline-none" /></div>) : (<textarea value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} placeholder="Paste job description..." className="w-full h-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 sm:p-5 text-sm text-zinc-300 focus:outline-none focus:border-zinc-600 resize-none font-mono min-h-[200px]" />)}</div>
                                 </div>
                             </div>
-                            {error && <div className="p-4 bg-red-950/20 border border-red-900/30 rounded-lg flex items-center gap-3 text-red-400 text-sm"><AlertCircle className="w-5 h-5 shrink-0" /> {error}</div>}
-                            <div className="flex justify-end"><button onClick={handleAnalysis} disabled={!resumeFile || isAnalyzing} className="px-8 py-3 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">Start Analysis</button></div>
+                            {error && <div className="p-3 sm:p-4 bg-red-950/20 border border-red-900/30 rounded-lg flex items-start gap-3 text-red-400 text-sm"><AlertCircle className="w-5 h-5 shrink-0 mt-0.5" /> <span>{error}</span></div>}
+                            <div className="flex justify-end pb-4"><button onClick={handleAnalysis} disabled={!resumeFile || isAnalyzing} className="w-full sm:w-auto px-8 py-3.5 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-bold rounded shadow-lg disabled:opacity-50 disabled:cursor-not-allowed touch-target">Start Analysis</button></div>
                          </div>
                      )}
                  </div>
@@ -428,21 +442,25 @@ const AppContent: React.FC = () => {
                         {resultTab === 'analysis' ? (
                           <div className="h-full overflow-y-auto p-6">
                             <ErrorBoundary>
-                              <AnalysisDashboard result={analysisResult} onUpdateProfile={handleUpdateAnalysisProfile} />
+                              <Suspense fallback={<div className="flex items-center justify-center h-64"><Loader2 className="w-8 h-8 text-orange-500 animate-spin" /></div>}>
+                                <AnalysisDashboard result={analysisResult} onUpdateProfile={handleUpdateAnalysisProfile} />
+                              </Suspense>
                             </ErrorBoundary>
                           </div>
                         ) : (
                           <ErrorBoundary>
-                            <ContentGenerator 
-                              resumeFile={resumeFile}
-                              resumeText={resumeText}
-                              jobDescription={jobDescription} 
-                              analysis={analysisResult} 
-                              isPaid={isPaid} 
-                              onPaymentSuccess={() => { setIsPaid(true); savePaymentState(true); }} 
-                              appLanguage={appLanguage} 
-                              setAppLanguage={setAppLanguage} 
-                            />
+                            <Suspense fallback={<div className="flex items-center justify-center h-64"><Loader2 className="w-8 h-8 text-orange-500 animate-spin" /></div>}>
+                              <ContentGenerator 
+                                resumeFile={resumeFile}
+                                resumeText={resumeText}
+                                jobDescription={jobDescription} 
+                                analysis={analysisResult} 
+                                isPaid={isPaid} 
+                                onPaymentSuccess={() => { setIsPaid(true); savePaymentState(true); }} 
+                                appLanguage={appLanguage} 
+                                setAppLanguage={setAppLanguage} 
+                              />
+                            </Suspense>
                           </ErrorBoundary>
                         )}
                      </div>

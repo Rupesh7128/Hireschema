@@ -13,11 +13,16 @@ export default defineConfig(({ mode }) => {
       build: {
         chunkSizeWarningLimit: 1500,
         target: 'es2020',
+        minify: 'esbuild',
+        cssMinify: true,
+        sourcemap: false,
         rollupOptions: {
           output: {
             // Ensure React is in a single chunk to prevent forwardRef issues
             manualChunks: {
               'react-vendor': ['react', 'react-dom'],
+              'ui-vendor': ['framer-motion', 'lucide-react'],
+              'chart-vendor': ['recharts'],
             }
           }
         }

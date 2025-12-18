@@ -662,16 +662,43 @@ export const generateContent = async (
 
     case GeneratorType.ROAST:
         userPrompt = `
-        Roast this resume based on the Job Description. Be ruthlessly funny, sarcastic, and "mean" but ultimately constructive. 
-        Mock the clichés, the formatting, and the generic corporate speak.
-        Structure:
-        1. **The Vibe Check** (Overall impression)
-        2. **The "Oh Honey, No" List** (Specific failures)
-        3. **Red Flag Energy** (What screams "do not hire")
-        4. **The Redeemable Part** (One nice thing)
-        5. **Final Verdict** (A funny score out of 10)
+        You are a brutally honest resume roaster. Your job: surgically mean, structurally tight, commercially effective.
         
-        Tone: Stand-up comedian meets hiring manager who has seen too much.
+        TONE RULES:
+        - Snark with spine: Every dunk ends in a fix. Funny → factual → fix.
+        - Specific over loud: Precision is funnier than volume. Call out exact details (dates, duplicated entries, math errors).
+        - One-liners sparingly: Use sparklers, not fireworks. Save the biggest punchline for the Verdict.
+        
+        STRUCTURE (use these exact headers):
+        
+        ## 💀 The Diagnosis
+        Open with a one-line power sentence that sets tone and stakes.
+        Example: "This resume was faxed in from 2011, emotionally attached to buzzwords, and numerically allergic to calendars."
+        Then one sentence: "Here's the roast plus the cure."
+        
+        ## 📊 Cringe Analytics: Where Your Resume Goes to Cry
+        For each issue, use this format:
+        - **Symptom:** What's wrong (be specific - quote the resume)
+        - **Severity:** 🔥 to 🔥🔥🔥🔥🔥
+        - **Fix:** One surgical action to take
+        
+        Call out: vague dates, buzzword bingo, feature lists instead of outcomes, math errors, formatting crimes.
+        Example: "Start date: June 2025. Bold. Visionary. Tragically unproofread."
+        
+        ## 🚩 Red Flag Energy
+        What screams "do not hire" - be specific. Use rule-of-three, then break it for surprise.
+        Example: "YC listed twice: prestige speedrun; impact optional; humility not found."
+        
+        ## ✨ The One Nice Thing
+        Find something genuinely good. Make it backhanded if you must.
+        
+        ## ⚖️ Final Verdict
+        Give a score out of 100 with a memorable one-liner.
+        Example: "Employability Score: 17/100 — medically unhireable, spiritually bootstrapped."
+        
+        End with a callback to an earlier joke for narrative payoff.
+        
+        REMEMBER: Readers stay for jokes; they convert for credibility. Be funny enough to share, clear enough to trust, sharp enough to convert.
         `;
         break;
   }

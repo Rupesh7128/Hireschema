@@ -88,17 +88,18 @@ const PaymentLock: React.FC<PaymentLockProps> = ({ onPaymentVerified, onBeforeRe
     setLicenseKey('');
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && licenseKey && !isVerifying && !isLocked) {
+      e.preventDefault();
       handleVerify();
     }
   };
 
   return (
-    <div className="h-full flex flex-col items-center justify-center p-4 sm:p-8 relative overflow-hidden bg-zinc-950/50 min-h-[500px]">
-      {/* Background Decor */}
-      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none"></div>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-orange-500/5 rounded-full blur-[100px] pointer-events-none animate-pulse"></div>
+    <div className="h-full flex flex-col items-center justify-center p-4 sm:p-8 relative overflow-hidden bg-zinc-950/50 min-h-[450px] sm:min-h-[500px]">
+      {/* Background Decor - reduced on mobile for performance */}
+      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none hidden sm:block"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[250px] sm:w-[500px] h-[250px] sm:h-[500px] bg-orange-500/5 rounded-full blur-[80px] sm:blur-[100px] pointer-events-none"></div>
 
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
@@ -108,18 +109,18 @@ const PaymentLock: React.FC<PaymentLockProps> = ({ onPaymentVerified, onBeforeRe
         {/* Header Strip */}
         <div className="h-1.5 w-full bg-gradient-to-r from-orange-600 via-red-500 to-orange-600"></div>
         
-        <div className="p-6 sm:p-8">
-          <div className="flex justify-center mb-6">
+        <div className="p-5 sm:p-8">
+          <div className="flex justify-center mb-5 sm:mb-6">
             <div className="relative">
-              <div className="absolute inset-0 bg-orange-500 blur-xl opacity-20 rounded-full"></div>
-              <div className="bg-zinc-950 border border-zinc-800 p-4 rounded-2xl shadow-lg relative">
-                <Lock className="w-8 h-8 text-orange-500" />
+              <div className="absolute inset-0 bg-orange-500 blur-xl opacity-20 rounded-full hidden sm:block"></div>
+              <div className="bg-zinc-950 border border-zinc-800 p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg relative">
+                <Lock className="w-6 sm:w-8 h-6 sm:h-8 text-orange-500" />
               </div>
             </div>
           </div>
 
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Unlock Downloads</h2>
+          <div className="text-center mb-5 sm:mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-white mb-2 tracking-tight">Unlock Downloads</h2>
             <p className="text-zinc-400 text-sm leading-relaxed">
               Download your optimized resume PDF for just $1. 
             </p>
@@ -134,7 +135,7 @@ const PaymentLock: React.FC<PaymentLockProps> = ({ onPaymentVerified, onBeforeRe
               </div>
               <button 
                 onClick={handlePaymentClick}
-                className="w-full group flex items-center justify-center gap-2 py-3 bg-white hover:bg-zinc-200 text-zinc-950 rounded-lg font-bold text-sm transition-all shadow-lg"
+                className="w-full group flex items-center justify-center gap-2 py-3.5 bg-white hover:bg-zinc-200 text-zinc-950 rounded-lg font-bold text-sm transition-all shadow-lg touch-target active:scale-[0.98]"
               >
                 <span>Pay $1 & Unlock</span>
                 <ExternalLink className="w-3.5 h-3.5 opacity-60 group-hover:translate-x-0.5 transition-transform" />
@@ -153,10 +154,14 @@ const PaymentLock: React.FC<PaymentLockProps> = ({ onPaymentVerified, onBeforeRe
                   type="text" 
                   value={licenseKey}
                   onChange={(e) => setLicenseKey(e.target.value)}
-                  onKeyPress={handleKeyPress}
+                  onKeyDown={handleKeyDown}
                   placeholder="paste_payment_id_here"
                   disabled={isVerifying || isLocked}
-                  className={`w-full bg-zinc-900 border ${error ? 'border-red-500/50 focus:border-red-500' : 'border-zinc-700 focus:border-orange-500'} rounded-lg py-2.5 pl-10 pr-24 text-sm text-white focus:outline-none transition-all placeholder:text-zinc-700 font-mono disabled:opacity-50`}
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  className={`w-full bg-zinc-900 border ${error ? 'border-red-500/50 focus:border-red-500' : 'border-zinc-700 focus:border-orange-500'} rounded-lg py-3 pl-10 pr-24 text-sm text-white focus:outline-none transition-all placeholder:text-zinc-700 font-mono disabled:opacity-50 touch-target`}
                 />
                 <button 
                   onClick={handleVerify}
