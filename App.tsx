@@ -142,14 +142,22 @@ const AppContent: React.FC = () => {
                     const persistedState = restoreStateAfterPayment();
                     console.log('Persisted state:', persistedState ? JSON.stringify({
                         hasResumeFile: !!persistedState.resumeFile,
+                        resumeFileName: persistedState.resumeFile?.name || 'none',
                         hasAnalysisResult: !!persistedState.analysisResult,
                         jobDescLength: persistedState.jobDescription?.length || 0,
-                        resumeTextLength: persistedState.resumeText?.length || 0
+                        resumeTextLength: persistedState.resumeText?.length || 0,
+                        resumeTextPreview: persistedState.resumeText?.substring(0, 100) || 'EMPTY'
                     }) : 'null');
                     
                     if (persistedState) {
-                        console.log('Restoring from persisted state, navigating to editor...');
+                        console.log('✅ Restoring from persisted state, navigating to editor...');
                         console.log('resumeText length being restored:', persistedState.resumeText?.length || 0);
+                        console.log('resumeText preview:', persistedState.resumeText?.substring(0, 150) || 'EMPTY');
+                        
+                        if (!persistedState.resumeText || persistedState.resumeText.length < 100) {
+                            console.warn('⚠️ WARNING: Restored resumeText is empty or too short!');
+                        }
+                        
                         // Set all state in sequence to ensure proper updates
                         setResumeFile(persistedState.resumeFile);
                         setResumeText(persistedState.resumeText || '');

@@ -152,29 +152,42 @@ const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, resumeT
   // Effect to extract text from PDF if resumeText prop is empty but we have a file
   useEffect(() => {
     const extractTextIfNeeded = async () => {
-      // If we already have text, use it
+      console.log('[ContentGenerator] extractTextIfNeeded called:', {
+        resumeTextPropLength: resumeText?.length || 0,
+        localResumeTextLength: localResumeText?.length || 0,
+        hasResumeFile: !!resumeFile,
+        resumeFileType: resumeFile?.type || 'none'
+      });
+      
+      // If we already have text from prop, use it
       if (resumeText && resumeText.length > 100) {
         console.log('[ContentGenerator] Using provided resumeText, length:', resumeText.length);
+        console.log('[ContentGenerator] resumeText preview:', resumeText.substring(0, 150));
         setLocalResumeText(resumeText);
         return;
       }
       
       // If no text but we have a PDF file, extract it
       if (resumeFile && resumeFile.type === 'application/pdf' && resumeFile.base64) {
-        console.log('[ContentGenerator] resumeText empty, extracting from PDF...');
+        console.log('[ContentGenerator] resumeText empty/short, extracting from PDF...');
         setIsExtractingText(true);
         try {
           const { extractTextFromPdf } = await import('../services/geminiService');
           const extractedText = await extractTextFromPdf(resumeFile.base64);
           console.log('[ContentGenerator] Extracted text length:', extractedText?.length || 0);
+          console.log('[ContentGenerator] Extracted text preview:', extractedText?.substring(0, 150) || 'EMPTY');
           if (extractedText && extractedText.length > 100) {
             setLocalResumeText(extractedText);
+          } else {
+            console.warn('[ContentGenerator] Extracted text too short or empty!');
           }
         } catch (e) {
           console.error('[ContentGenerator] Failed to extract text from PDF:', e);
         } finally {
           setIsExtractingText(false);
         }
+      } else {
+        console.warn('[ContentGenerator] No PDF file available for extraction');
       }
     };
     
@@ -183,19 +196,31 @@ const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, resumeT
   
   // Handler to save state before payment redirect
   const handleBeforePaymentRedirect = () => {
+    const textToSave = localResumeText || resumeText;
     console.log('=== handleBeforePaymentRedirect called ===');
     console.log('Saving state:', {
       hasResumeFile: !!resumeFile,
-      resumeTextLength: localResumeText?.length || resumeText?.length || 0,
+      resumeFileName: resumeFile?.name || 'none',
+      localResumeTextLength: localResumeText?.length || 0,
+      resumeTextPropLength: resumeText?.length || 0,
+      textToSaveLength: textToSave?.length || 0,
+      textToSavePreview: textToSave?.substring(0, 100) || 'EMPTY',
       jobDescriptionLength: jobDescription?.length || 0,
-      hasAnalysisResult: !!analysis
+      hasAnalysisResult: !!analysis,
+      analysisContactName: analysis?.contactProfile?.name || 'unknown'
     });
+    
+    if (!textToSave || textToSave.length < 100) {
+      console.warn('⚠️ WARNING: Saving state with empty/short resumeText!');
+    }
+    
     saveStateBeforePayment({
       resumeFile,
-      resumeText: localResumeText || resumeText,
+      resumeText: textToSave,
       jobDescription,
       analysisResult: analysis,
     });
+    console.log('✅ State saved to localStorage');
   };
   const [activeTab, setActiveTab] = useState<GeneratorType>(GeneratorType.ATS_RESUME);
   const [generatedData, setGeneratedData] = useState<Record<string, string>>({});

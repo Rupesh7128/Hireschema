@@ -584,48 +584,47 @@ export const generateContent = async (
       userPrompt = `
       You are an expert Resume Writer and ATS Optimization Specialist.
       
-      ⚠️ **ABSOLUTE RULE - ZERO FABRICATION POLICY** ⚠️
+      ════════════════════════════════════════════════════════════════════════════════
+      ⛔ CRITICAL: ZERO FABRICATION POLICY - READ THIS CAREFULLY ⛔
+      ════════════════════════════════════════════════════════════════════════════════
       
-      You are STRICTLY FORBIDDEN from changing, inventing, or hallucinating ANY factual information.
+      Your task is to REFORMAT and OPTIMIZE the resume above, NOT to create a new one.
       
-      **FACTS YOU MUST COPY EXACTLY FROM THE ORIGINAL RESUME:**
-      ✗ Company names - If original says "Acme Corp", output MUST say "Acme Corp" (not "Google", not "Microsoft", not anything else)
-      ✗ Job titles - If original says "Junior Developer", output MUST say "Junior Developer" (not "Senior Engineer")
-      ✗ Employment dates - If original says "Jan 2020 - Dec 2022", output MUST say "Jan 2020 - Dec 2022"
-      ✗ School names - If original says "State University", output MUST say "State University" (not "MIT", not "Stanford")
-      ✗ Degrees - If original says "B.S. in Computer Science", output MUST say "B.S. in Computer Science"
-      ✗ Graduation dates - Copy exactly
-      ✗ Certifications - Copy exactly
-      ✗ Contact info (name, email, phone, location) - Copy exactly
+      🚫 ABSOLUTELY FORBIDDEN - DO NOT:
+      • Invent ANY company names (use ONLY companies from the original resume)
+      • Invent ANY job titles (use ONLY titles from the original resume)
+      • Invent ANY school names (use ONLY schools from the original resume)
+      • Invent ANY degrees (use ONLY degrees from the original resume)
+      • Change ANY dates (copy dates EXACTLY as written)
+      • Add ANY skills not mentioned in the original resume
+      • Add ANY metrics/numbers not in the original resume
+      • Add ANY certifications not in the original resume
       
-      **WHAT YOU CAN IMPROVE:**
-      ✓ Rewrite bullet point descriptions to sound more impactful (same facts, better wording)
-      ✓ Add keywords from the job description naturally into existing bullet points
-      ✓ Write a compelling professional summary using the candidate's ACTUAL experience
-      ✓ Reorganize sections for better flow
-      ✓ Use stronger action verbs
+      ✅ YOU MUST:
+      • Copy the candidate's NAME exactly as shown
+      • Copy ALL company names exactly as shown
+      • Copy ALL job titles exactly as shown  
+      • Copy ALL school names exactly as shown
+      • Copy ALL dates exactly as shown
+      • Copy the candidate's contact info exactly
       
-      **WHAT YOU CANNOT DO:**
-      ✗ Invent companies the candidate never worked at
-      ✗ Invent job titles the candidate never held
-      ✗ Invent schools the candidate never attended
-      ✗ Invent metrics or numbers that aren't in the original
-      ✗ Change any dates
-      ✗ Add skills the candidate doesn't have
+      ✅ YOU MAY IMPROVE:
+      • Reword bullet points to sound more impactful (same facts, better phrasing)
+      • Add relevant keywords from the job description INTO existing bullet points
+      • Write a professional summary based on their ACTUAL experience
+      • Reorganize sections for better flow
+      • Use stronger action verbs
       
-      **INPUTS:**
-      1. **Original Resume Content**: Provided above - THIS IS YOUR ONLY SOURCE OF TRUTH
-      2. **Job Description**: Provided below
-      3. **Keywords to incorporate**: ${analysis.missingKeywords.join(", ")}
+      **Keywords to naturally incorporate**: ${analysis.missingKeywords.join(", ")}
       
       **OUTPUT FORMAT:**
-      - Use Markdown with # for name, ## for sections
-      - Use - for bullet points
-      - NO tables, NO columns
+      - Markdown format: # for name, ## for sections, - for bullets
+      - Single column layout, NO tables
+      - Include: Contact Info, Summary, Experience, Education, Skills
       
       **LANGUAGE:** ${langInstruction}
       
-      Output the FULL optimized resume. No explanations. Just the resume.
+      Output ONLY the optimized resume. No explanations, no preamble.
       `;
       break;
 
@@ -637,10 +636,17 @@ export const generateContent = async (
       userPrompt = `
       Write a persuasive Cover Letter for the candidate.
       
-      **CRITICAL**: Use ONLY the candidate's ACTUAL experience from the original resume.
-      - Reference their REAL companies, job titles, and achievements
-      - Do NOT invent or fabricate any experience
-      - The candidate's name is: ${profile.name}
+      ⛔ CRITICAL - ZERO FABRICATION POLICY:
+      • Use ONLY companies, job titles, and achievements from the ORIGINAL RESUME above
+      • Do NOT invent any experience, projects, or accomplishments
+      • Reference their REAL work history exactly as shown in the resume
+      • The candidate's name is: ${profile.name || 'the candidate'}
+      
+      The cover letter should:
+      1. Open with enthusiasm for the specific role
+      2. Highlight 2-3 relevant experiences FROM THE RESUME
+      3. Connect their ACTUAL skills to the job requirements
+      4. Close with a call to action
       
       ${langInstruction}
       ${toneInstruction}
@@ -653,13 +659,15 @@ export const generateContent = async (
       userPrompt = `
       Create an Interview Prep Kit for this candidate.
       
-      **CRITICAL**: Base all examples on the candidate's ACTUAL experience from their resume.
-      - Use their REAL companies, projects, and achievements for STAR examples
-      - Do NOT invent fictional scenarios
+      ⛔ CRITICAL - ZERO FABRICATION POLICY:
+      • ALL STAR examples MUST use companies, projects, and achievements from the ORIGINAL RESUME above
+      • Do NOT invent fictional scenarios or fake accomplishments
+      • Reference ONLY their real work history as shown in the resume
       
       Include:
       1. 10 Predicted Interview Questions based on the job description
-      2. STAR Method examples using the candidate's REAL experience
+      2. STAR Method examples using ONLY experiences from the resume above
+         - For each STAR example, cite the specific company/role from their resume
       3. Questions to ask the interviewer
       4. Common pitfalls to avoid
       
@@ -749,26 +757,39 @@ export const generateContent = async (
   // Build the resume context - prioritize original text if available
   // Log for debugging
   console.log('[generateContent] originalResumeText length:', originalResumeText?.length || 0);
+  console.log('[generateContent] First 200 chars of resumeText:', originalResumeText?.substring(0, 200) || 'EMPTY');
   
   const resumeContext = originalResumeText && originalResumeText.length > 100
     ? `
-╔══════════════════════════════════════════════════════════════════════════════╗
-║  ORIGINAL RESUME - THIS IS THE ONLY SOURCE OF TRUTH                          ║
-║  ALL company names, job titles, dates, schools MUST be copied EXACTLY        ║
-╚══════════════════════════════════════════════════════════════════════════════╝
+════════════════════════════════════════════════════════════════════════════════
+█ ORIGINAL RESUME CONTENT - THIS IS YOUR ONLY SOURCE OF TRUTH █
+════════════════════════════════════════════════════════════════════════════════
+⚠️ EVERY company name, job title, school name, date, and skill below is REAL.
+⚠️ You MUST use ONLY the information below. DO NOT invent anything.
+════════════════════════════════════════════════════════════════════════════════
 
 ${originalResumeText}
 
-╔══════════════════════════════════════════════════════════════════════════════╗
-║  END OF ORIGINAL RESUME - DO NOT INVENT ANY INFORMATION NOT SHOWN ABOVE      ║
-╚══════════════════════════════════════════════════════════════════════════════╝
+════════════════════════════════════════════════════════════════════════════════
+█ END OF ORIGINAL RESUME - USE ONLY THE INFORMATION ABOVE █
+════════════════════════════════════════════════════════════════════════════════
+⛔ If you output ANY company, school, or job title NOT shown above, you have FAILED.
+⛔ Double-check every fact against the original resume above before outputting.
+════════════════════════════════════════════════════════════════════════════════
 `
     : `
-⚠️ WARNING: Original resume text not available - using limited profile data ⚠️
-Summary: ${analysis.summary}
-Key Strengths: ${analysis.keyStrengths.join(", ")}
-Contact Info: ${JSON.stringify(analysis.contactProfile)}
-⚠️ Generate a generic template since original details are unavailable ⚠️
+════════════════════════════════════════════════════════════════════════════════
+⚠️ WARNING: Original resume text not available ⚠️
+════════════════════════════════════════════════════════════════════════════════
+Using limited profile data from analysis:
+- Name: ${analysis.contactProfile?.name || 'Unknown'}
+- Summary: ${analysis.summary || 'Not available'}
+- Key Strengths: ${analysis.keyStrengths?.join(", ") || 'Not available'}
+- Contact: ${JSON.stringify(analysis.contactProfile || {})}
+
+⚠️ Since original resume is unavailable, create a TEMPLATE with placeholders.
+⚠️ Use [Company Name], [Job Title], [School Name] as placeholders.
+════════════════════════════════════════════════════════════════════════════════
 `;
 
   const fullPrompt = `
