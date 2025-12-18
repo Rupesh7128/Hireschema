@@ -63,6 +63,7 @@ export interface HistoryItem {
     atsScore: number;
     status: ApplicationStatus;
     resumeFile: FileData;
+    resumeText?: string; // Extracted text from PDF for content generation
     jobDescription: string;
     analysisResult: AnalysisResult;
 }

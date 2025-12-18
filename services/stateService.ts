@@ -78,7 +78,12 @@ export function saveStateBeforePayment(state: Omit<PersistedState, 'timestamp'>)
     };
 
     localStorage.setItem(STATE_KEY, JSON.stringify(stateWithTimestamp));
-    console.log('State saved before payment redirect');
+    console.log('State saved before payment redirect:', {
+      hasResumeFile: !!state.resumeFile,
+      resumeTextLength: state.resumeText?.length || 0,
+      jobDescriptionLength: state.jobDescription?.length || 0,
+      hasAnalysisResult: !!state.analysisResult
+    });
   } catch (e) {
     console.error('Failed to save state before payment:', e);
   }

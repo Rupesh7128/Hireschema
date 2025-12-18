@@ -561,6 +561,7 @@ export const generateContent = async (
       tailorExperience?: boolean;
       tone?: string;
       language?: string;
+      resumeText?: string; // Original extracted resume text
   }
 ): Promise<string> => {
   
@@ -568,6 +569,7 @@ export const generateContent = async (
   const tailorExperience = options?.tailorExperience || false;
   const toneInstruction = options?.tone ? `Adopt a tone that is: ${options.tone}.` : "Adopt a professional, confident tone.";
   const language = options?.language || "English";
+  const originalResumeText = options?.resumeText || '';
   
   const langInstruction = language !== "English" 
     ? `IMPORTANT: TRANSLATE final output to ${language}.` 
@@ -579,48 +581,51 @@ export const generateContent = async (
 
   switch (type) {
     case GeneratorType.ATS_RESUME:
-      // Extract original text from file data if possible, or use a placeholder if not available directly here.
-      // Ideally, we should pass the raw text. For now, we rely on the prompt to ask for it if needed, 
-      // but better to include the full analysis context.
-      
       userPrompt = `
       You are an expert Resume Writer and ATS Optimization Specialist.
       
-      **TASK**: Rewrite the candidate's resume to strictly target the provided Job Description (JD).
+      ⚠️ **ABSOLUTE RULE - ZERO FABRICATION POLICY** ⚠️
       
-      **INPUTS**:
-      1. **Job Description**: Provided below.
-      2. **Candidate Analysis**:
-         - Missing Keywords: ${analysis.missingKeywords.join(", ")}
-         - Critical Issues: ${analysis.criticalIssues.join(", ")}
-         - Key Strengths: ${analysis.keyStrengths.join(", ")}
+      You are STRICTLY FORBIDDEN from changing, inventing, or hallucinating ANY factual information.
       
-      **STRICT REQUIREMENTS**:
-      1. **Structure**: Use a clean, standard reverse-chronological format.
-         - Header (Name, Contact - use placeholders if missing)
-         - Professional Summary (3-4 lines, high impact, incorporating JD keywords)
-         - Skills (Categorized: Technical, Soft, Tools - prioritizing JD matches)
-         - Professional Experience (Most important section)
-         - Education
+      **FACTS YOU MUST COPY EXACTLY FROM THE ORIGINAL RESUME:**
+      ✗ Company names - If original says "Acme Corp", output MUST say "Acme Corp" (not "Google", not "Microsoft", not anything else)
+      ✗ Job titles - If original says "Junior Developer", output MUST say "Junior Developer" (not "Senior Engineer")
+      ✗ Employment dates - If original says "Jan 2020 - Dec 2022", output MUST say "Jan 2020 - Dec 2022"
+      ✗ School names - If original says "State University", output MUST say "State University" (not "MIT", not "Stanford")
+      ✗ Degrees - If original says "B.S. in Computer Science", output MUST say "B.S. in Computer Science"
+      ✗ Graduation dates - Copy exactly
+      ✗ Certifications - Copy exactly
+      ✗ Contact info (name, email, phone, location) - Copy exactly
       
-      2. **Content Strategy (The 60/40 Rule)**:
-         - Keep 60% of the candidate's core truth (dates, companies, titles).
-         - Rewrite 40% of the bullet points to directly address the JD's requirements.
-         - **QUANTIFY**: Every bullet point MUST have a metric if possible (e.g., "Improved X by Y%", "Managed Z budget").
-         - **KEYWORDS**: Naturally weave in these missing keywords: ${analysis.missingKeywords.join(", ")}.
+      **WHAT YOU CAN IMPROVE:**
+      ✓ Rewrite bullet point descriptions to sound more impactful (same facts, better wording)
+      ✓ Add keywords from the job description naturally into existing bullet points
+      ✓ Write a compelling professional summary using the candidate's ACTUAL experience
+      ✓ Reorganize sections for better flow
+      ✓ Use stronger action verbs
       
-      3. **Formatting**:
-         - Use standard Markdown headers (#, ##).
-         - Use standard bullet points (-).
-         - NO tables, NO columns, NO graphics.
+      **WHAT YOU CANNOT DO:**
+      ✗ Invent companies the candidate never worked at
+      ✗ Invent job titles the candidate never held
+      ✗ Invent schools the candidate never attended
+      ✗ Invent metrics or numbers that aren't in the original
+      ✗ Change any dates
+      ✗ Add skills the candidate doesn't have
       
-      4. **Language**:
-         - ${langInstruction}
-         - Use active voice (e.g., "Spearheaded," "Engineered," "Optimized").
-         - Remove personal pronouns (I, me, my).
+      **INPUTS:**
+      1. **Original Resume Content**: Provided above - THIS IS YOUR ONLY SOURCE OF TRUTH
+      2. **Job Description**: Provided below
+      3. **Keywords to incorporate**: ${analysis.missingKeywords.join(", ")}
       
-      **OUTPUT**:
-      Provide the FULL, complete text of the new resume in Markdown. Do not summarize. Do not explain your changes. Just give the resume.
+      **OUTPUT FORMAT:**
+      - Use Markdown with # for name, ## for sections
+      - Use - for bullet points
+      - NO tables, NO columns
+      
+      **LANGUAGE:** ${langInstruction}
+      
+      Output the FULL optimized resume. No explanations. Just the resume.
       `;
       break;
 
@@ -629,11 +634,37 @@ export const generateContent = async (
       break;
 
     case GeneratorType.COVER_LETTER:
-      userPrompt = `Write a persuasive Cover Letter. ${langInstruction} Tone: ${toneInstruction}. Candidate: ${profile.name}.`;
+      userPrompt = `
+      Write a persuasive Cover Letter for the candidate.
+      
+      **CRITICAL**: Use ONLY the candidate's ACTUAL experience from the original resume.
+      - Reference their REAL companies, job titles, and achievements
+      - Do NOT invent or fabricate any experience
+      - The candidate's name is: ${profile.name}
+      
+      ${langInstruction}
+      ${toneInstruction}
+      
+      Output only the cover letter text, ready to use.
+      `;
       break;
 
     case GeneratorType.INTERVIEW_PREP:
-      userPrompt = `Create Interview Prep Kit. ${langInstruction}. STAR Method, 10 Predicted Questions, Follow-ups, Pitfalls.`;
+      userPrompt = `
+      Create an Interview Prep Kit for this candidate.
+      
+      **CRITICAL**: Base all examples on the candidate's ACTUAL experience from their resume.
+      - Use their REAL companies, projects, and achievements for STAR examples
+      - Do NOT invent fictional scenarios
+      
+      Include:
+      1. 10 Predicted Interview Questions based on the job description
+      2. STAR Method examples using the candidate's REAL experience
+      3. Questions to ask the interviewer
+      4. Common pitfalls to avoid
+      
+      ${langInstruction}
+      `;
       break;
 
     case GeneratorType.EMAIL_TEMPLATE:
@@ -648,7 +679,19 @@ export const generateContent = async (
       break;
     
     case GeneratorType.LEARNING_PATH:
-        userPrompt = `Create a "Mini Learning Path" for missing keywords: ${analysis.missingKeywords.slice(0, 4).join(", ")}. ${langInstruction}.`;
+        userPrompt = `
+        Create a "Mini Learning Path" to help this candidate fill skill gaps.
+        
+        **Missing skills to learn**: ${analysis.missingKeywords.slice(0, 4).join(", ")}
+        **Candidate's existing strengths**: ${analysis.keyStrengths.join(", ")}
+        
+        For each missing skill, provide:
+        1. Why it matters for the target role
+        2. 2-3 specific resources (courses, tutorials, projects)
+        3. Estimated time to learn basics
+        
+        ${langInstruction}
+        `;
         break;
       
     case GeneratorType.MARKET_INSIGHTS:
@@ -703,37 +746,40 @@ export const generateContent = async (
         break;
   }
 
-  // We MUST include the resume text in the context, otherwise the AI is hallucinating a resume.
-  // The resumeFile object contains base64, but we need text.
-  // Ideally, the caller should pass the extracted text.
-  // Since we don't have it here easily without re-parsing, we rely on the fact that `analysis` object 
-  // *should* ideally contain a summary or we pass it in. 
-  // However, looking at the code, `extractTextFromPdf` is client-side.
-  // The best approach here is to ask the user (developer) to ensure `resumeFile` text is passed, 
-  // OR we use the `analysis` result which contains `summary`, `keyStrengths` etc as a proxy for the resume content 
-  // if the full text isn't available. 
-  // BUT, to fix "generic resume", we really need the original content.
-  // Let's assume for now we don't have the full text readily available in this function signature 
-  // (it takes FileData which is base64).
-  // WE WILL INJECT THE SUMMARY + STRENGTHS + ISSUES as the "Resume Context" to ground the generation.
+  // Build the resume context - prioritize original text if available
+  // Log for debugging
+  console.log('[generateContent] originalResumeText length:', originalResumeText?.length || 0);
   
-  const resumeContext = `
-  Candidate Profile Summary: ${analysis.summary}
-  Key Strengths: ${analysis.keyStrengths.join(", ")}
-  Critical Issues to Fix: ${analysis.criticalIssues.join(", ")}
-  Contact Info: ${JSON.stringify(analysis.contactProfile)}
-  `;
+  const resumeContext = originalResumeText && originalResumeText.length > 100
+    ? `
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  ORIGINAL RESUME - THIS IS THE ONLY SOURCE OF TRUTH                          ║
+║  ALL company names, job titles, dates, schools MUST be copied EXACTLY        ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+${originalResumeText}
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  END OF ORIGINAL RESUME - DO NOT INVENT ANY INFORMATION NOT SHOWN ABOVE      ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+`
+    : `
+⚠️ WARNING: Original resume text not available - using limited profile data ⚠️
+Summary: ${analysis.summary}
+Key Strengths: ${analysis.keyStrengths.join(", ")}
+Contact Info: ${JSON.stringify(analysis.contactProfile)}
+⚠️ Generate a generic template since original details are unavailable ⚠️
+`;
 
   const fullPrompt = `
-  ORIGINAL RESUME CONTEXT:
-  ${resumeContext}
-  
-  TARGET JOB DESCRIPTION:
-  ${jobDescription}
-  
-  TASK:
-  ${userPrompt}
-  `;
+${resumeContext}
+
+TARGET JOB DESCRIPTION:
+${jobDescription}
+
+TASK:
+${userPrompt}
+`;
 
   try {
     const response = await generateWithFallback(

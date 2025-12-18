@@ -6,7 +6,7 @@ import {
     CheckCircle, Loader2
 } from 'lucide-react';
 import { FileData, AnalysisResult, HistoryItem, ContactProfile } from './types';
-import { analyzeResume } from './services/geminiService';
+import { analyzeResume, extractTextFromPdf } from './services/geminiService';
 import { db } from './services/db';
 import { logEvent, logPageView } from './services/analytics';
 import { verifyDodoPayment, savePaymentState, readPaymentState } from './services/paymentService';
@@ -143,14 +143,16 @@ const AppContent: React.FC = () => {
                     console.log('Persisted state:', persistedState ? JSON.stringify({
                         hasResumeFile: !!persistedState.resumeFile,
                         hasAnalysisResult: !!persistedState.analysisResult,
-                        jobDescLength: persistedState.jobDescription?.length || 0
+                        jobDescLength: persistedState.jobDescription?.length || 0,
+                        resumeTextLength: persistedState.resumeText?.length || 0
                     }) : 'null');
                     
                     if (persistedState) {
                         console.log('Restoring from persisted state, navigating to editor...');
+                        console.log('resumeText length being restored:', persistedState.resumeText?.length || 0);
                         // Set all state in sequence to ensure proper updates
                         setResumeFile(persistedState.resumeFile);
-                        setResumeText(persistedState.resumeText);
+                        setResumeText(persistedState.resumeText || '');
                         setJobDescription(persistedState.jobDescription);
                         setAnalysisResult(persistedState.analysisResult);
                         // CRITICAL: Set dashboard view to 'result' and tab to 'generator' (Editor)
@@ -167,6 +169,7 @@ const AppContent: React.FC = () => {
                         const mostRecent = h[0];
                         console.log('Restoring from history item:', mostRecent.id);
                         setResumeFile(mostRecent.resumeFile);
+                        setResumeText(mostRecent.resumeText || '');
                         setJobDescription(mostRecent.jobDescription);
                         setAnalysisResult(mostRecent.analysisResult);
                         // CRITICAL: Set dashboard view to 'result' and tab to 'generator' (Editor)
@@ -262,12 +265,33 @@ const AppContent: React.FC = () => {
 
   // --- ACTIONS ---
 
-  const handleLandingStart = (intent: 'scan' | 'optimize' | 'launch', file?: FileData) => {
+  // Extract text from PDF when file is uploaded
+  const handleFileUpload = async (file: FileData | null) => {
+    setResumeFile(file);
+    if (file && file.type === 'application/pdf') {
+      try {
+        const text = await extractTextFromPdf(file.base64);
+        setResumeText(text);
+      } catch (e) {
+        console.error('Failed to extract text from PDF:', e);
+        setResumeText('');
+      }
+    } else {
+      setResumeText('');
+    }
+  };
+
+  const handleLandingStart = async (intent: 'scan' | 'optimize' | 'launch', file?: FileData) => {
     setView('dashboard');
     window.history.pushState({}, '', '/app');
     
     // Always start a new scan session
-    setResumeFile(file || null);
+    if (file) {
+      await handleFileUpload(file);
+    } else {
+      setResumeFile(null);
+      setResumeText('');
+    }
     setJobDescription('');
     setAnalysisResult(null);
     setInputWizardStep(file ? 1 : 0);
@@ -276,6 +300,7 @@ const AppContent: React.FC = () => {
 
   const startNewScan = () => {
       setResumeFile(null);
+      setResumeText('');
       setJobDescription('');
       setAnalysisResult(null);
       setInputWizardStep(0);
@@ -295,13 +320,14 @@ const AppContent: React.FC = () => {
       
       // Create History Item
       const newItem: HistoryItem = {
-          id: Math.random().toString(36).substr(2, 9),
+          id: Math.random().toString(36).substring(2, 11),
           date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
           jobTitle: result.jobTitle || 'General Application',
           company: result.company || 'Unknown Company',
           atsScore: result.atsScore,
           status: 'To Do',
           resumeFile,
+          resumeText, // Include extracted text for content generation
           jobDescription,
           analysisResult: result
       };
@@ -448,7 +474,7 @@ const AppContent: React.FC = () => {
                                     <h3 className="text-xs font-bold text-zinc-500 uppercase mb-3">1. Select Resume</h3>
                                     <div className="flex-1 overflow-hidden h-full min-h-[250px]">
                                         <Suspense fallback={<div className="h-full flex items-center justify-center"><Loader2 className="w-6 h-6 text-orange-500 animate-spin" /></div>}>
-                                          <ResumeUploader onFileUpload={setResumeFile} currentFile={resumeFile} />
+                                          <ResumeUploader onFileUpload={handleFileUpload} currentFile={resumeFile} />
                                         </Suspense>
                                     </div>
                                     <div className="md:hidden mt-4"><button onClick={() => setInputWizardStep(1)} disabled={!resumeFile} className="w-full py-3.5 bg-zinc-800 text-white rounded font-bold touch-target active:bg-zinc-700 disabled:opacity-50">Next</button></div>

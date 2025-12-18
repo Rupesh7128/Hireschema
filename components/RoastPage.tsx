@@ -57,13 +57,17 @@ export const RoastPage = () => {
     setIsRoasting(true);
     setError(null);
     try {
-        const text = await extractTextFromPdf(fileData.base64.split(',')[1]);
+        // Handle both cases: base64 with data URL prefix or raw base64
+        const base64Data = fileData.base64.includes(',') 
+            ? fileData.base64.split(',')[1] 
+            : fileData.base64;
+        const text = await extractTextFromPdf(base64Data);
         const result = await generateContent(
             GeneratorType.ROAST,
             fileData,
-            text,
+            '', // No job description for roast
             { missingKeywords: [], contactProfile: { name: 'Candidate', email: '', phone: '', linkedin: '', location: '' }, atsScore: 0, relevanceScore: 0, roleFitAnalysis: '', languages: [], criticalIssues: [], keyStrengths: [], summary: '' }, 
-            { language: 'English' }
+            { language: 'English', resumeText: text }
         );
         setRoastResult(result);
     } catch (err: any) {

@@ -145,18 +145,54 @@ const ChatSidebar = ({
 
 const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, resumeText = '', jobDescription, analysis, isPaid, onPaymentSuccess, appLanguage, setAppLanguage }) => {
   
+  // Local state for resume text - allows fallback extraction if prop is empty
+  const [localResumeText, setLocalResumeText] = useState<string>(resumeText);
+  const [isExtractingText, setIsExtractingText] = useState(false);
+  
+  // Effect to extract text from PDF if resumeText prop is empty but we have a file
+  useEffect(() => {
+    const extractTextIfNeeded = async () => {
+      // If we already have text, use it
+      if (resumeText && resumeText.length > 100) {
+        console.log('[ContentGenerator] Using provided resumeText, length:', resumeText.length);
+        setLocalResumeText(resumeText);
+        return;
+      }
+      
+      // If no text but we have a PDF file, extract it
+      if (resumeFile && resumeFile.type === 'application/pdf' && resumeFile.base64) {
+        console.log('[ContentGenerator] resumeText empty, extracting from PDF...');
+        setIsExtractingText(true);
+        try {
+          const { extractTextFromPdf } = await import('../services/geminiService');
+          const extractedText = await extractTextFromPdf(resumeFile.base64);
+          console.log('[ContentGenerator] Extracted text length:', extractedText?.length || 0);
+          if (extractedText && extractedText.length > 100) {
+            setLocalResumeText(extractedText);
+          }
+        } catch (e) {
+          console.error('[ContentGenerator] Failed to extract text from PDF:', e);
+        } finally {
+          setIsExtractingText(false);
+        }
+      }
+    };
+    
+    extractTextIfNeeded();
+  }, [resumeFile, resumeText]);
+  
   // Handler to save state before payment redirect
   const handleBeforePaymentRedirect = () => {
     console.log('=== handleBeforePaymentRedirect called ===');
     console.log('Saving state:', {
       hasResumeFile: !!resumeFile,
-      resumeTextLength: resumeText?.length || 0,
+      resumeTextLength: localResumeText?.length || resumeText?.length || 0,
       jobDescriptionLength: jobDescription?.length || 0,
       hasAnalysisResult: !!analysis
     });
     saveStateBeforePayment({
       resumeFile,
-      resumeText,
+      resumeText: localResumeText || resumeText,
       jobDescription,
       analysisResult: analysis,
     });
@@ -228,12 +264,13 @@ const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, resumeT
   // Language Menu
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
 
-  // EAGER LOADING
+  // EAGER LOADING - wait for text extraction before generating
   useEffect(() => {
-    if (isPaid) {
+    if (isPaid && !isExtractingText && localResumeText) {
+        console.log('[ContentGenerator] Starting content generation with resumeText length:', localResumeText.length);
         generateAllContent();
     }
-  }, [appLanguage, isPaid]);
+  }, [appLanguage, isPaid, isExtractingText, localResumeText]);
 
   const generateAllContent = async () => {
     await handleGenerate(GeneratorType.ATS_RESUME, true);
@@ -261,6 +298,10 @@ const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, resumeT
     setLoadingStates(prev => ({ ...prev, [type]: true }));
     setError(null);
 
+    // Use localResumeText which has fallback extraction
+    const textToUse = localResumeText || resumeText;
+    console.log('[handleGenerate] Using resumeText length:', textToUse?.length || 0);
+
     try {
         const content = await generateContent(
             type, 
@@ -272,7 +313,8 @@ const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, resumeT
                 tailorExperience: tailorExperience && type === GeneratorType.ATS_RESUME,
                 language: appLanguage,
                 emailChannel: emailChannel,
-                emailScenario: emailScenario
+                emailScenario: emailScenario,
+                resumeText: textToUse // Pass original resume text to preserve facts
             }
         );
         setGeneratedData(prev => ({ ...prev, [type]: content }));
