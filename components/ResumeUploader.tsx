@@ -95,7 +95,7 @@ const ResumeUploader: React.FC<ResumeUploaderProps> = ({ onFileUpload, currentFi
                 <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className={`relative group cursor-pointer h-full rounded-xl border-2 border-dashed transition-all duration-300 flex flex-col items-center justify-center gap-4 ${isDragging ? 'border-orange-500 bg-orange-500/10' : error ? 'border-red-500/50 bg-red-950/10' : 'border-zinc-800 bg-zinc-900/50 hover:border-orange-500/30 hover:bg-zinc-900/80'}`}
+                    className={`relative group cursor-pointer h-full rounded-xl border-2 border-dashed transition-all duration-500 flex flex-col items-center justify-center gap-4 ${isDragging ? 'border-orange-500 bg-orange-500/10' : error ? 'border-red-500/50 bg-red-950/10' : 'border-zinc-800 bg-zinc-900/50 hover:border-orange-500/30 hover:bg-zinc-900/80'}`}
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
                     onDrop={handleDrop}

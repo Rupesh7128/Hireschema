@@ -585,7 +585,7 @@ const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, resumeT
 
     if (isResume && analysis.contactProfile.photo) {
         return (
-            <div className={`${bgClass} transition-colors duration-300 p-6 rounded-sm`}>
+            <div className={`${bgClass} transition-colors duration-500 p-6 rounded-sm`}>
                 <div className="flex justify-center mb-6">
                     <div className="p-1 rounded-full shadow-lg" style={{ backgroundColor: accentColor.value }}>
                         <img src={analysis.contactProfile.photo} alt="Profile" className={`w-24 h-24 rounded-full object-cover border-4 border-white`} />
@@ -596,7 +596,7 @@ const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, resumeT
         );
     }
     
-    return <div className={`${bgClass} transition-colors duration-300 p-6 rounded-sm`}>{content}</div>;
+    return <div className={`${bgClass} transition-colors duration-500 p-6 rounded-sm`}>{content}</div>;
   };
 
   return (
@@ -783,7 +783,7 @@ const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, resumeT
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-          <div className={`flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-8 md:px-12 max-w-5xl mx-auto w-full relative transition-colors duration-300 ${isLightMode ? 'bg-white' : 'bg-zinc-950'}`}>
+          <div className={`flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-8 md:px-12 max-w-5xl mx-auto w-full relative transition-colors duration-500 ${isLightMode ? 'bg-white' : 'bg-zinc-950'}`}>
              
              {!isPaid ? (
                  <div className="h-full flex flex-col items-center justify-center relative min-h-[400px]">

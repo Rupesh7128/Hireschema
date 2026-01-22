@@ -55,16 +55,21 @@ const getGenAI = (): GoogleGenerativeAI => {
     if (apiKey) {
         console.log(`[Gemini Service] API Key loaded: ${apiKey.substring(0, 4)}...${apiKey.substring(apiKey.length - 4)}`);
     } else {
-        console.error("[Gemini Service] API Key is MISSING! Please set VITE_GEMINI_API_KEY in Vercel.");
+        console.error("[Gemini Service] API Key is MISSING! Please check your environment variables.");
+        console.error("[Gemini Service] Available env vars:", {
+            vite_gemini: !!(import.meta as any).env?.VITE_GEMINI_API_KEY,
+            gemini: !!(import.meta as any).env?.GEMINI_API_KEY,
+            process_gemini: !!(process as any).env?.GEMINI_API_KEY,
+            process_api: !!(process as any).env?.API_KEY
+        });
+        throw new Error('Gemini API key not found. Please check your environment variables.');
     }
 
-    // Use placeholder if key missing to allow app to load, requests will fail gracefully
-    genAI = new GoogleGenerativeAI(apiKey || 'MISSING_API_KEY');
+    genAI = new GoogleGenerativeAI(apiKey);
     return genAI;
 };
 
-// --- UTILS ---
-
+// Test function to verify API key is working
 let cachedModels: string[] | null = null;
 
 const listAvailableModels = async (): Promise<string[]> => {
@@ -315,12 +320,22 @@ const getActionableError = (error: any): string => {
 
 export async function extractTextFromPdf(base64Data: string): Promise<string> {
   try {
+    // Wait for PDF.js to be available
+    let attempts = 0;
+    while (typeof (window as any).pdfjsLib === 'undefined' && attempts < 10) {
+      console.log('Waiting for PDF.js to load...');
+      await new Promise(resolve => setTimeout(resolve, 100));
+      attempts++;
+    }
+    
     // @ts-ignore
     if (typeof window.pdfjsLib === 'undefined') {
-      console.warn("PDF.js not loaded.");
-      return "Error: PDF Parser not loaded. Please refresh the page.";
+      console.error("PDF.js not loaded after waiting.");
+      throw new Error("PDF Parser not loaded. Please refresh the page and try again.");
     }
 
+    console.log('PDF.js is ready, extracting text...');
+    
     const binaryString = atob(base64Data);
     const len = binaryString.length;
     const bytes = new Uint8Array(len);
@@ -340,6 +355,8 @@ export async function extractTextFromPdf(base64Data: string): Promise<string> {
     let fullText = '';
     const maxPages = Math.min(pdf.numPages, 15);
     
+    console.log(`Extracting text from ${maxPages} pages...`);
+    
     for (let i = 1; i <= maxPages; i++) {
       const page = await pdf.getPage(i);
       const textContent = await page.getTextContent();
@@ -358,6 +375,7 @@ export async function extractTextFromPdf(base64Data: string): Promise<string> {
       fullText += pageText + linksText + '\n';
     }
 
+    console.log(`Extracted ${fullText.length} characters from PDF`);
     return fullText;
   } catch (e: any) {
     console.error("PDF Extraction Failed:", e);
@@ -713,43 +731,79 @@ export const generateContent = async (
 
     case GeneratorType.ROAST:
         userPrompt = `
-        You are a brutally honest resume roaster. Your job: surgically mean, structurally tight, commercially effective.
+        You are a brutally honest resume roaster with a PhD in Career Destruction. Your mission: deliver surgical burns that actually help.
         
         TONE RULES:
-        - Snark with spine: Every dunk ends in a fix. Funny → factual → fix.
-        - Specific over loud: Precision is funnier than volume. Call out exact details (dates, duplicated entries, math errors).
-        - One-liners sparingly: Use sparklers, not fireworks. Save the biggest punchline for the Verdict.
+        - Sharp wit with substance: Every roast must end with actionable advice
+        - Specific over generic: Quote exact phrases, call out specific dates/numbers
+        - Professional comedian energy: Funny but never cruel, sarcastic but constructive
+        - Use emojis strategically for visual impact
         
-        STRUCTURE (use these exact headers):
+        STRUCTURE (use these exact headers with emojis):
         
-        ## 💀 The Diagnosis
-        Open with a one-line power sentence that sets tone and stakes.
-        Example: "This resume was faxed in from 2011, emotionally attached to buzzwords, and numerically allergic to calendars."
-        Then one sentence: "Here's the roast plus the cure."
+        # 💀 The Diagnosis
         
-        ## 📊 Cringe Analytics: Where Your Resume Goes to Cry
-        For each issue, use this format:
-        - **Symptom:** What's wrong (be specific - quote the resume)
-        - **Severity:** 🔥 to 🔥🔥🔥🔥🔥
-        - **Fix:** One surgical action to take
+        Open with a devastating one-liner that captures the resume's biggest flaw.
+        Examples: 
+        - "This resume reads like it was written by ChatGPT having an existential crisis."
+        - "Someone took 'fake it till you make it' as a literal instruction manual."
         
-        Call out: vague dates, buzzword bingo, feature lists instead of outcomes, math errors, formatting crimes.
-        Example: "Start date: June 2025. Bold. Visionary. Tragically unproofread."
+        Follow with: "Here's your roast with a side of reality check."
         
-        ## 🚩 Red Flag Energy
-        What screams "do not hire" - be specific. Use rule-of-three, then break it for surprise.
-        Example: "YC listed twice: prestige speedrun; impact optional; humility not found."
+        # 📊 Damage Assessment
         
-        ## ✨ The One Nice Thing
-        Find something genuinely good. Make it backhanded if you must.
+        Break down 3-4 major issues using this format:
         
-        ## ⚖️ Final Verdict
-        Give a score out of 100 with a memorable one-liner.
-        Example: "Employability Score: 17/100 — medically unhireable, spiritually bootstrapped."
+        ## 🔥 [Issue Category] 
+        **The Crime:** [Specific quote or example from resume]
+        **Cringe Level:** [1-5 fire emojis] 🔥🔥🔥
+        **The Fix:** [Specific actionable advice]
         
-        End with a callback to an earlier joke for narrative payoff.
+        Categories to cover:
+        - **Buzzword Bingo** (overused terms, meaningless jargon)
+        - **Date Disasters** (gaps, inconsistencies, future dates)
+        - **Impact Invisibility** (no metrics, vague achievements)
+        - **Format Failures** (inconsistent styling, poor layout)
         
-        REMEMBER: Readers stay for jokes; they convert for credibility. Be funny enough to share, clear enough to trust, sharp enough to convert.
+        # 🚩 Red Flag Parade
+        
+        List 3-5 specific things that make recruiters hit delete:
+        - Use bullet points with fire emojis
+        - Quote exact problematic phrases
+        - Explain why each is problematic
+        
+        # ✨ The One Redeeming Quality
+        
+        Find something genuinely good (even if backhanded):
+        "Credit where credit's due: [specific positive thing]. Now let's talk about everything else..."
+        
+        # 🎯 The Verdict
+        
+        **Employability Score: [15-50]/100**
+        
+        **Status:** [Choose one]
+        - "Medically Unhireable" (15-25)
+        - "Spiritually Unemployable" (26-35) 
+        - "Barely Breathing" (36-45)
+        - "Surprisingly Salvageable" (46-50)
+        
+        **Bottom Line:** [Memorable one-liner that ties back to opening]
+        
+        # 🛠️ Emergency Surgery Required
+        
+        Top 3 immediate fixes:
+        1. **[Action]** - [Why it matters]
+        2. **[Action]** - [Why it matters] 
+        3. **[Action]** - [Why it matters]
+        
+        End with: "Your resume doesn't have to be a comedy show. Fix these, and you might actually get hired."
+        
+        CRITICAL RULES:
+        - Use ONLY information from the actual resume provided
+        - Quote specific phrases, dates, and details
+        - Be funny but constructive - every criticism needs a solution
+        - Keep sections concise but impactful
+        - Use formatting (bold, emojis) for visual appeal
         `;
         break;
   }

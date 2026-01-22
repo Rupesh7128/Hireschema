@@ -1,0 +1,47 @@
+#!/bin/bash
+
+echo "🚀 Hireschema Deployment Script"
+echo "================================"
+
+# Check if build exists
+if [ ! -d "dist" ]; then
+    echo "📦 Building application..."
+    npm run build
+fi
+
+echo "✅ Build completed successfully!"
+echo ""
+echo "📋 Next Steps:"
+echo ""
+echo "1. GITHUB DEPLOYMENT:"
+echo "   Create a Personal Access Token at: https://github.com/settings/tokens"
+echo "   Then run: git push https://YOUR_TOKEN@github.com/Rupesh7128/Hireschema.git main"
+echo ""
+echo "2. VERCEL DEPLOYMENT:"
+echo "   Option A - Vercel CLI:"
+echo "   npm install -g vercel (or use sudo if needed)"
+echo "   vercel"
+echo ""
+echo "   Option B - Vercel Dashboard:"
+echo "   1. Go to https://vercel.com"
+echo "   2. Click 'New Project'"
+echo "   3. Import from GitHub: Rupesh7128/Hireschema"
+echo "   4. Add environment variables (see DEPLOYMENT.md)"
+echo "   5. Deploy"
+echo ""
+echo "3. ENVIRONMENT VARIABLES:"
+echo "   Add these in Vercel Dashboard → Settings → Environment Variables:"
+echo "   - VITE_GEMINI_API_KEY"
+echo "   - VITE_OPENAI_API_KEY"
+echo "   - VITE_DODO_API_KEY"
+echo "   - VITE_DODO_PRODUCT_ID"
+echo "   - VITE_DODO_ENV"
+echo "   - GEMINI_API_KEY"
+echo "   - OPENAI_API_KEY"
+echo "   - DODO_PAYMENTS_API_KEY"
+echo "   - DODO_PRODUCT_ID"
+echo "   - DODO_ENV"
+echo ""
+echo "📖 See DEPLOYMENT.md for detailed instructions and API keys"
+echo ""
+echo "🎉 Your app is ready for deployment!"

@@ -289,7 +289,13 @@ const AppContent: React.FC = () => {
     }
   };
 
-  const handleLandingStart = async (intent: 'scan' | 'optimize' | 'launch', file?: FileData) => {
+  const handleLandingStart = async (intent: 'scan' | 'optimize' | 'launch' | 'roast', file?: FileData) => {
+    if (intent === 'roast') {
+      setView('roast');
+      window.history.pushState({}, '', '/roast');
+      return;
+    }
+    
     setView('dashboard');
     window.history.pushState({}, '', '/app');
     

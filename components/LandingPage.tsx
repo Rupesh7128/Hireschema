@@ -4,15 +4,15 @@ import { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence, useMotionValueEvent } from 'framer-motion';
 import { 
   Sparkles, Upload, Search, ArrowRight, FileText, Globe, GraduationCap, 
-  BrainCircuit, ShieldCheck, ChevronDown, CheckCircle2, XCircle, 
-  Check, Award, Lock, CreditCard, Database, Activity, Zap 
+  BrainCircuit, ShieldCheck, CheckCircle2, XCircle, 
+  Check, Award, Lock, CreditCard, Database, Activity, Zap, Flame 
 } from 'lucide-react';
 import { AnimatedLogo } from './AnimatedLogo';
 import { FileData } from '../types';
 import { logEvent } from '../services/analytics';
 
 interface LandingPageProps {
-  onStart: (intent: 'scan' | 'optimize' | 'launch', file?: FileData) => void;
+  onStart: (intent: 'scan' | 'optimize' | 'launch' | 'roast', file?: FileData) => void;
 }
 
 // Consistent Global Button Styles - Mobile optimized with active states
@@ -91,7 +91,7 @@ const FeatureMarquee = () => {
 // --- VISUAL STEP GRAPHIC ---
 const StepGraphic = ({ step }: { step: 1 | 2 | 3 }) => {
   return (
-    <div className="w-32 h-24 bg-zinc-900 border border-zinc-800 rounded-lg relative mb-8 shadow-2xl flex items-center justify-center overflow-hidden group-hover:border-zinc-600 transition-all duration-500 mx-auto">
+    <div className="w-32 h-24 bg-zinc-900 border border-zinc-800 rounded-lg relative mb-8 shadow-2xl flex items-center justify-center overflow-hidden group-hover:border-zinc-600 transition-all duration-700 mx-auto">
        {/* Background Grid */}
        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:10px_10px]"></div>
        
@@ -143,32 +143,14 @@ const StepGraphic = ({ step }: { step: 1 | 2 | 3 }) => {
 
 // --- FAQ ITEM COMPONENT ---
 const FAQItem: React.FC<{ question: string; answer: string }> = ({ question, answer }) => {
-    const [isOpen, setIsOpen] = useState(false);
     return (
-        <div className="border-b border-white/10">
-            <button 
-                onClick={() => setIsOpen(!isOpen)}
-                className="w-full py-6 flex items-center justify-between text-left focus:outline-none group"
-            >
-                <span className={`text-base font-medium transition-colors ${isOpen ? 'text-orange-500' : 'text-zinc-200 group-hover:text-white'}`}>
-                    {question}
-                </span>
-                <ChevronDown className={`w-5 h-5 text-zinc-500 transition-transform duration-300 ${isOpen ? 'rotate-180 text-orange-500' : ''}`} />
-            </button>
-            <AnimatePresence>
-                {isOpen && (
-                    <motion.div 
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="overflow-hidden"
-                    >
-                        <p className="pb-6 text-zinc-400 text-sm leading-relaxed max-w-3xl">
-                            {answer}
-                        </p>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+        <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-xl p-6 hover:bg-zinc-900/70 hover:border-zinc-700/50 transition-all duration-500 group h-full">
+            <h3 className="text-base font-semibold text-white mb-3 leading-relaxed group-hover:text-orange-100 transition-colors">
+                {question}
+            </h3>
+            <p className="text-zinc-400 text-sm leading-relaxed group-hover:text-zinc-300 transition-colors">
+                {answer}
+            </p>
         </div>
     );
 }
@@ -295,7 +277,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               backgroundColor: "rgba(9,9,11,0.5)",
               backdropFilter: "blur(8px)"
           }}
-          transition={{ duration: 0.4, type: "spring", damping: 20, stiffness: 100 }}
+          transition={{ duration: 0.6, type: "spring", damping: 20, stiffness: 100 }}
           style={{
               left: '50%',
               x: '-50%',
@@ -308,10 +290,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               <AnimatedLogo />
           </div>
           <div className="flex items-center gap-2 sm:gap-6">
-              <a href="/roast" target="_blank" className="hidden sm:flex items-center gap-2 text-xs font-bold text-red-500 hover:text-red-400 active:text-red-300 transition-colors uppercase tracking-widest border border-red-500/20 px-3 py-1.5 rounded bg-red-500/5 hover:bg-red-500/10 cursor-pointer touch-target">
+              <button onClick={() => onStart('roast')} className="hidden sm:flex items-center gap-2 text-xs font-bold text-red-500 hover:text-red-400 active:text-red-300 transition-colors uppercase tracking-widest border border-red-500/20 px-3 py-1.5 rounded bg-red-500/5 hover:bg-red-500/10 cursor-pointer touch-target">
                     <Zap className="w-3 h-3" /> Roast My Resume
-                 </a>
-              <a href="#how-it-works" className="hidden md:block text-xs font-bold text-zinc-400 hover:text-white uppercase tracking-widest transition-colors touch-target py-2">How it Works</a>
+                 </button>
+              <button onClick={() => onStart('roast')} className="sm:hidden flex items-center gap-1 text-xs font-bold text-red-500 hover:text-red-400 active:text-red-300 transition-colors border border-red-500/20 px-2 py-1 rounded bg-red-500/5 hover:bg-red-500/10 cursor-pointer touch-target">
+                    <Flame className="w-3 h-3" /> Roast
+                 </button>
               <button 
                   onClick={() => onStart('scan')}
                   className={HEADER_BUTTON_STYLE}
@@ -350,7 +334,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
+                transition={{ duration: 1.2 }}
                 className="mb-6 px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-full inline-flex items-center gap-2"
             >
                 <XCircle className="w-4 h-4 text-red-500" />
@@ -360,7 +344,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             <motion.h1 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
+                transition={{ duration: 1.4 }}
                 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tighter text-white mb-6 leading-[1.1] sm:leading-[1]"
             >
                 Your resume gets filtered out<br/>
@@ -370,7 +354,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             <motion.p 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
+                transition={{ duration: 1.4, delay: 0.4 }}
                 className="max-w-3xl text-lg sm:text-xl text-zinc-400 mb-6 leading-relaxed font-light"
             >
                Companies use <span className="text-white font-semibold">ATS (Applicant Tracking Systems)</span> to auto-reject resumes missing specific keywords. 
@@ -381,7 +365,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
+                transition={{ duration: 1.4, delay: 0.6 }}
                 className="flex flex-wrap justify-center gap-3 mb-10 text-sm"
             >
                 <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-full">
@@ -401,7 +385,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
+                transition={{ duration: 1.4, delay: 0.8 }}
                 className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto mb-10"
             >
                 <button 
@@ -415,7 +399,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             <motion.div 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.8 }}
+                transition={{ delay: 1.2 }}
                 className="flex flex-wrap justify-center gap-4 sm:gap-6 text-[10px] sm:text-xs text-zinc-500 font-mono items-center px-4"
             >
                 <span className="flex items-center gap-2 whitespace-nowrap"><ShieldCheck className="w-3.5 h-3.5 text-green-500" /> 50,000+ resumes scanned</span>
@@ -479,6 +463,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                         initial={{ opacity: 0, x: -20 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
+                        transition={{ duration: 0.8 }}
                         className="bg-zinc-900 border border-zinc-800 p-6 rounded-lg opacity-60"
                     >
                         <div className="flex justify-between mb-2">
@@ -499,7 +484,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                         initial={{ opacity: 0, x: 20 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
-                        transition={{ delay: 0.2 }}
+                        transition={{ delay: 0.4, duration: 0.8 }}
                         className="bg-zinc-900 border border-green-500/30 p-6 rounded-lg shadow-[0_0_30px_rgba(34,197,94,0.1)] relative overflow-hidden"
                     >
                          <div className="absolute top-0 left-0 w-1 h-full bg-green-500"></div>
@@ -575,7 +560,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                         initial={{ opacity: 0, y: 10 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ delay: i * 0.1 }}
+                        transition={{ delay: i * 0.2, duration: 0.8 }}
                         className="bg-zinc-900 border border-white/5 p-8 rounded-lg hover:border-orange-500/30 transition-all group"
                     >
                         <div className="w-10 h-10 rounded bg-zinc-950 border border-zinc-800 flex items-center justify-center mb-4 group-hover:text-orange-500 transition-colors">
@@ -707,7 +692,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                         initial={{ opacity: 0, y: 10 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ delay: i * 0.05 }}
+                        transition={{ delay: i * 0.15, duration: 0.8 }}
                         className="bg-zinc-900/50 border border-white/5 p-6 rounded-xl hover:border-zinc-700 transition-colors group"
                     >
                         <div className="flex items-center gap-3 mb-6">
@@ -745,11 +730,19 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
 
       {/* --- FAQ SECTION --- */}
       <section id="faq" className="py-16 sm:py-24 px-4 sm:px-6 bg-zinc-950 border-t border-white/10 scroll-mt-20">
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-4xl mx-auto">
               <h2 className="text-2xl sm:text-3xl font-bold text-white mb-8 sm:mb-12 text-center">Frequently Asked Questions</h2>
-              <div className="space-y-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
                   {faqs.map((item, i) => (
-                      <FAQItem key={i} question={item.q} answer={item.a} />
+                      <motion.div
+                          key={i}
+                          initial={{ opacity: 0, y: 20 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ duration: 0.8, delay: i * 0.2 }}
+                      >
+                          <FAQItem question={item.q} answer={item.a} />
+                      </motion.div>
                   ))}
               </div>
           </div>
