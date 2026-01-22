@@ -258,10 +258,10 @@ export const RoastPage = () => {
                             
                             <div className="text-zinc-400 text-xs font-bold uppercase tracking-widest mb-3">Employability Score</div>
                             <div className="relative mb-4">
-                                <div className="text-6xl sm:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-b from-red-400 to-red-600">
+                                <div className="text-5xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-red-400 to-red-600">
                                     {roastScore}
                                 </div>
-                                <div className="text-2xl font-bold text-zinc-500 absolute -bottom-1 -right-8">/100</div>
+                                <div className="text-xl font-bold text-zinc-500 absolute -bottom-1 -right-8">/100</div>
                             </div>
                             
                             <div className="flex items-center gap-2 text-red-400 text-sm font-bold bg-red-950/40 px-4 py-2 rounded-full border border-red-500/20">
@@ -288,7 +288,7 @@ export const RoastPage = () => {
                                             dataKey="value"
                                         >
                                             {roastCategories.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={entry.color} />
+                                                <Cell key={`cell-${index}`} fill={entry.color} strokeWidth={0} />
                                             ))}
                                         </Pie>
                                         <Tooltip 
@@ -296,8 +296,10 @@ export const RoastPage = () => {
                                                 backgroundColor: '#18181b', 
                                                 border: '1px solid #27272a', 
                                                 borderRadius: '8px', 
-                                                fontSize: '12px' 
-                                            }} 
+                                                fontSize: '12px',
+                                                color: '#e4e4e7'
+                                            }}
+                                            itemStyle={{ color: '#e4e4e7' }}
                                         />
                                     </PieChart>
                                 </ResponsiveContainer>
