@@ -153,10 +153,10 @@ export const RoastPage = () => {
                     <div className="inline-flex items-center justify-center p-3 sm:p-4 bg-red-500/10 rounded-full mb-4 border border-red-500/20 shadow-[0_0_30px_rgba(239,68,68,0.3)]">
                         <Flame className="w-8 sm:w-10 h-8 sm:h-10 text-red-500" />
                     </div>
-                    <h1 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter uppercase">
+                    <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tighter uppercase">
                         Roast My <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">Resume</span>
                     </h1>
-                    <p className="text-zinc-400 text-base sm:text-lg max-w-md mx-auto leading-relaxed px-2">
+                    <p className="text-zinc-400 text-sm sm:text-lg max-w-md mx-auto leading-relaxed px-2">
                         Your resume is about to have a very bad day. Get brutally honest feedback that's <span className="text-white font-bold">surgically mean and commercially effective.</span>
                     </p>
                 </motion.div>
@@ -380,21 +380,21 @@ export const RoastPage = () => {
                                 <Skull className="w-6 h-6 text-red-500" />
                             </div>
                             <div>
-                                <h2 className="text-xl sm:text-2xl font-black text-white">The Verdict</h2>
+                                <h2 className="text-3xl font-bold text-white">The Verdict</h2>
                                 <p className="text-zinc-400 text-sm">Brutally honest feedback incoming</p>
                             </div>
                         </div>
                         
                         <div className="roast-content prose prose-invert max-w-none
-                            prose-headings:text-red-400 prose-headings:font-black prose-headings:tracking-tight
-                            prose-h1:text-2xl prose-h1:sm:text-3xl prose-h1:mb-8 prose-h1:pb-4 prose-h1:border-b prose-h1:border-red-500/20
-                            prose-h2:text-xl prose-h2:sm:text-2xl prose-h2:mt-10 prose-h2:mb-6 prose-h2:pb-2 prose-h2:border-b prose-h2:border-red-500/10 prose-h2:text-orange-400
+                            prose-headings:text-red-400 prose-headings:font-bold prose-headings:tracking-tight
+                            prose-h1:text-3xl prose-h1:mb-8 prose-h1:pb-4 prose-h1:border-b prose-h1:border-red-500/20
+                            prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-6 prose-h2:pb-2 prose-h2:border-b prose-h2:border-red-500/10 prose-h2:text-orange-400
                             prose-h3:text-lg prose-h3:font-bold prose-h3:text-orange-300 prose-h3:mt-6 prose-h3:mb-3
-                            prose-p:text-zinc-300 prose-p:leading-relaxed prose-p:text-sm prose-p:sm:text-base prose-p:mb-6 prose-p:font-medium
+                            prose-p:text-zinc-300 prose-p:leading-relaxed prose-p:text-sm sm:prose-p:text-base prose-p:mb-6 prose-p:font-medium
                             prose-strong:text-white prose-strong:font-bold prose-strong:bg-red-950/40 prose-strong:px-1.5 prose-strong:py-0.5 prose-strong:rounded prose-strong:border prose-strong:border-red-500/20
                             prose-em:text-orange-400 prose-em:not-italic prose-em:font-semibold
                             prose-ul:my-6 prose-ul:space-y-4
-                            prose-li:text-zinc-300 prose-li:text-sm prose-li:sm:text-base prose-li:leading-relaxed prose-li:pl-2
+                            prose-li:text-zinc-300 prose-li:text-sm sm:prose-li:text-base prose-li:leading-relaxed prose-li:pl-2
                             prose-li:marker:text-red-500
                             prose-ol:my-6 prose-ol:space-y-4
                             prose-hr:my-10 prose-hr:border-zinc-800
@@ -406,12 +406,12 @@ export const RoastPage = () => {
                             <ReactMarkdown 
                                 remarkPlugins={[remarkGfm]}
                                 components={{
-                                    h1: ({node, ...props}) => <h1 className="text-2xl sm:text-3xl font-black text-red-500 mb-6 pb-4 border-b border-red-500/20 tracking-tight" {...props} />,
-                                    h2: ({node, ...props}) => <h2 className="text-xl sm:text-2xl font-bold text-orange-500 mt-10 mb-4 pb-2 border-b border-white/5" {...props} />,
+                                    h1: ({node, ...props}) => <h1 className="text-3xl font-bold text-red-500 mb-6 pb-4 border-b border-red-500/20 tracking-tight" {...props} />,
+                                    h2: ({node, ...props}) => <h2 className="text-2xl font-bold text-orange-500 mt-10 mb-4 pb-2 border-b border-white/5" {...props} />,
                                     h3: ({node, ...props}) => <h3 className="text-lg font-bold text-orange-400 mt-6 mb-2" {...props} />,
-                                    p: ({node, ...props}) => <p className="text-zinc-300 leading-relaxed mb-4" {...props} />,
-                                    ul: ({node, ...props}) => <ul className="space-y-3 my-4 list-disc pl-5 text-zinc-300" {...props} />,
-                                    ol: ({node, ...props}) => <ol className="space-y-3 my-4 list-decimal pl-5 text-zinc-300" {...props} />,
+                                    p: ({node, ...props}) => <p className="text-zinc-300 leading-relaxed mb-4 text-sm sm:text-base" {...props} />,
+                                    ul: ({node, ...props}) => <ul className="space-y-3 my-4 list-disc pl-5 text-zinc-300 text-sm sm:text-base" {...props} />,
+                                    ol: ({node, ...props}) => <ol className="space-y-3 my-4 list-decimal pl-5 text-zinc-300 text-sm sm:text-base" {...props} />,
                                     li: ({node, ...props}) => <li className="pl-1" {...props} />,
                                     blockquote: ({node, ...props}) => (
                                         <blockquote className="my-8 border-l-4 border-red-500 bg-gradient-to-r from-red-950/30 to-transparent p-6 rounded-r-lg shadow-sm" {...props} />
@@ -440,7 +440,7 @@ export const RoastPage = () => {
                                     <Trophy className="w-8 h-8 text-orange-500" />
                                 </div>
                                 <div>
-                                    <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">Ready to stop being a punchline?</h3>
+                                    <h3 className="text-3xl font-bold text-white mb-2">Ready to stop being a punchline?</h3>
                                     <p className="text-zinc-400 text-sm sm:text-base max-w-md leading-relaxed">
                                         We've roasted thousands and hired hundreds. Your resume doesn't have to be a comedy show.
                                     </p>
@@ -460,14 +460,14 @@ export const RoastPage = () => {
                             <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
                                 <button 
                                     onClick={() => window.location.reload()} 
-                                    className="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 active:bg-zinc-600 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-all touch-target border border-zinc-700"
+                                    className="px-6 sm:px-10 py-3.5 sm:py-4 bg-zinc-800 hover:bg-zinc-700 active:bg-zinc-600 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-all touch-target border border-zinc-700"
                                 >
                                     <RotateCcw className="w-4 h-4" /> 
                                     <span>Roast Another</span>
                                 </button>
                                 <button 
                                     onClick={() => window.location.href = 'https://www.hireschema.com/app'}
-                                    className="px-8 py-3 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 active:from-orange-700 active:to-red-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-all hover:scale-105 shadow-lg shadow-orange-900/30 touch-target"
+                                    className="px-6 sm:px-10 py-3.5 sm:py-4 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 active:from-orange-700 active:to-red-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-all hover:scale-105 shadow-lg shadow-orange-900/30 touch-target"
                                 >
                                     Fix It Fast <ArrowRight className="w-4 h-4" />
                                 </button>
