@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Upload, AlertCircle, Loader2, ArrowRight, Flame, Skull, TrendingDown, Trophy, RotateCcw, Star, Zap, Target, Award } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { AnimatedLogo } from './AnimatedLogo';
 import { FileData, GeneratorType } from '../types';
 import { generateContent, extractTextFromPdf } from '../services/geminiService';
@@ -399,7 +400,7 @@ export const RoastPage = () => {
                             [&_li]:relative [&_li]:pl-6 [&_li]:before:content-['🔥'] [&_li]:before:absolute [&_li]:before:left-0 [&_li]:before:top-0
                             [&_li]:bg-zinc-900/30 [&_li]:p-3 [&_li]:rounded-lg [&_li]:border [&_li]:border-zinc-800/50
                         ">
-                            <ReactMarkdown>{roastResult}</ReactMarkdown>
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>{roastResult}</ReactMarkdown>
                         </div>
                     </motion.div>
 

@@ -739,7 +739,7 @@ export const generateContent = async (
         - Professional comedian energy: Funny but never cruel, sarcastic but constructive
         - Use emojis strategically for visual impact
         
-        STRUCTURE (use these exact headers with emojis):
+        STRUCTURE (You MUST use Markdown Headers starting with #. Do NOT use bold ** for section titles):
         
         # 💀 The Diagnosis
         
@@ -799,6 +799,7 @@ export const generateContent = async (
         End with: "Your resume doesn't have to be a comedy show. Fix these, and you might actually get hired."
         
         CRITICAL RULES:
+        - Use strict Markdown formatting (# for main headers, ## for subheaders)
         - Use ONLY information from the actual resume provided
         - Quote specific phrases, dates, and details
         - Be funny but constructive - every criticism needs a solution
