@@ -76,14 +76,22 @@ const FeatureMarquee = () => {
              <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-zinc-950 to-transparent z-10"></div>
              <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-zinc-950 to-transparent z-10"></div>
              
-             <div className="flex animate-marquee whitespace-nowrap items-center w-max">
+             <motion.div 
+                className="flex whitespace-nowrap items-center w-max"
+                animate={{ x: "-50%" }}
+                transition={{ 
+                    repeat: Infinity, 
+                    ease: "linear", 
+                    duration: 60 
+                }}
+             >
                 {[...items, ...items, ...items, ...items].map((item, i) => (
                     <div key={i} className="flex items-center gap-3 mx-6 opacity-60 hover:opacity-100 transition-opacity">
                          <Sparkles className="w-3 h-3 text-orange-500" />
                          <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-300">{item}</span>
                     </div>
                 ))}
-             </div>
+             </motion.div>
         </div>
     );
 };
