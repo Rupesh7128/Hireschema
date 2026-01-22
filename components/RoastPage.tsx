@@ -385,20 +385,21 @@ export const RoastPage = () => {
                         
                         <div className="roast-content prose prose-invert max-w-none
                             prose-headings:text-red-400 prose-headings:font-black prose-headings:tracking-tight
-                            prose-h1:text-2xl prose-h1:sm:text-3xl prose-h1:mb-6 prose-h1:pb-3 prose-h1:border-b prose-h1:border-red-500/20
-                            prose-h2:text-xl prose-h2:sm:text-2xl prose-h2:mt-8 prose-h2:mb-4 prose-h2:pb-2 prose-h2:border-b prose-h2:border-red-500/10
-                            prose-h3:text-lg prose-h3:font-bold prose-h3:text-orange-400 prose-h3:mt-6 prose-h3:mb-3
-                            prose-p:text-zinc-300 prose-p:leading-relaxed prose-p:text-sm prose-p:sm:text-base prose-p:mb-4 prose-p:font-medium
-                            prose-strong:text-white prose-strong:font-bold prose-strong:bg-red-950/30 prose-strong:px-1 prose-strong:rounded
+                            prose-h1:text-2xl prose-h1:sm:text-3xl prose-h1:mb-8 prose-h1:pb-4 prose-h1:border-b prose-h1:border-red-500/20
+                            prose-h2:text-xl prose-h2:sm:text-2xl prose-h2:mt-10 prose-h2:mb-6 prose-h2:pb-2 prose-h2:border-b prose-h2:border-red-500/10 prose-h2:text-orange-400
+                            prose-h3:text-lg prose-h3:font-bold prose-h3:text-orange-300 prose-h3:mt-6 prose-h3:mb-3
+                            prose-p:text-zinc-300 prose-p:leading-relaxed prose-p:text-sm prose-p:sm:text-base prose-p:mb-6 prose-p:font-medium
+                            prose-strong:text-white prose-strong:font-bold prose-strong:bg-red-950/40 prose-strong:px-1.5 prose-strong:py-0.5 prose-strong:rounded prose-strong:border prose-strong:border-red-500/20
                             prose-em:text-orange-400 prose-em:not-italic prose-em:font-semibold
-                            prose-ul:my-6 prose-ul:space-y-3
+                            prose-ul:my-6 prose-ul:space-y-4
                             prose-li:text-zinc-300 prose-li:text-sm prose-li:sm:text-base prose-li:leading-relaxed prose-li:pl-2
                             prose-li:marker:text-red-500
-                            prose-blockquote:border-l-4 prose-blockquote:border-red-500 prose-blockquote:bg-red-950/20 prose-blockquote:p-4 prose-blockquote:rounded-r-lg prose-blockquote:my-6
+                            prose-ol:my-6 prose-ol:space-y-4
+                            prose-hr:my-10 prose-hr:border-zinc-800
+                            prose-blockquote:border-l-4 prose-blockquote:border-red-500 prose-blockquote:bg-gradient-to-r prose-blockquote:from-red-950/20 prose-blockquote:to-transparent prose-blockquote:p-6 prose-blockquote:rounded-r-lg prose-blockquote:my-8 prose-blockquote:shadow-sm
                             prose-code:bg-zinc-800 prose-code:text-orange-400 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-sm
-                            [&_ul]:list-none [&_ul]:pl-0
-                            [&_li]:relative [&_li]:pl-6 [&_li]:before:content-['🔥'] [&_li]:before:absolute [&_li]:before:left-0 [&_li]:before:top-0
-                            [&_li]:bg-zinc-900/30 [&_li]:p-3 [&_li]:rounded-lg [&_li]:border [&_li]:border-zinc-800/50
+                            [&_ul]:list-disc [&_ul]:pl-5
+                            [&_li_strong]:text-orange-200 [&_li_strong]:bg-transparent [&_li_strong]:border-none [&_li_strong]:px-0
                         ">
                             <ReactMarkdown remarkPlugins={[remarkGfm]}>{roastResult}</ReactMarkdown>
                         </div>

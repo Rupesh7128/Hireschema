@@ -738,6 +738,7 @@ export const generateContent = async (
         - Specific over generic: Quote exact phrases, call out specific dates/numbers
         - Professional comedian energy: Funny but never cruel, sarcastic but constructive
         - NO EMOJIS: Do NOT use emojis in the output.
+        - Formatting: Use standard Markdown. Use > blockquotes for the "cards".
         
         STRUCTURE (You MUST use Markdown Headers starting with #. Do NOT use bold ** for section titles):
         
@@ -750,32 +751,46 @@ export const generateContent = async (
         
         Follow with: "Here's your roast with a side of reality check."
         
+        ---
+        
         # Damage Assessment
         
-        Break down 3-4 major issues using this format:
+        Break down 3-4 major issues. IMPORTANT: Format each issue exactly like this, using a blockquote (>):
         
-        ## [Issue Category] 
-        **The Crime:** [Specific quote or example from resume]
-        **Cringe Level:** [1-5 scale, e.g., 5/5]
-        **The Fix:** [Specific actionable advice]
+        ## [Issue Category Name]
         
-        Categories to cover:
-        - **Buzzword Bingo** (overused terms, meaningless jargon)
-        - **Date Disasters** (gaps, inconsistencies, future dates)
-        - **Impact Invisibility** (no metrics, vague achievements)
-        - **Format Failures** (inconsistent styling, poor layout)
+        > **The Crime:** "[Specific quote from resume]"
+        >
+        > **Cringe Level:** [1-5 scale, e.g., 5/5]
+        >
+        > **The Fix:** [Specific actionable advice in 1-2 sentences]
+        
+        
+        Categories to cover (choose 3-4 relevant ones):
+        - Buzzword Bingo
+        - Date Disasters
+        - Impact Invisibility
+        - Format Failures
+        - Generic Fluff
+        
+        ---
         
         # Red Flag Parade
         
-        List 3-5 specific things that make recruiters hit delete:
-        - Use bullet points
-        - Quote exact problematic phrases
-        - Explain why each is problematic
+        List 3-5 specific things that make recruiters hit delete (use a bulleted list):
+        
+        - **[Short Label]:** [Explanation of why this is a red flag]
+        - **[Short Label]:** [Explanation of why this is a red flag]
+        - **[Short Label]:** [Explanation of why this is a red flag]
+        
+        ---
         
         # The One Redeeming Quality
         
         Find something genuinely good (even if backhanded):
         "Credit where credit's due: [specific positive thing]. Now let's talk about everything else..."
+        
+        ---
         
         # The Verdict
         
@@ -789,23 +804,24 @@ export const generateContent = async (
         
         **Bottom Line:** [Memorable one-liner that ties back to opening]
         
+        ---
+        
         # Emergency Surgery Required
         
-        Top 3 immediate fixes:
-        1. **[Action]** - [Why it matters]
-        2. **[Action]** - [Why it matters] 
-        3. **[Action]** - [Why it matters]
+        Top 3 immediate fixes (use a numbered list):
+        
+        1. **[Action Label]** - [Why it matters in 1 sentence]
+        2. **[Action Label]** - [Why it matters in 1 sentence]
+        3. **[Action Label]** - [Why it matters in 1 sentence]
         
         End with: "Your resume doesn't have to be a comedy show. Fix these, and you might actually get hired."
         
         CRITICAL RULES:
-        - Use strict Markdown formatting (# for main headers, ## for subheaders)
-        - Use ONLY information from the actual resume provided
-        - Quote specific phrases, dates, and details
-        - Be funny but constructive - every criticism needs a solution
-        - Keep sections concise but impactful
-        - NO EMOJIS allowed in the output
-        - Ensure proper spacing between sections and bullet points
+        - Use strict Markdown formatting (#, ##, >, -, 1.)
+        - Use BLOCKQUOTES (>) for the Damage Assessment items to create "cards".
+        - Use SEPARATORS (---) between main sections.
+        - NO EMOJIS allowed.
+        - Ensure proper spacing between sections.
         `;
         break;
   }
