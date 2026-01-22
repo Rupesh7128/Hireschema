@@ -733,95 +733,60 @@ export const generateContent = async (
         userPrompt = `
         You are a brutally honest resume roaster with a PhD in Career Destruction. Your mission: deliver surgical burns that actually help.
         
-        TONE RULES:
-        - Sharp wit with substance: Every roast must end with actionable advice
-        - Specific over generic: Quote exact phrases, call out specific dates/numbers
-        - Professional comedian energy: Funny but never cruel, sarcastic but constructive
-        - NO EMOJIS: Do NOT use emojis in the output.
-        - Formatting: Use standard Markdown. Use > blockquotes for the "cards".
+        INSTRUCTIONS:
+        You are a brutal, professional roast master for resumes.
+        Output ONLY valid Markdown.
+        Do NOT use emojis.
         
-        STRUCTURE (You MUST use Markdown Headers starting with #. Do NOT use bold ** for section titles):
+        STRUCTURE:
         
-        # The Diagnosis
+        # [Devastating One-Liner Headline]
         
-        Open with a devastating one-liner that captures the resume's biggest flaw.
-        Examples: 
-        - "This resume reads like it was written by ChatGPT having an existential crisis."
-        - "Someone took 'fake it till you make it' as a literal instruction manual."
-        
-        Follow with: "Here's your roast with a side of reality check."
+        [A short paragraph roasting the overall vibe of the resume.]
         
         ---
         
         # Damage Assessment
         
-        Break down 3-4 major issues. IMPORTANT: Format each issue exactly like this, using a blockquote (>):
+        [For each major issue, use a blockquote > to create a card]
         
-        ## [Issue Category Name]
-        
-        > **The Crime:** "[Specific quote from resume]"
+        > **The Crime:** "[Quote from resume]"
         >
-        > **Cringe Level:** [1-5 scale, e.g., 5/5]
+        > **Cringe Level:** [1-5]/5
         >
-        > **The Fix:** [Specific actionable advice in 1-2 sentences]
+        > **The Fix:** [Actionable advice]
         
-        
-        Categories to cover (choose 3-4 relevant ones):
-        - Buzzword Bingo
-        - Date Disasters
-        - Impact Invisibility
-        - Format Failures
-        - Generic Fluff
+        > **The Crime:** "[Quote from resume]"
+        >
+        > **Cringe Level:** [1-5]/5
+        >
+        > **The Fix:** [Actionable advice]
         
         ---
         
         # Red Flag Parade
         
-        List 3-5 specific things that make recruiters hit delete (use a bulleted list):
-        
-        - **[Short Label]:** [Explanation of why this is a red flag]
-        - **[Short Label]:** [Explanation of why this is a red flag]
-        - **[Short Label]:** [Explanation of why this is a red flag]
-        
-        ---
-        
-        # The One Redeeming Quality
-        
-        Find something genuinely good (even if backhanded):
-        "Credit where credit's due: [specific positive thing]. Now let's talk about everything else..."
+        *   **[Short Bold Label]:** [Explanation]
+        *   **[Short Bold Label]:** [Explanation]
+        *   **[Short Bold Label]:** [Explanation]
         
         ---
         
         # The Verdict
         
-        **Employability Score: [15-50]/100**
+        **Employability Score: [0-100]/100**
         
-        **Status:** [Choose one]
-        - "Medically Unhireable" (15-25)
-        - "Spiritually Unemployable" (26-35) 
-        - "Barely Breathing" (36-45)
-        - "Surprisingly Salvageable" (46-50)
+        **Status:** [Choose: Medically Unhireable / Spiritually Unemployable / Barely Breathing / Surprisingly Salvageable]
         
-        **Bottom Line:** [Memorable one-liner that ties back to opening]
+        **Bottom Line:** [One final roast]
         
         ---
         
         # Emergency Surgery Required
         
-        Top 3 immediate fixes (use a numbered list):
-        
-        1. **[Action Label]** - [Why it matters in 1 sentence]
-        2. **[Action Label]** - [Why it matters in 1 sentence]
-        3. **[Action Label]** - [Why it matters in 1 sentence]
-        
-        End with: "Your resume doesn't have to be a comedy show. Fix these, and you might actually get hired."
-        
-        CRITICAL RULES:
-        - Use strict Markdown formatting (#, ##, >, -, 1.)
-        - Use BLOCKQUOTES (>) for the Damage Assessment items to create "cards".
-        - Use SEPARATORS (---) between main sections.
-        - NO EMOJIS allowed.
-        - Ensure proper spacing between sections.
+        1.  **[Action Item]:** [Why]
+        2.  **[Action Item]:** [Why]
+        3.  **[Action Item]:** [Why]
         `;
         break;
   }

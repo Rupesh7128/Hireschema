@@ -401,7 +401,25 @@ export const RoastPage = () => {
                             [&_ul]:list-disc [&_ul]:pl-5
                             [&_li_strong]:text-orange-200 [&_li_strong]:bg-transparent [&_li_strong]:border-none [&_li_strong]:px-0
                         ">
-                            <ReactMarkdown remarkPlugins={[remarkGfm]}>{roastResult}</ReactMarkdown>
+                            <ReactMarkdown 
+                                remarkPlugins={[remarkGfm]}
+                                components={{
+                                    h1: ({node, ...props}) => <h1 className="text-2xl sm:text-3xl font-black text-red-500 mb-6 pb-4 border-b border-red-500/20 tracking-tight" {...props} />,
+                                    h2: ({node, ...props}) => <h2 className="text-xl sm:text-2xl font-bold text-orange-500 mt-10 mb-4 pb-2 border-b border-white/5" {...props} />,
+                                    h3: ({node, ...props}) => <h3 className="text-lg font-bold text-orange-400 mt-6 mb-2" {...props} />,
+                                    p: ({node, ...props}) => <p className="text-zinc-300 leading-relaxed mb-4" {...props} />,
+                                    ul: ({node, ...props}) => <ul className="space-y-3 my-4 list-disc pl-5 text-zinc-300" {...props} />,
+                                    ol: ({node, ...props}) => <ol className="space-y-3 my-4 list-decimal pl-5 text-zinc-300" {...props} />,
+                                    li: ({node, ...props}) => <li className="pl-1" {...props} />,
+                                    blockquote: ({node, ...props}) => (
+                                        <blockquote className="my-8 border-l-4 border-red-500 bg-gradient-to-r from-red-950/30 to-transparent p-6 rounded-r-lg shadow-sm" {...props} />
+                                    ),
+                                    strong: ({node, ...props}) => <strong className="font-bold text-white bg-white/5 px-1.5 py-0.5 rounded border border-white/10" {...props} />,
+                                    hr: ({node, ...props}) => <hr className="my-10 border-zinc-800" {...props} />
+                                }}
+                            >
+                                {roastResult}
+                            </ReactMarkdown>
                         </div>
                     </motion.div>
 
