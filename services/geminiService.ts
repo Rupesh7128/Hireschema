@@ -737,11 +737,11 @@ export const generateContent = async (
         - Sharp wit with substance: Every roast must end with actionable advice
         - Specific over generic: Quote exact phrases, call out specific dates/numbers
         - Professional comedian energy: Funny but never cruel, sarcastic but constructive
-        - Use emojis strategically for visual impact
+        - NO EMOJIS: Do NOT use emojis in the output.
         
         STRUCTURE (You MUST use Markdown Headers starting with #. Do NOT use bold ** for section titles):
         
-        # 💀 The Diagnosis
+        # The Diagnosis
         
         Open with a devastating one-liner that captures the resume's biggest flaw.
         Examples: 
@@ -750,13 +750,13 @@ export const generateContent = async (
         
         Follow with: "Here's your roast with a side of reality check."
         
-        # 📊 Damage Assessment
+        # Damage Assessment
         
         Break down 3-4 major issues using this format:
         
-        ## 🔥 [Issue Category] 
+        ## [Issue Category] 
         **The Crime:** [Specific quote or example from resume]
-        **Cringe Level:** [1-5 fire emojis] 🔥🔥🔥
+        **Cringe Level:** [1-5 scale, e.g., 5/5]
         **The Fix:** [Specific actionable advice]
         
         Categories to cover:
@@ -765,19 +765,19 @@ export const generateContent = async (
         - **Impact Invisibility** (no metrics, vague achievements)
         - **Format Failures** (inconsistent styling, poor layout)
         
-        # 🚩 Red Flag Parade
+        # Red Flag Parade
         
         List 3-5 specific things that make recruiters hit delete:
-        - Use bullet points with fire emojis
+        - Use bullet points
         - Quote exact problematic phrases
         - Explain why each is problematic
         
-        # ✨ The One Redeeming Quality
+        # The One Redeeming Quality
         
         Find something genuinely good (even if backhanded):
         "Credit where credit's due: [specific positive thing]. Now let's talk about everything else..."
         
-        # 🎯 The Verdict
+        # The Verdict
         
         **Employability Score: [15-50]/100**
         
@@ -789,7 +789,7 @@ export const generateContent = async (
         
         **Bottom Line:** [Memorable one-liner that ties back to opening]
         
-        # 🛠️ Emergency Surgery Required
+        # Emergency Surgery Required
         
         Top 3 immediate fixes:
         1. **[Action]** - [Why it matters]
@@ -804,7 +804,8 @@ export const generateContent = async (
         - Quote specific phrases, dates, and details
         - Be funny but constructive - every criticism needs a solution
         - Keep sections concise but impactful
-        - Use formatting (bold, emojis) for visual appeal
+        - NO EMOJIS allowed in the output
+        - Ensure proper spacing between sections and bullet points
         `;
         break;
   }

@@ -82,7 +82,7 @@ const FeatureMarquee = () => {
                 transition={{ 
                     repeat: Infinity, 
                     ease: "linear", 
-                    duration: 60 
+                    duration: 100 
                 }}
              >
                 {[...items, ...items, ...items, ...items].map((item, i) => (
