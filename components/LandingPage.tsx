@@ -285,7 +285,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               backgroundColor: "rgba(9,9,11,0.5)",
               backdropFilter: "blur(8px)"
           }}
-          transition={{ duration: 0.6, type: "spring", damping: 20, stiffness: 100 }}
+          transition={{ duration: 0.8, type: "spring", damping: 25, stiffness: 60 }}
           style={{
               left: '50%',
               x: '-50%',
