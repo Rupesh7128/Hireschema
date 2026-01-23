@@ -304,8 +304,7 @@ const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, resumeT
         { type: GeneratorType.COVER_LETTER, delay: 3000 },
         { type: GeneratorType.INTERVIEW_PREP, delay: 6000 },
         { type: GeneratorType.LEARNING_PATH, delay: 9000 },
-        { type: GeneratorType.EMAIL_TEMPLATE, delay: 12000 },
-        { type: GeneratorType.MARKET_INSIGHTS, delay: 15000 }
+        { type: GeneratorType.EMAIL_TEMPLATE, delay: 12000 }
     ];
 
     queue.forEach(item => {
@@ -464,7 +463,6 @@ const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, resumeT
     { id: GeneratorType.COVER_LETTER, icon: FileText, label: 'Cover Letter' },
     { id: GeneratorType.INTERVIEW_PREP, icon: MessageSquare, label: 'Interview' },
     { id: GeneratorType.EMAIL_TEMPLATE, icon: Mail, label: 'Outreach' },
-    { id: GeneratorType.MARKET_INSIGHTS, icon: TrendingUp, label: 'Market Insights' },
   ];
 
   const renderContent = () => {
@@ -475,50 +473,6 @@ const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, resumeT
     const textClass = isResume ? 'text-zinc-900' : (isLightMode ? 'text-zinc-800' : 'text-zinc-300');
     const borderClass = isResume ? 'border-zinc-200' : (isLightMode ? 'border-zinc-200' : 'border-zinc-800');
     const h1Class = isResume ? 'text-zinc-900' : (isLightMode ? 'text-zinc-900' : 'text-white');
-
-    if (activeTab === GeneratorType.MARKET_INSIGHTS) {
-        let json;
-        try {
-            json = JSON.parse(generatedData[activeTab]);
-        } catch (e) {
-            // Fallback to text if parsing fails
-        }
-
-        if (json) {
-            const cardBg = isLightMode ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-900/50 border-white/10';
-            const cardTitle = 'text-zinc-500 text-xs font-bold uppercase mb-2';
-            const cardValue = isLightMode ? 'text-zinc-900' : 'text-white';
-            const cardText = isLightMode ? 'text-zinc-700' : 'text-zinc-300';
-            
-            return (
-                <div className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className={`${cardBg} p-6 rounded-xl border`}>
-                            <h3 className={cardTitle}>Verdict</h3>
-                            <p className={`${cardValue} text-lg font-bold`}>{json.verdict || "N/A"}</p>
-                        </div>
-                        <div className={`${cardBg} p-6 rounded-xl border`}>
-                            <h3 className={cardTitle}>Salary Range</h3>
-                            <p className="text-green-500 text-lg font-bold">{json.salary_range || "N/A"}</p>
-                        </div>
-                    </div>
-                    <div className={`${cardBg} p-6 rounded-xl border`}>
-                        <h3 className={cardTitle}>Culture & WFH</h3>
-                        <p className={`${cardText} text-sm leading-relaxed`}>{json.culture_wfh}</p>
-                    </div>
-                    {/* Add Interview Trends */}
-                     <div className={`${cardBg} p-6 rounded-xl border`}>
-                        <h3 className={cardTitle}>Interview Trends</h3>
-                        <ul className="list-disc pl-5 space-y-1">
-                             {json.interview_trends?.map((q: string, i: number) => (
-                                 <li key={i} className={`${cardText} text-sm`}>{q}</li>
-                             ))}
-                        </ul>
-                    </div>
-                </div>
-            );
-        }
-    }
 
     if (isEditing) {
         return (

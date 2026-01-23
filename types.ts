@@ -8,12 +8,6 @@ export interface ContactProfile {
   photo?: string; // Base64 string
 }
 
-export interface MarketAnalysis {
-  salary: string;
-  verdict: string;
-  culture: string;
-}
-
 export interface AnalysisResult {
   jobTitle?: string; // New: For Dashboard
   company?: string; // New: For Dashboard
@@ -26,7 +20,6 @@ export interface AnalysisResult {
   criticalIssues: string[];
   keyStrengths: string[];
   summary: string;
-  marketAnalysis?: MarketAnalysis;
 }
 
 export enum GeneratorType {
@@ -36,7 +29,6 @@ export enum GeneratorType {
   INTERVIEW_PREP = 'Interview Q&A',
   EMAIL_TEMPLATE = 'Cold Outreach',
   LEARNING_PATH = 'Learning Path',
-  MARKET_INSIGHTS = 'Market Insights',
   ROAST = 'Roast My Resume',
 }
 

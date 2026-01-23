@@ -518,12 +518,11 @@ export const analyzeResume = async (
     2. Dual Scoring (ATS Score, Relevance Score).
     3. Role Fit Analysis.
     4. Contact Profile (Name, Email, Phone, LinkedIn, Location).
-    5. Market Insights (Salary, Verdict, Culture).
     
     Return structured JSON:
     jobTitle: string, company: string, atsScore: number, relevanceScore: number, roleFitAnalysis: string,
     contactProfile: object, languages: array, missingKeywords: array, criticalIssues: array, keyStrengths: array,
-    summary: string, marketAnalysis: object { salary, verdict, culture }
+    summary: string
   `;
   
   try {
@@ -559,8 +558,7 @@ export const analyzeResume = async (
         missingKeywords: [],
         criticalIssues: [msg],
         keyStrengths: [],
-        summary: 'Basic scan completed with limited insights.',
-        marketAnalysis: { salary: '', verdict: '', culture: '' }
+        summary: 'Basic scan completed with limited insights.'
     };
     return fallback;
   }
@@ -720,15 +718,6 @@ export const generateContent = async (
         `;
         break;
       
-    case GeneratorType.MARKET_INSIGHTS:
-        useJson = true;
-        userPrompt = `
-        Analyze the Job Description using internal knowledge.
-        1. Verdict (Good job?), 2. Salary Range, 3. Culture/WFH, 4. Interview Trends.
-        Output strictly valid JSON: { "verdict", "salary_range", "culture_wfh", "interview_trends", "pros", "cons" }
-        `;
-        break;
-
     case GeneratorType.ROAST:
         userPrompt = `
         You are a brutally honest resume roaster with a PhD in Career Destruction. Your mission: deliver surgical burns that actually help.
