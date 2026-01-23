@@ -138,7 +138,6 @@ export const RoastPage = () => {
         <div className="cursor-pointer" onClick={() => window.location.href = '/'}>
           <AnimatedLogo />
         </div>
-        <button onClick={() => window.history.back()} className="text-xs font-bold text-zinc-400 hover:text-white active:text-white transition-colors touch-target px-2 py-2">Back to Home</button>
       </header>
 
       <main className="pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 container mx-auto max-w-5xl min-h-screen min-h-[100dvh] flex flex-col">
