@@ -466,7 +466,7 @@ export const RoastPage = () => {
                                     <span>Roast Another</span>
                                 </button>
                                 <button 
-                                    onClick={() => window.location.href = 'https://www.hireschema.com/app'}
+                                    onClick={() => window.location.href = 'https://www.hireschema.com'}
                                     className="px-6 sm:px-10 py-3.5 sm:py-4 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 active:from-orange-700 active:to-red-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-all hover:scale-105 shadow-lg shadow-orange-900/30 touch-target"
                                 >
                                     Fix It Fast <ArrowRight className="w-4 h-4" />
