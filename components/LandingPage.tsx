@@ -800,13 +800,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             </div>
 
             <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p className="text-zinc-500 text-xs">© 2025 HireSchema AI. All rights reserved.</p>
-                <div className="flex gap-4">
-                     <a href="/status" className="text-zinc-400 text-xs hover:text-white cursor-pointer flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> 
-                        System Status: Operational — Last updated: Nov 26, 2025, 23:45 IST
-                     </a>
-                </div>
+                <p className="text-zinc-500 text-xs">© 2026 HireSchema AI. All rights reserved.</p>
             </div>
          </div>
       </footer>

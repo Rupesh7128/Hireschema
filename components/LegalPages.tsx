@@ -23,7 +23,7 @@ const LegalPages: React.FC<LegalPagesProps> = ({ page, onBack }) => {
             <h1 className="text-3xl font-bold text-white mb-8 flex items-center gap-3">
               <Shield className="w-8 h-8 text-orange-500" /> Privacy Policy
             </h1>
-            <p><strong>Last Updated: November 2025</strong></p>
+            <p><strong>Last Updated: January 2026</strong></p>
             <p>At HireSchema (by KoK Labs), we prioritize your data privacy and security. This Privacy Policy outlines how we handle your information.</p>
             
             <h3 className="text-xl font-bold text-white mt-6">1. Data Collection & Usage</h3>
@@ -50,7 +50,7 @@ const LegalPages: React.FC<LegalPagesProps> = ({ page, onBack }) => {
              <h1 className="text-3xl font-bold text-white mb-8 flex items-center gap-3">
               <FileText className="w-8 h-8 text-orange-500" /> Terms & Conditions
             </h1>
-            <p><strong>Last Updated: November 2025</strong></p>
+            <p><strong>Last Updated: January 2026</strong></p>
             
             <h3 className="text-xl font-bold text-white mt-6">1. Service Usage</h3>
             <p>HireSchema provides AI-powered resume analysis and optimization. By using our service, you agree that:</p>
@@ -72,7 +72,7 @@ const LegalPages: React.FC<LegalPagesProps> = ({ page, onBack }) => {
              <h1 className="text-3xl font-bold text-white mb-8 flex items-center gap-3">
               <Cookie className="w-8 h-8 text-orange-500" /> Cookie Policy
             </h1>
-            <p><strong>Last Updated: November 2025</strong></p>
+            <p><strong>Last Updated: January 2026</strong></p>
 
             <h3 className="text-xl font-bold text-white mt-6">1. What are cookies?</h3>
             <p>Cookies are small text files stored on your device. We use them sparingly to enhance your experience.</p>
@@ -112,7 +112,7 @@ const LegalPages: React.FC<LegalPagesProps> = ({ page, onBack }) => {
         </div>
 
         <footer className="mt-12 text-center text-zinc-600 text-xs">
-          © 2025 HireSchema AI. All rights reserved.
+          © 2026 HireSchema AI. All rights reserved.
         </footer>
       </div>
     </motion.div>
