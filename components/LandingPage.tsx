@@ -256,7 +256,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
       { q: "Can I download the optimized resume?", a: "Yes. Pay $1 per download for the optimized resume PDF. Tailored cover letter PDF is included." },
       { q: "Does it work for all industries?", a: "Best for roles with explicit skills (engineering, product, design, marketing, ops). Generalist roles supported, but scoring predictiveness varies." },
       { q: "Is this free to use?", a: "Analysis is free. Pay only when you download." },
-      { q: "Can I edit AI suggestions?", a: "Yes. Edit bullets inline before export; your voice is preserved." },
+      { q: "Can I edit suggestions?", a: "Yes. Edit bullets inline before export; your voice is preserved." },
       { q: "What languages are supported?", a: "English, Spanish, French, German, Hindi, Portuguese, Japanese, Korean." }
   ];
 
@@ -800,7 +800,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             </div>
 
             <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p className="text-zinc-500 text-xs">© 2026 HireSchema AI. All rights reserved.</p>
+                <p className="text-zinc-500 text-xs">© 2026 HireSchema. All rights reserved.</p>
             </div>
          </div>
       </footer>

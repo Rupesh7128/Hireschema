@@ -77,7 +77,7 @@ const ChatSidebar = ({
                         onClick={() => setMode('chat')}
                         className={`text-xs font-bold uppercase tracking-wider border-b-2 pb-1 transition-colors ${mode === 'chat' ? 'text-orange-500 border-orange-500' : 'text-zinc-500 border-transparent hover:text-zinc-300'}`}
                      >
-                        AI Chat
+                        Assistant
                      </button>
                 </div>
                 <button onClick={onClose}><X className="w-4 h-4 text-zinc-500" /></button>
@@ -241,6 +241,9 @@ const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, resumeT
   // Chat / Refinement
   const [showChat, setShowChat] = useState(false);
   const [chatInput, setChatInput] = useState("");
+  const [chatHistory, setChatHistory] = useState<{role: 'user' | 'model', content: string}[]>([
+      { role: 'model', content: "I'm your Resume Assistant. Ask me to rewrite a bullet point, explain a gap, or suggest stronger action verbs." }
+  ]);
   const [isRefining, setIsRefining] = useState(false);
   const [isDownloading, setIsDownloading] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<string | null>(null);

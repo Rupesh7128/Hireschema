@@ -36,7 +36,7 @@ const LegalPages: React.FC<LegalPagesProps> = ({ page, onBack }) => {
             <h3 className="text-xl font-bold text-white mt-6">2. Third-Party Services</h3>
             <p>We use trusted third-party services for specific functions:</p>
             <ul className="list-disc pl-5 space-y-2">
-              <li><strong>Google Gemini API:</strong> For AI analysis. Data sent is transient and not used to train models.</li>
+              <li><strong>Google Gemini API:</strong> For advanced text analysis. Data sent is transient and not used to train models.</li>
               <li><strong>Dodo Payments:</strong> For secure payment processing. We do not handle or store your credit card information.</li>
             </ul>
 
@@ -53,7 +53,7 @@ const LegalPages: React.FC<LegalPagesProps> = ({ page, onBack }) => {
             <p><strong>Last Updated: January 2026</strong></p>
             
             <h3 className="text-xl font-bold text-white mt-6">1. Service Usage</h3>
-            <p>HireSchema provides AI-powered resume analysis and optimization. By using our service, you agree that:</p>
+            <p>HireSchema provides automated resume analysis and optimization. By using our service, you agree that:</p>
             <ul className="list-disc pl-5 space-y-2">
               <li>You are uploading documents you own or have the right to process.</li>
               <li>You will not use the service for any illegal or unauthorized purpose.</li>
@@ -63,7 +63,7 @@ const LegalPages: React.FC<LegalPagesProps> = ({ page, onBack }) => {
             <p>Our "Pay-as-you-go" model charges $1 per download. Payments are processed securely via Dodo Payments. Refunds are handled on a case-by-case basis if the service fails to deliver the generated content.</p>
 
             <h3 className="text-xl font-bold text-white mt-6">3. Disclaimer</h3>
-            <p>The AI suggestions provided are for informational purposes only. We do not guarantee a specific job outcome or interview offer. Career decisions should be made based on your own judgment.</p>
+            <p>The suggestions provided are for informational purposes only. We do not guarantee a specific job outcome or interview offer. Career decisions should be made based on your own judgment.</p>
           </div>
         );
       case 'cookies':
@@ -112,7 +112,7 @@ const LegalPages: React.FC<LegalPagesProps> = ({ page, onBack }) => {
         </div>
 
         <footer className="mt-12 text-center text-zinc-600 text-xs">
-          © 2026 HireSchema AI. All rights reserved.
+          © 2026 HireSchema. All rights reserved.
         </footer>
       </div>
     </motion.div>
