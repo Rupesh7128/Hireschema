@@ -278,14 +278,54 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onBack, initialSlug }) => {
         )}
       </main>
 
-      {/* Footer (Simplified for Blog) */}
-      <footer className="mt-20 border-t border-white/5 py-12 bg-zinc-950 text-center">
-        <div className="flex items-center justify-center gap-2 mb-4 opacity-50 grayscale hover:grayscale-0 transition-all">
-          <AnimatedLogo />
-        </div>
-        <p className="text-zinc-600 text-xs">
-          © {new Date().getFullYear()} HireSchema. All rights reserved.
-        </p>
+      {/* Footer (Original Design) */}
+      <footer className="bg-gradient-to-b from-zinc-950 via-zinc-900 to-orange-900 border-t border-orange-900/30 pt-12 sm:pt-20 pb-8 sm:pb-10 px-4 sm:px-6 w-full relative overflow-hidden safe-area-inset-bottom mt-20">
+         {/* Subtle overlay */}
+         <div className="absolute inset-0 bg-black/20 pointer-events-none"></div>
+         
+         <div className="max-w-7xl mx-auto w-full relative z-10">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 mb-12 sm:mb-16">
+                <div className="col-span-2 sm:col-span-2 md:col-span-1">
+                    <AnimatedLogo className="mb-4 sm:mb-6" />
+                    <p className="text-zinc-400 text-sm leading-relaxed max-w-xs">
+                        HireSchema is built by KoK Labs.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 className="text-orange-100 font-bold mb-4 sm:mb-6 text-sm uppercase tracking-wider">Product</h4>
+                    <ul className="space-y-2 sm:space-y-3 text-sm text-zinc-400">
+                        <li><span onClick={onBack} className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">Resume Scanner</span></li>
+                        <li><span onClick={onBack} className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">Cover Letter Engine</span></li>
+                        <li><span onClick={onBack} className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">Interview Prep</span></li>
+                        <li><span onClick={handleBackToList} className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">Blog</span></li>
+                        <li><span onClick={onBack} className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">$1 per download</span></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 className="text-orange-100 font-bold mb-6 text-sm uppercase tracking-wider">Legal</h4>
+                    <ul className="space-y-3 text-sm text-zinc-400">
+                        <li><a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="/terms" className="hover:text-white transition-colors">Terms & Conditions</a></li>
+                        <li><a href="/cookies" className="hover:text-white transition-colors">Cookie Policy</a></li>
+                    </ul>
+                </div>
+
+                 <div>
+                    <h4 className="text-orange-100 font-bold mb-6 text-sm uppercase tracking-wider">Connect</h4>
+                    <ul className="space-y-3 text-sm text-zinc-400">
+                        <li><span className="hover:text-white transition-colors cursor-pointer">Twitter / X</span></li>
+                        <li><span className="hover:text-white transition-colors cursor-pointer">LinkedIn</span></li>
+                        <li><span className="hover:text-white transition-colors cursor-pointer">GitHub</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p className="text-zinc-500 text-xs">© 2026 HireSchema. All rights reserved.</p>
+            </div>
+         </div>
       </footer>
     </div>
   );
