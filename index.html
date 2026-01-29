@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
     <meta name="description" content="75% of resumes are rejected by ATS robots. Scan your resume, find missing keywords, and download an optimized version for $1." />
-    <meta name="theme-color" content="#18181B" />
+    <meta name="theme-color" content="#EA580C" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -19,9 +19,9 @@
       window.Buffer = window.Buffer || { isBuffer: () => false };
     </script>
 
-    <!-- Custom Favicon (Monochrome 'H') -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2318181b'/%3E%3Cpath d='M10 9v14M22 9v14M10 16h12' stroke='white' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E" />
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2318181b'/%3E%3Cpath d='M10 9v14M22 9v14M10 16h12' stroke='white' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E" />
+    <!-- Custom Favicon (Orange 'H' Logo) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23ea580c'/%3E%3Cpath d='M10 9v14M22 9v14M10 16h12' stroke='white' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E" />
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23ea580c'/%3E%3Cpath d='M10 9v14M22 9v14M10 16h12' stroke='white' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E" />
 
     <!-- Preconnect to critical domains for faster loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -61,7 +61,7 @@
         function overlay(message){
           var root = document.getElementById('root') || document.body;
           root.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#09090b;color:#e4e4e7;font-family:monospace;padding:20px;text-align:center">\n' +
-            '<h2 style="color:#18181b;margin-bottom:10px">Runtime Error</h2>\n' +
+            '<h2 style="color:#f97316;margin-bottom:10px">Runtime Error</h2>\n' +
             '<pre style="background:#18181b;padding:15px;border-radius:8px;margin-top:20px;color:#ef4444;max-width:800px;overflow:auto">'+ String(message || 'Unknown error') +'</pre>\n' +
           '</div>';
         }
@@ -83,30 +83,20 @@
               mono: ['JetBrains Mono', 'monospace'],
             },
             colors: {
-              // Minimalist Monochrome Theme (Option 11/12 Hybrid)
-              // Primary Action Color (Orange -> Minimalist Black/Dark Grey)
               orange: {
-                450: '#52525B', // Zinc-600
-                500: '#18181B', // Zinc-900 (Primary Black)
-                550: '#09090B', // Zinc-950
-                600: '#000000', // Pure Black
-                700: '#27272A',
-                800: '#3F3F46',
-                900: '#52525B',
-                950: '#18181B',
+                450: '#F97316',
+                500: '#F97316',
+                550: '#EA580C',
+                600: '#EA580C',
+                700: '#C2410C',
+                800: '#9A3412',
+                900: '#7C2D12',
+                950: '#431407',
               },
-              // Background Tones
               zinc: {
-                850: '#FAFAFA', // Light Mode Bg (Paper White)
-                900: '#F4F4F5', // Light Mode Surface
-                950: '#FFFFFF', // Light Mode Base
-                
-                // Dark Mode Overrides (handled via CSS variables usually, but mapping here for direct replacement)
-                dark: {
-                    850: '#18181B',
-                    900: '#09090B', 
-                    950: '#000000'
-                }
+                850: '#202022',
+                900: '#18181B',
+                950: '#09090B',
               }
             },
             animation: {
