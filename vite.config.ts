@@ -8,6 +8,13 @@ export default defineConfig(({ mode }) => {
       server: {
         port: 3000,
         host: '0.0.0.0',
+        proxy: {
+          '/api/massblog': {
+            target: env.VITE_MASSBLOG_URL || 'https://www.massblogger.com',
+            changeOrigin: true,
+            rewrite: (p) => p.replace(/^\/api\/massblog/, '/api'),
+          },
+        },
       },
       plugins: [react()],
       build: {
