@@ -295,10 +295,16 @@ const AppContent: React.FC = () => {
     }
   };
 
-  const handleLandingStart = async (intent: 'scan' | 'optimize' | 'launch' | 'roast', file?: FileData) => {
+  const handleLandingStart = async (intent: 'scan' | 'optimize' | 'launch' | 'roast' | 'blog', file?: FileData) => {
     if (intent === 'roast') {
       setView('roast');
       window.history.pushState({}, '', '/roast');
+      return;
+    }
+
+    if (intent === 'blog') {
+      setView('blog');
+      window.history.pushState({}, '', '/blog');
       return;
     }
     

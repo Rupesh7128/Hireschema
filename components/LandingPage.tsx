@@ -5,14 +5,14 @@ import { motion, useScroll, useTransform, AnimatePresence, useMotionValueEvent }
 import { 
   Sparkles, Upload, Search, ArrowRight, FileText, Globe, GraduationCap, 
   BrainCircuit, ShieldCheck, CheckCircle2, XCircle, 
-  Check, Award, Lock, CreditCard, Database, Activity, Zap, Flame 
+  Check, Award, Lock, CreditCard, Database, Activity, Zap, Flame, BookOpen 
 } from 'lucide-react';
 import { AnimatedLogo } from './AnimatedLogo';
 import { FileData } from '../types';
 import { logEvent } from '../services/analytics';
 
 interface LandingPageProps {
-  onStart: (intent: 'scan' | 'optimize' | 'launch' | 'roast', file?: FileData) => void;
+  onStart: (intent: 'scan' | 'optimize' | 'launch' | 'roast' | 'blog', file?: FileData) => void;
 }
 
 // Consistent Global Button Styles - Mobile optimized with active states
@@ -298,6 +298,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               <AnimatedLogo />
           </div>
           <div className="flex items-center gap-2 sm:gap-6">
+              <button onClick={() => onStart('blog')} className="hidden sm:flex items-center gap-2 text-xs font-bold text-zinc-400 hover:text-white transition-colors uppercase tracking-widest px-3 py-1.5 cursor-pointer touch-target">
+                  <BookOpen className="w-3 h-3" /> Blog
+              </button>
               <button onClick={() => onStart('roast')} className="hidden sm:flex items-center gap-2 text-xs font-bold text-orange-500 hover:text-orange-400 active:text-orange-300 transition-colors uppercase tracking-widest border border-orange-500/20 px-3 py-1.5 rounded bg-orange-500/5 hover:bg-orange-500/10 cursor-pointer touch-target">
                     <Zap className="w-3 h-3" /> Roast My Resume
                  </button>
@@ -776,6 +779,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                         <li><span className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">Resume Scanner</span></li>
                         <li><span className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">Cover Letter Engine</span></li>
                         <li><span className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">Interview Prep</span></li>
+                        <li><span onClick={() => onStart('blog')} className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">Blog</span></li>
                         <li><span className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">$1 per download</span></li>
                     </ul>
                 </div>
