@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { getBlogPosts, getBlogPost, getInternalLinks, BlogPost } from '../services/blogService';
-import { Loader2, Calendar, ArrowLeft, ArrowRight, Clock, Tag } from 'lucide-react';
+import { Loader2, ArrowLeft, ArrowRight } from 'lucide-react';
 import { AnimatedLogo } from './AnimatedLogo';
 
 interface BlogPageProps {
@@ -121,93 +121,217 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onBack, initialSlug }) => {
     });
   };
 
-  // HEADER COMPONENT (Reused to match App structure)
+  // HEADER COMPONENT
   const Header = () => (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/5 h-14 sm:h-16 flex items-center justify-between px-4 sm:px-6 safe-area-inset">
-      <div className="cursor-pointer flex items-center gap-2" onClick={onBack}>
-         <AnimatedLogo />
-         <span className="text-zinc-500 text-sm font-mono hidden sm:inline">/ BLOG</span>
+    <header className="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-xl border-b border-white/5 h-16 flex items-center justify-between px-6 safe-area-inset transition-all duration-300">
+      <div className="cursor-pointer flex items-center gap-3 group" onClick={onBack}>
+         <AnimatedLogo className="w-8 h-8 opacity-90 group-hover:opacity-100 transition-opacity" />
+         <span className="text-zinc-400 text-sm font-medium tracking-tight group-hover:text-white transition-colors">/ blog</span>
       </div>
       <button 
         onClick={onBack}
-        className="text-xs font-bold text-zinc-500 hover:text-white transition-colors flex items-center gap-1"
+        className="text-xs font-medium text-zinc-500 hover:text-white transition-colors flex items-center gap-2 group px-3 py-1.5 rounded-full hover:bg-white/5"
       >
-        <ArrowLeft className="w-4 h-4" /> Back to App
+        <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" /> Back
       </button>
     </header>
   );
+
+  // Featured Carousel Component
+  const FeaturedCarousel = ({ featuredPosts }: { featuredPosts: BlogPost[] }) => {
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    useEffect(() => {
+        if (featuredPosts.length <= 1) return;
+        const interval = setInterval(() => {
+            setCurrentIndex((prev) => (prev + 1) % featuredPosts.length);
+        }, 5000); // Rotate every 5 seconds
+        return () => clearInterval(interval);
+    }, [featuredPosts.length]);
+
+    const nextSlide = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setCurrentIndex((prev) => (prev + 1) % featuredPosts.length);
+    };
+
+    const prevSlide = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setCurrentIndex((prev) => (prev - 1 + featuredPosts.length) % featuredPosts.length);
+    };
+
+    if (featuredPosts.length === 0) return null;
+
+    return (
+        <div className="relative w-full aspect-[21/9] sm:aspect-[2.4/1] bg-zinc-900 rounded-2xl overflow-hidden border border-white/10 group mb-20">
+             {featuredPosts.map((post, index) => (
+                 <div 
+                    key={post.slug}
+                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+                    onClick={() => handlePostClick(post.slug)}
+                 >
+                     {/* Background Image with Gradient Overlay */}
+                     {post.featuredImage && (
+                         <div className="absolute inset-0">
+                             <img 
+                                src={post.featuredImage} 
+                                alt={post.title}
+                                className="w-full h-full object-cover"
+                             />
+                             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
+                             <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-transparent to-transparent" />
+                         </div>
+                     )}
+                     
+                     {/* Content */}
+                     <div className="absolute bottom-0 left-0 p-8 sm:p-12 max-w-3xl flex flex-col gap-4">
+                         <div className="flex items-center gap-3 text-sm animate-in slide-in-from-left-4 fade-in duration-700 delay-100">
+                             <span className="px-3 py-1 rounded-full bg-orange-500 text-white text-xs font-bold uppercase tracking-wider shadow-[0_0_15px_rgba(249,115,22,0.5)]">
+                                 {post.category || 'Featured'}
+                             </span>
+                             <span className="text-zinc-300 font-medium">{formatDate(post.createdAt)}</span>
+                         </div>
+                         
+                         <h2 className="text-3xl sm:text-5xl font-bold text-white leading-tight tracking-tight drop-shadow-lg animate-in slide-in-from-left-4 fade-in duration-700 delay-200">
+                             {post.title}
+                         </h2>
+                         
+                         {post.metaDescription && (
+                             <p className="text-zinc-300 text-lg line-clamp-2 max-w-2xl drop-shadow-md animate-in slide-in-from-left-4 fade-in duration-700 delay-300 hidden sm:block">
+                                 {post.metaDescription}
+                             </p>
+                         )}
+
+                         <div className="pt-4 animate-in slide-in-from-left-4 fade-in duration-700 delay-400">
+                            <span className="inline-flex items-center gap-2 text-white font-semibold group-hover/btn:text-orange-400 transition-colors">
+                                Read Article <ArrowRight className="w-4 h-4" />
+                            </span>
+                         </div>
+                     </div>
+                 </div>
+             ))}
+
+             {/* Controls */}
+             {featuredPosts.length > 1 && (
+                 <>
+                    <div className="absolute bottom-8 right-8 z-20 flex gap-2">
+                        <button 
+                            onClick={prevSlide}
+                            className="p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md text-white transition-all hover:scale-105 active:scale-95 border border-white/10"
+                        >
+                            <ArrowLeft className="w-5 h-5" />
+                        </button>
+                        <button 
+                            onClick={nextSlide}
+                            className="p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md text-white transition-all hover:scale-105 active:scale-95 border border-white/10"
+                        >
+                            <ArrowRight className="w-5 h-5" />
+                        </button>
+                    </div>
+
+                    {/* Indicators */}
+                    <div className="absolute top-8 right-8 z-20 flex gap-1.5">
+                        {featuredPosts.map((_, idx) => (
+                            <div 
+                                key={idx} 
+                                className={`h-1 rounded-full transition-all duration-500 ${idx === currentIndex ? 'w-8 bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.5)]' : 'w-2 bg-white/20'}`} 
+                            />
+                        ))}
+                    </div>
+                 </>
+             )}
+        </div>
+    );
+  };
 
   if (loading && !posts.length && !currentPost) {
     return (
       <div className="min-h-screen bg-black text-white font-sans selection:bg-orange-500/30">
         <Header />
         <div className="flex items-center justify-center h-screen">
-          <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
+          <Loader2 className="w-6 h-6 text-zinc-600 animate-spin" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white font-sans selection:bg-orange-500/30 pt-20 pb-12">
+    <div className="min-h-screen bg-black text-zinc-100 font-sans selection:bg-orange-500/30 pt-24 pb-12">
       <Header />
+      
+      {/* Background Gradients */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-[128px]" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-[128px]" />
+      </div>
 
-      <main className="container mx-auto max-w-5xl px-4 sm:px-6">
+      <main className="relative z-10 container mx-auto max-w-6xl px-6">
         {error && (
-            <div className="mb-8 p-4 bg-red-950/20 border border-red-900/30 rounded-lg text-red-400 text-sm text-center">
+            <div className="mb-12 p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm text-center">
                 {error}
             </div>
         )}
 
         {view === 'list' ? (
-          <div className="space-y-12">
-            <div className="text-center space-y-4 mb-16">
-              <h1 className="text-4xl sm:text-6xl font-black tracking-tighter uppercase text-transparent bg-clip-text bg-gradient-to-r from-zinc-200 to-zinc-500">
-                Latest <span className="text-orange-500">Insights</span>
-              </h1>
-              <p className="text-zinc-400 max-w-2xl mx-auto text-lg">
-                Tips, tricks, and strategies to beat the ATS and land your dream job.
-              </p>
+          <div className="space-y-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            {/* Hero Section */}
+            <div className="py-20 border-b border-white/5">
+              <div className="max-w-3xl">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-zinc-400 mb-6">
+                   <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
+                   HireSchema Blog
+                </div>
+                <h1 className="text-5xl sm:text-7xl font-bold tracking-tight text-white mb-6">
+                  Latest <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">Insights</span>
+                </h1>
+                <p className="text-xl text-zinc-400 font-light leading-relaxed max-w-2xl">
+                  Expert advice on resume optimization, ATS strategies, and career growth in the AI era.
+                </p>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-              {posts.map((post) => (
+            {/* Featured Carousel */}
+            {posts.length > 0 && (
+                <FeaturedCarousel featuredPosts={posts.slice(0, 3)} />
+            )}
+
+            {/* Grid for the rest */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {posts.slice(3).map((post, i) => (
                 <article 
                   key={post.slug}
-                  className="group bg-zinc-900/30 border border-zinc-800 rounded-2xl overflow-hidden hover:border-orange-500/50 transition-all duration-300 hover:shadow-[0_0_30px_rgba(249,115,22,0.1)] cursor-pointer flex flex-col"
+                  className="group cursor-pointer flex flex-col bg-zinc-900/20 border border-white/5 rounded-2xl overflow-hidden hover:border-orange-500/30 transition-all duration-300 hover:bg-zinc-900/40"
                   onClick={() => handlePostClick(post.slug)}
                 >
                   {post.featuredImage && (
-                    <div className="aspect-video w-full overflow-hidden">
+                    <div className="aspect-[16/10] w-full overflow-hidden bg-zinc-900 relative">
                       <img 
                         src={post.featuredImage} 
                         alt={post.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-90 group-hover:opacity-100"
                       />
                     </div>
                   )}
-                  <div className="p-6 flex-1 flex flex-col">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="px-2 py-1 bg-orange-500/10 text-orange-500 text-[10px] font-bold uppercase tracking-wider rounded border border-orange-500/20">
+                  <div className="p-6 flex flex-col gap-3 flex-1">
+                    <div className="flex items-center justify-between text-xs mb-1">
+                      <span className="font-semibold text-orange-400 uppercase tracking-wider">
                         {post.category || 'Career'}
                       </span>
-                      <span className="text-zinc-500 text-xs flex items-center gap-1">
-                        <Calendar className="w-3 h-3" /> {formatDate(post.createdAt)}
-                      </span>
+                      <span className="text-zinc-500">{formatDate(post.createdAt)}</span>
                     </div>
                     
-                    <h2 className="text-xl font-bold text-white mb-3 group-hover:text-orange-400 transition-colors line-clamp-2">
+                    <h2 className="text-xl font-bold text-zinc-100 group-hover:text-white transition-colors leading-snug line-clamp-2">
                       {post.title}
                     </h2>
                     
                     {post.metaDescription && (
-                      <p className="text-zinc-400 text-sm line-clamp-3 mb-4 flex-1">
+                      <p className="text-zinc-400 text-sm leading-relaxed line-clamp-3 flex-1">
                         {post.metaDescription}
                       </p>
                     )}
                     
-                    <div className="mt-auto pt-4 border-t border-white/5 flex items-center text-sm font-bold text-zinc-500 group-hover:text-white transition-colors">
-                      Read Article <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                    <div className="mt-4 pt-4 border-t border-white/5 flex items-center justify-between">
+                        <span className="text-xs font-medium text-zinc-500 group-hover:text-white transition-colors">Read more</span>
+                        <ArrowRight className="w-3.5 h-3.5 text-zinc-600 group-hover:text-orange-400 group-hover:translate-x-1 transition-all" />
                     </div>
                   </div>
                 </article>
@@ -215,115 +339,86 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onBack, initialSlug }) => {
             </div>
 
             {posts.length === 0 && !loading && (
-              <div className="text-center py-20 bg-zinc-900/30 rounded-2xl border border-zinc-800 border-dashed">
-                <p className="text-zinc-500">No posts found. Check back later!</p>
+              <div className="text-center py-32 border-t border-white/5">
+                <p className="text-zinc-600">No posts found.</p>
               </div>
             )}
           </div>
         ) : (
-          <article className="max-w-3xl mx-auto">
+          <article className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-700">
              <button 
                 onClick={handleBackToList}
-                className="mb-8 text-sm font-bold text-zinc-500 hover:text-orange-500 transition-colors flex items-center gap-2"
+                className="mb-12 text-sm font-medium text-zinc-500 hover:text-white transition-colors flex items-center gap-2 group"
               >
-                <ArrowLeft className="w-4 h-4" /> Back to Articles
+                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" /> Back to Articles
               </button>
 
             {currentPost && (
               <>
-                <header className="mb-10 text-center">
-                   <div className="flex items-center justify-center gap-3 mb-6">
-                      <span className="px-3 py-1 bg-orange-500/10 text-orange-500 text-xs font-bold uppercase tracking-wider rounded-full border border-orange-500/20">
+                <header className="mb-16">
+                   <div className="flex items-center gap-4 mb-6 text-sm text-zinc-500">
+                      <span className="text-orange-500 font-medium uppercase tracking-wider">
                         {currentPost.category || 'Career'}
                       </span>
-                      <span className="text-zinc-500 text-sm flex items-center gap-1">
-                        <Calendar className="w-3.5 h-3.5" /> {formatDate(currentPost.createdAt)}
-                      </span>
+                      <span className="w-1 h-1 rounded-full bg-zinc-800" />
+                      <span>{formatDate(currentPost.createdAt)}</span>
                    </div>
                    
-                   <h1 className="text-3xl sm:text-5xl font-black text-white mb-6 leading-tight">
+                   <h1 className="text-4xl sm:text-6xl font-semibold text-white mb-8 leading-[1.1] tracking-tight">
                      {currentPost.title}
                    </h1>
 
                    {currentPost.featuredImage && (
-                    <div className="rounded-2xl overflow-hidden border border-zinc-800 shadow-2xl mb-10">
+                    <div className="w-full aspect-[21/9] overflow-hidden rounded-sm bg-zinc-900 mb-12">
                       <img 
                         src={currentPost.featuredImage} 
                         alt={currentPost.title}
-                        className="w-full h-auto"
+                        className="w-full h-full object-cover"
                       />
                     </div>
                    )}
                 </header>
 
-                {/* Content with Tailwind Typography (Prose) */}
                 <div 
-                  className="prose prose-invert prose-orange max-w-none 
-                    prose-headings:font-bold prose-headings:tracking-tight
-                    prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl
-                    prose-p:text-zinc-300 prose-p:leading-relaxed
-                    prose-a:text-orange-500 prose-a:no-underline hover:prose-a:underline
-                    prose-strong:text-white
-                    prose-ul:list-disc prose-ul:pl-6
-                    prose-ol:list-decimal prose-ol:pl-6
-                    prose-img:rounded-xl prose-img:border prose-img:border-zinc-800
-                    prose-blockquote:border-l-4 prose-blockquote:border-orange-500 prose-blockquote:bg-zinc-900/50 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg
-                    prose-code:bg-zinc-800 prose-code:text-orange-400 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none
+                  className="prose prose-invert prose-lg max-w-none 
+                    prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-white
+                    prose-p:text-zinc-400 prose-p:leading-8 prose-p:font-light
+                    prose-a:text-white prose-a:underline prose-a:decoration-zinc-700 prose-a:underline-offset-4 hover:prose-a:decoration-orange-500 hover:prose-a:text-orange-400 transition-all
+                    prose-strong:text-white prose-strong:font-medium
+                    prose-ul:list-disc prose-ul:pl-0 prose-ul:text-zinc-400
+                    prose-li:pl-2
+                    prose-img:rounded-sm prose-img:grayscale-[0.5] hover:prose-img:grayscale-0 transition-all
+                    prose-blockquote:border-l-2 prose-blockquote:border-white/20 prose-blockquote:pl-6 prose-blockquote:text-zinc-300 prose-blockquote:italic
+                    prose-code:bg-white/10 prose-code:text-zinc-200 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none
                   "
                   dangerouslySetInnerHTML={{ __html: currentPost.content || '' }}
                 />
+                
+                <div className="mt-20 pt-12 border-t border-white/5 flex justify-between items-center">
+                    <button onClick={handleBackToList} className="text-zinc-500 hover:text-white transition-colors text-sm font-medium">
+                        &larr; More Articles
+                    </button>
+                    <div className="flex gap-4">
+                        {/* Share buttons could go here */}
+                    </div>
+                </div>
               </>
             )}
           </article>
         )}
       </main>
 
-      {/* Footer (Original Design) */}
-      <footer className="bg-gradient-to-b from-zinc-950 via-zinc-900 to-orange-900 border-t border-orange-900/30 pt-12 sm:pt-20 pb-8 sm:pb-10 px-4 sm:px-6 w-full relative overflow-hidden safe-area-inset-bottom mt-20">
-         {/* Subtle overlay */}
-         <div className="absolute inset-0 bg-black/20 pointer-events-none"></div>
-         
-         <div className="max-w-7xl mx-auto w-full relative z-10">
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 mb-12 sm:mb-16">
-                <div className="col-span-2 sm:col-span-2 md:col-span-1">
-                    <AnimatedLogo className="mb-4 sm:mb-6" />
-                    <p className="text-zinc-400 text-sm leading-relaxed max-w-xs">
-                        HireSchema is built by KoK Labs.
-                    </p>
-                </div>
-                
-                <div>
-                    <h4 className="text-orange-100 font-bold mb-4 sm:mb-6 text-sm uppercase tracking-wider">Product</h4>
-                    <ul className="space-y-2 sm:space-y-3 text-sm text-zinc-400">
-                        <li><span onClick={onBack} className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">Resume Scanner</span></li>
-                        <li><span onClick={onBack} className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">Cover Letter Engine</span></li>
-                        <li><span onClick={onBack} className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">Interview Prep</span></li>
-                        <li><span onClick={handleBackToList} className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">Blog</span></li>
-                        <li><span onClick={onBack} className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">$1 per download</span></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h4 className="text-orange-100 font-bold mb-6 text-sm uppercase tracking-wider">Legal</h4>
-                    <ul className="space-y-3 text-sm text-zinc-400">
-                        <li><a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                        <li><a href="/terms" className="hover:text-white transition-colors">Terms & Conditions</a></li>
-                        <li><a href="/cookies" className="hover:text-white transition-colors">Cookie Policy</a></li>
-                    </ul>
-                </div>
-
-                 <div>
-                    <h4 className="text-orange-100 font-bold mb-6 text-sm uppercase tracking-wider">Connect</h4>
-                    <ul className="space-y-3 text-sm text-zinc-400">
-                        <li><span className="hover:text-white transition-colors cursor-pointer">Twitter / X</span></li>
-                        <li><span className="hover:text-white transition-colors cursor-pointer">LinkedIn</span></li>
-                        <li><span className="hover:text-white transition-colors cursor-pointer">GitHub</span></li>
-                    </ul>
-                </div>
+      {/* Minimal Footer */}
+      <footer className="mt-32 border-t border-white/5 py-12 px-6">
+         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-6 text-zinc-600 text-sm">
+            <div className="flex items-center gap-2">
+                <AnimatedLogo className="w-5 h-5 opacity-50 grayscale" />
+                <span>© 2026 HireSchema</span>
             </div>
-
-            <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p className="text-zinc-500 text-xs">© 2026 HireSchema. All rights reserved.</p>
+            <div className="flex gap-6">
+                <span onClick={onBack} className="hover:text-zinc-400 cursor-pointer transition-colors">Home</span>
+                <span className="hover:text-zinc-400 cursor-pointer transition-colors">Twitter</span>
+                <span className="hover:text-zinc-400 cursor-pointer transition-colors">GitHub</span>
             </div>
          </div>
       </footer>
