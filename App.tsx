@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { 
     Plus, Link as LinkIcon, FileText, AlertCircle, Radar, 
-    CheckCircle, Loader2
+    CheckCircle, Loader2, Search, Sparkles, BrainCircuit, GraduationCap, Globe
 } from 'lucide-react';
 import { FileData, AnalysisResult, HistoryItem, ContactProfile } from './types';
 import { analyzeResume, extractTextFromPdf } from './services/geminiService';
@@ -21,6 +21,8 @@ const LandingPage = lazy(() => import('./components/LandingPage'));
 const LegalPages = lazy(() => import('./components/LegalPages'));
 const RoastPage = lazy(() => import('./components/RoastPage').then(m => ({ default: m.RoastPage })));
 const BlogPage = lazy(() => import('./components/BlogPage').then(m => ({ default: m.BlogPage })));
+const FeaturePage = lazy(() => import('./components/FeaturePage').then(m => ({ default: m.FeaturePage })));
+const PricingPage = lazy(() => import('./components/PricingPage'));
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -59,10 +61,11 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
 
 const AppContent: React.FC = () => {
   // --- VIEWS ---
-  const [view, setView] = useState<'landing' | 'dashboard' | 'legal' | 'roast' | 'blog'>('landing');
+  const [view, setView] = useState<'landing' | 'dashboard' | 'legal' | 'roast' | 'blog' | 'feature' | 'pricing'>('landing');
   const [legalPage, setLegalPage] = useState<'privacy' | 'terms' | 'cookies' | null>(null);
   const [dashboardView, setDashboardView] = useState<'scan' | 'result'>('scan');
   const [blogSlug, setBlogSlug] = useState<string | null>(null);
+  const [featureId, setFeatureId] = useState<string | null>(null);
 
   // --- DATA ---
   const [history, setHistory] = useState<HistoryItem[]>([]);
@@ -264,6 +267,11 @@ const AppContent: React.FC = () => {
            setLegalPage(path.substring(1) as any);
         } else if (path === '/roast') {
            setView('roast');
+        } else if (path === '/pricing') {
+           setView('pricing');
+        } else if (path.startsWith('/feature/')) {
+           setView('feature');
+           setFeatureId(path.replace('/feature/', ''));
         } else if (path.startsWith('/blog')) {
            setView('blog');
            const slug = path.replace(/^\/blog\/?/, '');
@@ -295,10 +303,23 @@ const AppContent: React.FC = () => {
     }
   };
 
-  const handleLandingStart = async (intent: 'scan' | 'optimize' | 'launch' | 'roast' | 'blog', file?: FileData) => {
+  const handleLandingStart = async (intent: 'scan' | 'optimize' | 'launch' | 'roast' | 'blog' | 'feature' | 'pricing', file?: FileData, featureSlug?: string) => {
     if (intent === 'roast') {
       setView('roast');
       window.history.pushState({}, '', '/roast');
+      return;
+    }
+
+    if (intent === 'pricing') {
+      setView('pricing');
+      window.history.pushState({}, '', '/pricing');
+      return;
+    }
+
+    if (intent === 'feature' && featureSlug) {
+      setView('feature');
+      setFeatureId(featureSlug);
+      window.history.pushState({}, '', `/feature/${featureSlug}`);
       return;
     }
 
@@ -416,7 +437,158 @@ const AppContent: React.FC = () => {
 
   if (view === 'landing') return <Suspense fallback={<LoadingFallback />}><LandingPage onStart={handleLandingStart} /></Suspense>;
   if (view === 'roast') return <Suspense fallback={<LoadingFallback />}><RoastPage /></Suspense>;
+  if (view === 'pricing') return <Suspense fallback={<LoadingFallback />}><PricingPage onBack={() => { setView('landing'); window.history.pushState({}, '', '/'); }} onStart={(intent) => handleLandingStart(intent)} /></Suspense>;
   if (view === 'blog') return <Suspense fallback={<LoadingFallback />}><BlogPage onBack={() => { setView('landing'); window.history.pushState({}, '', '/'); }} initialSlug={blogSlug} /></Suspense>;
+  
+  if (view === 'feature' && featureId) {
+     const features = {
+         'missing-keywords': {
+             title: "Find Missing Keywords",
+             subtitle: "The secret reason your resume is getting rejected.",
+             description: "Most resumes get rejected because they don't match the specific language of the job description. ATS software scans for exact keyword matches. If you say 'customer service' but the job wants 'client success', you might get filtered out. Our tool compares your resume against the job posting and highlights exactly which keywords you are missing, so you can add them instantly.",
+             icon: Search,
+             benefits: [
+                 "Scan against any job description in seconds",
+                 "See a list of exact missing keywords (hard skills, soft skills, tools)",
+                 "Get a match score to know where you stand",
+                 "Increase your chances of passing the ATS filter by 3x"
+             ],
+             problemTitle: "You're qualified, but the robot doesn't know it.",
+             problemDesc: "Applicant Tracking Systems (ATS) are dumb. They look for exact keyword matches. If the job description asks for \"React.js\" and you write \"ReactJS\", some older systems might miss it. If they want \"Project Management\" and you write \"Led projects\", you lose points. This is why 75% of qualified candidates are rejected instantly.",
+             solutionTitle: "We reverse-engineer the job description.",
+             solutionDesc: "HireSchema scans the job posting just like an ATS would. We extract the critical skills, tools, and certifications it demands. Then, we compare it against your resume to show you the exact gap. We tell you: \"Hey, you're missing 'Agile Methodology' and 'JIRA'—add these to get past the filter.\"",
+             howItWorksSteps: [
+                 { title: "Upload & Paste", desc: "Upload your resume PDF and paste the job description you're applying for." },
+                 { title: "Instant Analysis", desc: "We scan both documents and identify the keyword gaps in real-time." },
+                 { title: "Fill the Gaps", desc: "We give you a checklist of words to add. You update your resume, and your score goes up." }
+             ]
+         },
+         'fix-automatically': {
+             title: "Fix It Automatically",
+             subtitle: "Your experience, rewritten to win.",
+             description: "Knowing what's missing is half the battle. Fixing it is the other half. We don't just list keywords; we rewrite your bullet points to include them naturally. Our AI analyzes your experience and suggests professional, impact-driven rewrites that seamlessly integrate the required skills, so you sound like the perfect candidate without lying.",
+             icon: Sparkles,
+             benefits: [
+                 "One-click rewrites for bullet points",
+                 "Natural integration of missing keywords",
+                 "Maintain your unique voice while optimizing for ATS",
+                 "Save hours of editing time per application"
+             ],
+             problemTitle: "Rewriting resumes is exhausting.",
+             problemDesc: "Staring at a bullet point trying to figure out how to shoehorn in \"Cross-functional leadership\" without sounding robotic is painful. You spend hours tweaking wording, only to second-guess yourself. It's the biggest bottleneck in applying for jobs.",
+             solutionTitle: "One-click optimization.",
+             solutionDesc: "Our AI doesn't just tell you what to fix—it fixes it for you. We take your existing bullet point (e.g., \"Managed a team\") and rewrite it to match the job's level and requirements (e.g., \"Spearheaded a cross-functional team of 10 to deliver critical milestones\"). It sounds like you, just 10x more hireable.",
+             howItWorksSteps: [
+                 { title: "Select a Bullet", desc: "Click on any bullet point in your resume that needs improvement." },
+                 { title: "Get Suggestions", desc: "See 3 AI-generated variations that include the missing keywords naturally." },
+                 { title: "Apply & Export", desc: "Choose the best one, click apply, and download your perfectly optimized resume." }
+             ]
+         },
+         'cover-letter': {
+             title: "Cover Letter Included",
+             subtitle: "Stop writing cover letters from scratch.",
+             description: "Stop writing generic cover letters that get ignored. We generate a tailored cover letter that connects your specific experience to the company's needs. It highlights why you're a good fit based on the job description and your resume's strongest points, giving you a compelling narrative in seconds.",
+             icon: FileText,
+             benefits: [
+                 "Personalized to the specific company and role",
+                 "Highlights your most relevant achievements",
+                 "Professional tone and formatting",
+                 "Ready to download and send immediately"
+             ],
+             problemTitle: "Cover letters are a waste of time (but required).",
+             problemDesc: "You hate writing them. Recruiters hate reading generic ones. But many jobs still require them, or they can be the tie-breaker. Writing a unique, thoughtful letter for every single application is impossible when you're applying to 50 jobs.",
+             solutionTitle: "Hyper-personalized letters in seconds.",
+             solutionDesc: "We analyze your resume and the company's mission. Then, we generate a cover letter that bridges the gap. It doesn't just say \"I want this job\"—it says \"I have done X at my past role, which proves I can solve Y problem for you.\" It's persuasive, professional, and instant.",
+             howItWorksSteps: [
+                 { title: "Analyze Context", desc: "We look at your resume's strengths and the job's requirements." },
+                 { title: "Generate Draft", desc: "We write a compelling narrative connecting your past to their future." },
+                 { title: "Download PDF", desc: "Get a formatted, ready-to-send PDF cover letter that matches your resume style." }
+             ]
+         },
+         'interview-prep': {
+             title: "Interview Questions",
+             subtitle: "Know what they'll ask before you walk in.",
+             description: "Walk into your interview with confidence. We analyze the job description to predict the most likely interview questions you'll face. But we don't stop there — we also provide sample answers based on your actual resume experience, helping you frame your stories to prove you're the right hire.",
+             icon: BrainCircuit,
+             benefits: [
+                 "Predict likely technical and behavioral questions",
+                 "Get personalized STAR-method answer suggestions",
+                 "Identify key talking points from your resume",
+                 "Practice with confidence before the real thing"
+             ],
+             problemTitle: "The \"Tell me about a time...\" freeze.",
+             problemDesc: "You know you can do the job, but explaining it under pressure is hard. You get asked a specific technical question or a behavioral curveball, and your mind goes blank. You ramble, miss the point, and lose the offer.",
+             solutionTitle: "Your personal interview coach.",
+             solutionDesc: "We predict the questions based on the role (e.g., \"How do you handle API latency?\" for a backend role). Then, we give you the cheat sheet. \"Here is a project on your resume that proves you can do this. Mention X, Y, and Z.\" We structure the answer for you using the STAR method (Situation, Task, Action, Result).",
+             howItWorksSteps: [
+                 { title: "Predict Questions", desc: "We generate role-specific questions based on the JD keywords." },
+                 { title: "Draft Answers", desc: "We use your resume history to draft bullet-proof answers for each question." },
+                 { title: "Practice Mode", desc: "Review your talking points so you can recite them naturally in the interview." }
+             ]
+         },
+         'skill-gap': {
+             title: "Learn What You're Missing",
+             subtitle: "Don't let one missing skill cost you the job.",
+             description: "Sometimes you are missing a key skill required for the job. Instead of just flagging it, we help you bridge the gap. We identify the critical skills you lack and point you toward resources to learn them quickly, so you can honestly add them to your resume or discuss them in an interview.",
+             icon: GraduationCap,
+             benefits: [
+                 "Identify critical skill gaps preventing you from getting hired",
+                 "Get curated learning resources for missing tools",
+                 "Understand the 'why' behind job requirements",
+                 "Level up your profile for future roles"
+             ],
+             problemTitle: "The \"Must have experience with X\" blocker.",
+             problemDesc: "You're perfect for the role, except they want \"JIRA\" and you've only used \"Trello\". Or they want \"Tableau\" and you know \"Excel\". These small gaps can get you rejected, even though you could learn the tool in an afternoon.",
+             solutionTitle: "Bridge the gap instantly.",
+             solutionDesc: "We identify these missing hard skills. Then, instead of just saying \"You fail\", we give you a path forward. \"Here is a crash course on JIRA. Watch this, understand the basics, and you can honestly say you're familiar with it.\" We turn a 'No' into a 'Yes'.",
+             howItWorksSteps: [
+                 { title: "Identify Gaps", desc: "We flag hard skills (tools, languages) that are strict requirements." },
+                 { title: "Curate Resources", desc: "We link you to the best quick-start guides and tutorials for that specific tool." },
+                 { title: "Update Resume", desc: "Once you understand the basics, we help you phrase it correctly on your resume." }
+             ]
+         },
+         'translate': {
+             title: "Works in 8 Languages",
+             subtitle: "Go global without the headache.",
+             description: "The job market is global, and so are you. Whether you're applying for a role in Berlin, Tokyo, or Sao Paulo, we've got you covered. Instantly translate your resume and cover letter into 8 major languages while maintaining professional formatting and ATS optimization.",
+             icon: Globe,
+             benefits: [
+                 "Instant translation to Spanish, French, German, Hindi, Portuguese, Japanese, Korean",
+                 "Maintain ATS-friendly formatting across languages",
+                 "Localized keyword optimization",
+                 "Expand your job search to international markets"
+             ],
+             problemTitle: "Applying abroad is a formatting nightmare.",
+             problemDesc: "Translating a resume isn't just about words. It's about layout, tone, and keywords. Google Translate messes up your formatting and makes you sound unnatural. Hiring professional translators is expensive and slow.",
+             solutionTitle: "Native-level translation, instantly.",
+             solutionDesc: "We translate your entire resume and cover letter while keeping the hidden ATS code intact. We ensure the keywords match the local language's equivalent for that job title. It's like having a native speaker rewrite your resume in seconds.",
+             howItWorksSteps: [
+                 { title: "Choose Language", desc: "Select from English, Spanish, French, German, Hindi, Portuguese, Japanese, or Korean." },
+                 { title: "AI Translation", desc: "We translate the content while preserving professional tone and industry terms." },
+                 { title: "Download", desc: "Get a perfectly formatted PDF in the new language, ready to apply." }
+             ]
+         }
+     };
+
+     const feature = features[featureId as keyof typeof features];
+     if (feature) {
+         return (
+             <Suspense fallback={<LoadingFallback />}>
+                 <FeaturePage 
+                    {...feature} 
+                    onBack={() => { setView('landing'); window.history.pushState({}, '', '/'); }}
+                    onCtaClick={() => handleLandingStart('scan')}
+                    onNavigate={(target) => {
+                         if (target === 'blog') handleLandingStart('blog');
+                         else if (target === 'roast') handleLandingStart('roast');
+                         else handleLandingStart('scan'); // default
+                    }}
+                 />
+             </Suspense>
+         );
+     }
+  }
+
   if (view === 'legal' && legalPage) return <Suspense fallback={<LoadingFallback />}><LegalPages page={legalPage} onBack={() => { setView('landing'); window.history.pushState({}, '', '/'); }} /></Suspense>;
 
   return (

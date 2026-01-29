@@ -12,7 +12,7 @@ import { FileData } from '../types';
 import { logEvent } from '../services/analytics';
 
 interface LandingPageProps {
-  onStart: (intent: 'scan' | 'optimize' | 'launch' | 'roast' | 'blog', file?: FileData) => void;
+  onStart: (intent: 'scan' | 'optimize' | 'launch' | 'roast' | 'blog' | 'feature' | 'pricing', file?: FileData, featureSlug?: string) => void;
 }
 
 // Consistent Global Button Styles - Mobile optimized with active states
@@ -20,6 +20,10 @@ const ORANGE_BUTTON_STYLE = "px-6 sm:px-10 py-3.5 sm:py-4 bg-orange-600 hover:bg
 const HEADER_BUTTON_STYLE = "px-4 sm:px-6 py-2 sm:py-2.5 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-xs uppercase tracking-wide flex items-center gap-1.5 sm:gap-2 shadow-[3px_3px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none active:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] active:translate-x-[1px] active:translate-y-[1px] transition-all rounded-sm cursor-pointer border-none touch-target";
 
 // --- MOUSE TRAIL COMPONENT ---
+const ArrowDownIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-500"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+)
+
 const MouseTrail = () => {
     const [points, setPoints] = useState<{ x: number, y: number, id: number }[]>([]);
     
@@ -168,10 +172,48 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
   const yHero = useTransform(scrollY, [0, 500], [0, 100]);
   const [isScrolled, setIsScrolled] = useState(false);
 
+  // Trigger header transition later (after hero) for smoother feel
   useMotionValueEvent(scrollY, "change", (latest) => {
-    setIsScrolled(latest > 50);
+    // 85vh is roughly where hero ends (~700-800px on desktop)
+    const threshold = window.innerHeight * 0.8;
+    setIsScrolled(latest > threshold);
   });
   
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type === 'application/pdf') {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const base64String = reader.result as string;
+            const base64 = base64String.split(',')[1];
+            localStorage.removeItem('hireSchema_roastMode');
+            onStart('scan', {
+                name: file.name,
+                type: file.type,
+                base64: base64
+            });
+        };
+        reader.readAsDataURL(file);
+    } else {
+        alert("Please upload a PDF file.");
+    }
+  };
+
   const handleHeroUpload = (e: React.ChangeEvent<HTMLInputElement>, isRoast = false) => {
     const file = e.target.files?.[0];
     if (file && file.type === 'application/pdf') {
@@ -200,36 +242,42 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
 
   const features = [
     {
+      id: "missing-keywords",
       title: "See What's Missing",
       desc: "We compare your resume to the job posting and show exactly which keywords you're missing.",
       micro: "Like spell-check, but for job applications.",
       icon: Search
     },
     {
+      id: "fix-automatically",
       title: "Fix It Automatically",
       desc: "We rewrite your bullet points to include the right keywords naturally.",
       micro: "Your experience, better words.",
       icon: Sparkles
     },
     {
+      id: "cover-letter",
       title: "Cover Letter Included",
       desc: "Get a personalized cover letter that matches the job you're applying for.",
       micro: "No more blank page anxiety.",
       icon: FileText
     },
     {
+      id: "interview-prep",
       title: "Interview Questions",
       desc: "See likely interview questions based on the job description, with sample answers.",
       micro: "Be prepared, not surprised.",
       icon: BrainCircuit
     },
     {
+      id: "skill-gap",
       title: "Learn What You're Missing",
       desc: "If you're missing a skill, we show you free resources to learn it quickly.",
       micro: "Turn weaknesses into strengths.",
       icon: GraduationCap
     },
     {
+      id: "translate",
       title: "Works in 8 Languages",
       desc: "Applying for jobs abroad? Translate your resume and cover letter instantly.",
       micro: "English, Spanish, French, German, Hindi, Portuguese, Japanese, Korean.",
@@ -250,13 +298,14 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
   ];
 
   const faqs = [
-      { q: "What is ATS and why does it matter?", a: "ATS (Applicant Tracking System) is software that companies use to filter resumes before a human sees them. It scans for specific keywords from the job description. If your resume doesn't match, it gets auto-rejected — even if you're qualified. About 75% of resumes are rejected this way." },
-      { q: "Is my data safe?", a: "Yes. We use TLS encryption, temporary in-session processing, and zero data retention. You can close the app to end processing immediately. Payments handled securely by Dodo Payments." },
-      { q: "How does the ATS scoring work?", a: "We compare your resume against the job description to find missing keywords, check if your sections are properly labeled (Experience, Education, Skills), detect tools and technologies mentioned, and flag formatting issues that confuse ATS parsers. Your score shows how likely you are to pass the ATS filter." },
-      { q: "Can I download the optimized resume?", a: "Yes. Pay $1 per download for the optimized resume PDF. Tailored cover letter PDF is included." },
-      { q: "Does it work for all industries?", a: "Best for roles with explicit skills (engineering, product, design, marketing, ops). Generalist roles supported, but scoring predictiveness varies." },
-      { q: "Is this free to use?", a: "Analysis is free. Pay only when you download." },
-      { q: "Can I edit suggestions?", a: "Yes. Edit bullets inline before export; your voice is preserved." },
+      { q: "How is this different from generic AI tools?", a: "General chatbots write generic content that sounds artificial. We are purpose-built for ATS optimization. We reverse-engineer the specific keywords, skills, and formatting rules that Applicant Tracking Systems use to filter candidates. We provide a score, identify exact missing keywords based on the job description, and correct the underlying resume code." },
+      { q: "What is ATS and why does it matter?", a: "ATS (Applicant Tracking System) is software companies use to filter resumes before a human reviews them. It scans for specific keywords from the job description. If a resume lacks these exact matches, it is often auto-rejected, regardless of the candidate's qualifications. Approximately 75% of resumes are rejected at this stage." },
+      { q: "Is my data secure?", a: "Yes. We use TLS encryption, temporary in-session processing, and zero data retention. You can close the application to end processing immediately. Payments are handled securely by Dodo Payments." },
+      { q: "How does the ATS scoring work?", a: "We compare your resume against the job description to identify missing keywords, verify section labeling (Experience, Education, Skills), detect mentioned tools and technologies, and flag formatting issues that confuse ATS parsers. Your score reflects the likelihood of passing the ATS filter." },
+      { q: "Can I download the optimized resume?", a: "Yes. There is a $1 fee per download for the optimized resume PDF. A tailored cover letter PDF is included." },
+      { q: "Does it work for all industries?", a: "It is most effective for roles with explicit hard skills (engineering, product, design, marketing, operations). Generalist roles are supported, though scoring precision may vary." },
+      { q: "Is this free to use?", a: "The analysis is free. Payment is only required when you choose to download the optimized files." },
+      { q: "Can I edit the suggestions?", a: "Yes. You can edit bullet points inline before exporting; your personal voice is preserved." },
       { q: "What languages are supported?", a: "English, Spanish, French, German, Hindi, Portuguese, Japanese, Korean." }
   ];
 
@@ -267,7 +316,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
 
       {/* --- HEADER --- */}
       <motion.nav 
-          initial={{ y: 0, width: "100%", borderRadius: "0px", top: 0, borderColor: "rgba(255,255,255,0.05)", backgroundColor: "rgba(9,9,11,0.0)" }}
+          initial={{ y: 0, width: "100%", borderRadius: "0px", top: 0, borderColor: "rgba(255,255,255,0.0)", backgroundColor: "rgba(9,9,11,0.0)" }}
           animate={isScrolled ? { 
               width: "90%",
               maxWidth: "1024px", 
@@ -281,11 +330,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               maxWidth: "100%",
               borderRadius: "0px",
               top: 0,
-              borderColor: "rgba(255,255,255,0.05)",
-              backgroundColor: "rgba(9,9,11,0.5)",
-              backdropFilter: "blur(8px)"
+              borderColor: "rgba(255,255,255,0.0)",
+              backgroundColor: "rgba(9,9,11,0.0)", // Fully transparent at top
+              backdropFilter: "blur(0px)"
           }}
-          transition={{ duration: 0.8, type: "spring", damping: 25, stiffness: 60 }}
+          transition={{ duration: 1.2, type: "spring", damping: 30, stiffness: 50 }}
           style={{
               left: '50%',
               x: '-50%',
@@ -300,6 +349,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
           <div className="flex items-center gap-2 sm:gap-6">
               <button onClick={() => onStart('blog')} className="hidden sm:flex items-center gap-2 text-xs font-bold text-zinc-400 hover:text-white transition-colors uppercase tracking-widest px-3 py-1.5 cursor-pointer touch-target">
                   <BookOpen className="w-3 h-3" /> Blog
+              </button>
+              <button onClick={() => onStart('pricing')} className="hidden sm:flex items-center gap-2 text-xs font-bold text-zinc-400 hover:text-white transition-colors uppercase tracking-widest px-3 py-1.5 cursor-pointer touch-target">
+                  Pricing
               </button>
               <button onClick={() => onStart('roast')} className="hidden sm:flex items-center gap-2 text-xs font-bold text-orange-500 hover:text-orange-400 active:text-orange-300 transition-colors uppercase tracking-widest border border-orange-500/20 px-3 py-1.5 rounded bg-orange-500/5 hover:bg-orange-500/10 cursor-pointer touch-target">
                     <Zap className="w-3 h-3" /> Roast My Resume
@@ -317,7 +369,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
       </motion.nav>
 
       {/* --- HERO SECTION --- */}
-      <section className="relative min-h-[85vh] sm:min-h-[90vh] min-h-[85dvh] sm:min-h-[90dvh] flex flex-col items-center justify-center pt-20 sm:pt-24 px-4 sm:px-6 border-b border-white/10 overflow-hidden bg-zinc-950">
+      <section className="relative min-h-[100vh] sm:min-h-[100vh] min-h-[100dvh] sm:min-h-[100dvh] flex flex-col items-center justify-center pt-20 sm:pt-24 px-4 sm:px-6 border-b border-white/10 overflow-hidden bg-zinc-950 pb-20">
         
         {/* Live Animated Gradient Background - Reduced on mobile for performance */}
         <div className="absolute inset-0 bg-zinc-950 overflow-hidden pointer-events-none">
@@ -397,14 +449,44 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1.4, delay: 0.8 }}
-                className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto mb-10"
+                className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto mb-10 relative"
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
             >
+                {isDragging && (
+                    <div className="absolute inset-0 -m-4 bg-orange-500/20 border-2 border-dashed border-orange-500 rounded-xl z-50 backdrop-blur-sm flex items-center justify-center">
+                        <div className="bg-zinc-950 px-6 py-3 rounded-full border border-orange-500/50 text-orange-500 font-bold flex items-center gap-2 shadow-xl">
+                            <Upload className="w-5 h-5 animate-bounce" />
+                            Drop PDF to Scan
+                        </div>
+                    </div>
+                )}
+
                 <button 
-                  onClick={() => { logEvent('cta_click', { type: 'optimize' }); onStart('optimize'); }}
-                  className={ORANGE_BUTTON_STYLE + " w-full sm:w-auto"}
+                  onClick={() => { 
+                      logEvent('cta_click', { type: 'optimize' }); 
+                      // Trigger file input click
+                      document.getElementById('hero-upload')?.click();
+                  }}
+                  className={ORANGE_BUTTON_STYLE + " w-full sm:w-auto relative overflow-hidden group"}
                 >
-                    Scan My Resume — Free in 30 Seconds
+                    <Upload className="w-4 h-4 mr-2" />
+                    Scan My Resume — Free
+                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                 </button>
+                <input 
+                    type="file" 
+                    id="hero-upload" 
+                    accept=".pdf" 
+                    className="hidden" 
+                    onChange={(e) => handleHeroUpload(e)}
+                />
+                
+                <p className="sm:hidden text-zinc-500 text-xs mt-2">Tap to upload PDF</p>
+                <p className="hidden sm:block text-zinc-500 text-xs mt-2 absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap opacity-60">
+                    or drag and drop PDF here
+                </p>
             </motion.div>
 
             <motion.div 
@@ -433,32 +515,85 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 <div className="space-y-6">
                     <h2 className="text-3xl font-bold text-white">Why your resume gets rejected</h2>
                     <p className="text-zinc-400 text-sm mb-4">ATS software scans for specific keywords from the job description. If your resume doesn't match, it's auto-rejected — even if you're qualified.</p>
-                    <ul className="space-y-6">
-                        <li className="flex gap-4 items-start">
-                            <div className="w-8 h-8 rounded bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0 text-orange-500 font-bold font-mono">1</div>
-                            <div>
-                                <h3 className="text-lg font-bold text-white mb-1">Missing keywords = instant rejection</h3>
-                                <p className="text-zinc-500 text-sm">Don’t spend hours tweaking. We match context instantly.</p>
-                            </div>
+                    <ul className="space-y-8">
+                        {/* Point 1 */}
+                        <li className="group">
+                             <div className="flex gap-4 items-start mb-3">
+                                <div className="w-8 h-8 rounded bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0 text-orange-500 font-bold font-mono group-hover:border-orange-500/50 transition-colors">1</div>
+                                <div>
+                                    <h3 className="text-lg font-bold text-white mb-1 group-hover:text-orange-100 transition-colors">Missing keywords = instant rejection</h3>
+                                    <p className="text-zinc-500 text-sm">Don’t spend hours tweaking. We match context instantly.</p>
+                                </div>
+                             </div>
+                             {/* Mini Visual for Point 1 */}
+                             <div className="ml-12 p-4 bg-zinc-900/30 border border-zinc-800 rounded-lg relative overflow-hidden group-hover:border-orange-500/20 transition-all">
+                                 <div className="flex gap-2 items-center text-xs font-mono text-zinc-500 mb-2">
+                                     <XCircle className="w-3 h-3 text-red-500" /> Missing: "React", "TypeScript"
+                                 </div>
+                                 <div className="h-1 w-full bg-zinc-800 rounded-full overflow-hidden">
+                                     <motion.div 
+                                        className="h-full bg-red-500" 
+                                        initial={{ width: "100%" }}
+                                        whileInView={{ width: "40%" }}
+                                        transition={{ duration: 1.5, repeat: Infinity, repeatType: "reverse" }}
+                                     />
+                                 </div>
+                             </div>
                         </li>
-                         <li className="flex gap-4 items-start">
-                            <div className="w-8 h-8 rounded bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0 text-orange-500 font-bold font-mono">2</div>
-                            <div>
-                                <h3 className="text-lg font-bold text-white mb-1">Wrong format = unreadable</h3>
-                                <p className="text-zinc-500 text-sm">Tables, columns, and fancy designs confuse ATS parsers. We flag formatting issues.</p>
-                            </div>
+
+                         {/* Point 2 */}
+                        <li className="group">
+                             <div className="flex gap-4 items-start mb-3">
+                                <div className="w-8 h-8 rounded bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0 text-orange-500 font-bold font-mono group-hover:border-orange-500/50 transition-colors">2</div>
+                                <div>
+                                    <h3 className="text-lg font-bold text-white mb-1 group-hover:text-orange-100 transition-colors">Wrong format = unreadable</h3>
+                                    <p className="text-zinc-500 text-sm">Tables, columns, and fancy designs confuse ATS parsers.</p>
+                                </div>
+                             </div>
+                             {/* Mini Visual for Point 2 */}
+                             <div className="ml-12 p-4 bg-zinc-900/30 border border-zinc-800 rounded-lg relative overflow-hidden group-hover:border-orange-500/20 transition-all">
+                                 <div className="flex gap-2 mb-2">
+                                     <div className="w-8 h-10 bg-zinc-800 border border-zinc-700 rounded-sm opacity-50 skew-x-12 origin-bottom-left"></div>
+                                     <div className="w-8 h-10 bg-zinc-800 border border-red-500/50 rounded-sm flex items-center justify-center">
+                                         <span className="text-[8px] text-red-500 font-bold">ERROR</span>
+                                     </div>
+                                 </div>
+                                 <div className="text-[10px] text-zinc-600 font-mono">Parsing failed: Complex layout detected.</div>
+                             </div>
                         </li>
-                         <li className="flex gap-4 items-start">
-                            <div className="w-8 h-8 rounded bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0 text-orange-500 font-bold font-mono">3</div>
-                            <div>
-                                <h3 className="text-lg font-bold text-white mb-1">We fix it for you</h3>
-                                <p className="text-zinc-500 text-sm">Upload your resume + job description. Get a score, missing keywords, and an optimized version.</p>
-                            </div>
+
+                         {/* Point 3 */}
+                        <li className="group">
+                             <div className="flex gap-4 items-start mb-3">
+                                <div className="w-8 h-8 rounded bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0 text-orange-500 font-bold font-mono group-hover:border-orange-500/50 transition-colors">3</div>
+                                <div>
+                                    <h3 className="text-lg font-bold text-white mb-1 group-hover:text-orange-100 transition-colors">We fix it for you</h3>
+                                    <p className="text-zinc-500 text-sm">Upload your resume + job description. Get optimized instantly.</p>
+                                </div>
+                             </div>
+                             {/* Mini Visual for Point 3 */}
+                             <div className="ml-12 p-4 bg-zinc-900/30 border border-zinc-800 rounded-lg relative overflow-hidden group-hover:border-orange-500/20 transition-all">
+                                 <div className="flex justify-between items-center mb-2">
+                                     <div className="flex gap-1">
+                                         <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                                         <span className="text-[10px] text-green-500 font-bold uppercase">Optimized</span>
+                                     </div>
+                                     <span className="text-[10px] text-white font-bold">Score: 94/100</span>
+                                 </div>
+                                 <div className="h-1 w-full bg-zinc-800 rounded-full overflow-hidden">
+                                     <motion.div 
+                                        className="h-full bg-green-500" 
+                                        initial={{ width: "0%" }}
+                                        whileInView={{ width: "94%" }}
+                                        transition={{ duration: 1 }}
+                                     />
+                                 </div>
+                             </div>
                         </li>
                     </ul>
                 </div>
                 
-                <div className="p-6 bg-zinc-900/50 border border-orange-500/20 rounded-xl inline-block">
+                <div className="p-6 bg-zinc-900/50 border border-orange-500/20 rounded-xl inline-block mt-4">
                     <div className="text-3xl font-bold text-orange-500 mb-1">80–90+</div>
                     <p className="text-sm text-zinc-300 font-medium">Average score after our fix</p>
                     <p className="text-[10px] text-zinc-500 mt-2 font-mono">Most users start at 40-60. We get you interview-ready.</p>
@@ -527,9 +662,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                   </div>
                   
                   {/* Step 1 */}
-                  <div className="flex flex-col items-center text-center relative group">
+                  <div 
+                      className="flex flex-col items-center text-center relative group cursor-pointer"
+                      onClick={() => onStart('scan')}
+                  >
                       <StepGraphic step={1} />
-                      <h4 className="text-lg font-bold text-white mb-3">Upload & Scan</h4>
+                      <h4 className="text-lg font-bold text-white mb-3 group-hover:text-orange-500 transition-colors">Upload & Scan</h4>
                       <p className="text-zinc-400 text-sm leading-relaxed max-w-[280px]">
                           Drop your resume (PDF) and copy-paste the job posting you want to apply for. Takes 10 seconds.
                       </p>
@@ -572,13 +710,15 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: i * 0.2, duration: 0.8 }}
-                        className="bg-zinc-900 border border-white/5 p-8 rounded-lg hover:border-orange-500/30 transition-all group"
+                        className="bg-zinc-900 border border-white/5 p-8 rounded-lg hover:border-orange-500/30 transition-all group cursor-pointer"
+                        onClick={() => onStart('feature', undefined, f.id)}
                     >
                         <div className="w-10 h-10 rounded bg-zinc-950 border border-zinc-800 flex items-center justify-center mb-4 group-hover:text-orange-500 transition-colors">
                             <f.icon className="w-5 h-5 text-zinc-400 group-hover:text-orange-500" />
                         </div>
-                        <h3 className="text-lg font-bold text-white mb-2">
+                        <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
                             {f.title}
+                            <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-orange-500" />
                         </h3>
                         <p className="text-zinc-400 text-sm leading-relaxed mb-4">
                             {f.desc}
@@ -634,7 +774,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                       </ul>
                       <button 
                         onClick={() => { logEvent('cta_click', { tier: 'paid' }); onStart('optimize'); }} 
-                        className="w-full py-4 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-sm text-sm transition-colors shadow-lg shadow-orange-900/20"
+                        className={ORANGE_BUTTON_STYLE + " w-full shadow-lg shadow-orange-900/20"}
                       >
                         Start now
                       </button>
@@ -811,9 +951,5 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
     </div>
   );
 };
-
-const ArrowDownIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-500"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
-)
 
 export default LandingPage;
