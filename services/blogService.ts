@@ -1,4 +1,6 @@
 
+/// <reference types="vite/client" />
+
 const BASE_URL = import.meta.env.VITE_MASSBLOG_URL || 'https://www.massblogger.com';
 const API_KEY = import.meta.env.VITE_MASSBLOG_API;
 
@@ -39,9 +41,21 @@ export const getBlogPosts = async (): Promise<BlogPost[]> => {
   }
 
   try {
-    const response = await fetch(`${BASE_URL}/api/blog?apiKey=${API_KEY}`);
-    if (!response.ok) throw new Error('Failed to fetch posts');
+    console.log(`Fetching blog posts from: ${BASE_URL}/api/blog`);
+    const response = await fetch(`${BASE_URL}/api/blog?apiKey=${API_KEY}`, {
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      const text = await response.text();
+      console.error(`Blog API Error (${response.status}):`, text);
+      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+    }
+    
     const data = await response.json();
+    console.log('Blog posts fetched:', data.length);
     
     // Filter out future posts
     const now = new Date();
@@ -51,6 +65,7 @@ export const getBlogPosts = async (): Promise<BlogPost[]> => {
     });
   } catch (error) {
     console.error('Error fetching blog posts:', error);
+    // Return empty array to avoid crashing UI, but log error
     return [];
   }
 };
