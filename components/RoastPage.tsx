@@ -18,19 +18,19 @@ export const RoastPage = () => {
   const [currentRoastPhase, setCurrentRoastPhase] = useState('');
 
   const roastData = [
-    { name: 'Formatting', value: Math.floor(Math.random() * 30) + 10, color: '#ef4444' },
-    { name: 'Keywords', value: Math.floor(Math.random() * 25) + 15, color: '#f97316' },
-    { name: 'Impact', value: Math.floor(Math.random() * 20) + 5, color: '#eab308' },
-    { name: 'Brevity', value: Math.floor(Math.random() * 40) + 20, color: '#22c55e' },
-    { name: 'Cringe Factor', value: Math.floor(Math.random() * 30) + 70, color: '#dc2626' },
+    { name: 'Formatting', value: Math.floor(Math.random() * 30) + 10, color: '#f97316' },
+    { name: 'Keywords', value: Math.floor(Math.random() * 25) + 15, color: '#fb923c' },
+    { name: 'Impact', value: Math.floor(Math.random() * 20) + 5, color: '#fdba74' },
+    { name: 'Brevity', value: Math.floor(Math.random() * 40) + 20, color: '#52525b' },
+    { name: 'Cringe Factor', value: Math.floor(Math.random() * 30) + 70, color: '#ea580c' },
   ];
 
   const roastCategories = [
-    { name: 'Unemployable', value: 35, color: '#dc2626' },
+    { name: 'Unemployable', value: 35, color: '#c2410c' },
     { name: 'Questionable', value: 25, color: '#f97316' },
-    { name: 'Mediocre', value: 20, color: '#eab308' },
-    { name: 'Decent', value: 15, color: '#22c55e' },
-    { name: 'Hireable', value: 5, color: '#10b981' },
+    { name: 'Mediocre', value: 20, color: '#fb923c' },
+    { name: 'Decent', value: 15, color: '#71717a' },
+    { name: 'Hireable', value: 5, color: '#a1a1aa' },
   ];
 
   const roastingPhases = [
@@ -132,7 +132,7 @@ export const RoastPage = () => {
   };
 
   return (
-    <div className="min-h-screen min-h-[100dvh] bg-black text-white font-sans selection:bg-red-500/30">
+    <div className="min-h-screen min-h-[100dvh] bg-black text-white font-sans selection:bg-orange-500/30">
       {/* Header - Mobile optimized */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/5 h-14 sm:h-16 flex items-center justify-between px-4 sm:px-6 safe-area-inset">
         <div className="cursor-pointer" onClick={() => window.location.href = '/'}>
@@ -149,11 +149,11 @@ export const RoastPage = () => {
                     animate={{ scale: 1, opacity: 1 }}
                     className="space-y-4"
                 >
-                    <div className="inline-flex items-center justify-center p-3 sm:p-4 bg-red-500/10 rounded-full mb-4 border border-red-500/20 shadow-[0_0_30px_rgba(239,68,68,0.3)]">
-                        <Flame className="w-8 sm:w-10 h-8 sm:h-10 text-red-500" />
+                    <div className="inline-flex items-center justify-center p-3 sm:p-4 bg-orange-500/10 rounded-full mb-4 border border-orange-500/20 shadow-[0_0_30px_rgba(249,115,22,0.3)]">
+                        <Flame className="w-8 sm:w-10 h-8 sm:h-10 text-orange-500" />
                     </div>
                     <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tighter uppercase">
-                        Roast My <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">Resume</span>
+                        Roast My <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-300">Resume</span>
                     </h1>
                     <p className="text-zinc-400 text-sm sm:text-lg max-w-md mx-auto leading-relaxed px-2">
                         Your resume is about to have a very bad day. Get brutally honest feedback that's <span className="text-white font-bold">surgically mean and commercially effective.</span>
@@ -166,10 +166,10 @@ export const RoastPage = () => {
                     transition={{ delay: 0.4 }}
                     className="w-full max-w-md px-2"
                 >
-                    <label className="group relative flex flex-col items-center justify-center w-full h-56 sm:h-64 rounded-2xl border-2 border-dashed border-zinc-800 hover:border-red-500/50 active:border-red-500/70 bg-zinc-900/30 hover:bg-zinc-900 transition-all cursor-pointer overflow-hidden touch-target">
+                    <label className="group relative flex flex-col items-center justify-center w-full h-56 sm:h-64 rounded-2xl border-2 border-dashed border-zinc-800 hover:border-orange-500/50 active:border-orange-500/70 bg-zinc-900/30 hover:bg-zinc-900 transition-all cursor-pointer overflow-hidden touch-target">
                         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5"></div>
                         <div className="relative z-10 flex flex-col items-center justify-center pt-5 pb-6">
-                            <Upload className="w-10 sm:w-12 h-10 sm:h-12 text-zinc-600 group-hover:text-red-500 mb-4 transition-colors transform group-hover:scale-110 duration-500" />
+                            <Upload className="w-10 sm:w-12 h-10 sm:h-12 text-zinc-600 group-hover:text-orange-500 mb-4 transition-colors transform group-hover:scale-110 duration-500" />
                             <p className="mb-2 text-base sm:text-lg text-white font-bold">Drop your PDF here</p>
                             <p className="text-xs text-zinc-500 font-mono">TAP TO UPLOAD</p>
                         </div>
@@ -177,7 +177,7 @@ export const RoastPage = () => {
                     </label>
                 </motion.div>
                 {error && (
-                    <div className="text-red-500 text-sm font-bold flex items-center gap-2 bg-red-950/30 px-4 py-2 rounded-lg border border-red-900/50 mx-2">
+                    <div className="text-orange-500 text-sm font-bold flex items-center gap-2 bg-orange-950/30 px-4 py-2 rounded-lg border border-orange-900/50 mx-2">
                         <AlertCircle className="w-4 h-4 shrink-0" /> {error}
                     </div>
                 )}
@@ -191,9 +191,9 @@ export const RoastPage = () => {
                     animate={{ scale: 1, opacity: 1 }}
                     className="relative"
                 >
-                    <div className="absolute inset-0 bg-red-500 blur-3xl opacity-30 animate-pulse"></div>
-                    <div className="relative w-24 h-24 bg-zinc-900 border-2 border-red-500/30 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(239,68,68,0.4)]">
-                        <Flame className="w-12 h-12 text-red-500 animate-bounce" />
+                    <div className="absolute inset-0 bg-orange-500 blur-3xl opacity-30 animate-pulse"></div>
+                    <div className="relative w-24 h-24 bg-zinc-900 border-2 border-orange-500/30 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(249,115,22,0.4)]">
+                        <Flame className="w-12 h-12 text-orange-500 animate-bounce" />
                     </div>
                 </motion.div>
                 
@@ -201,7 +201,7 @@ export const RoastPage = () => {
                     <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
                         ROASTING IN PROGRESS
                     </h2>
-                    <p className="text-red-400 font-mono text-sm animate-pulse">
+                    <p className="text-orange-400 font-mono text-sm animate-pulse">
                         {currentRoastPhase}
                     </p>
                 </div>
@@ -209,7 +209,7 @@ export const RoastPage = () => {
                 <div className="w-full max-w-md space-y-3">
                     <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
                         <motion.div 
-                            className="h-full bg-gradient-to-r from-red-600 via-orange-500 to-red-600"
+                            className="h-full bg-gradient-to-r from-orange-600 via-orange-500 to-orange-600"
                             initial={{ width: 0 }}
                             animate={{ width: `${roastingProgress}%` }}
                             transition={{ duration: 0.8 }}
@@ -222,15 +222,15 @@ export const RoastPage = () => {
 
                 <div className="grid grid-cols-3 gap-4 text-center">
                     <div className="space-y-1">
-                        <div className="text-2xl font-black text-red-500">{Math.floor(Math.random() * 50) + 20}</div>
+                        <div className="text-2xl font-black text-orange-500">{Math.floor(Math.random() * 50) + 20}</div>
                         <div className="text-xs text-zinc-500 uppercase">Buzzwords</div>
                     </div>
                     <div className="space-y-1">
-                        <div className="text-2xl font-black text-orange-500">{Math.floor(Math.random() * 15) + 5}</div>
+                        <div className="text-2xl font-black text-zinc-400">{Math.floor(Math.random() * 15) + 5}</div>
                         <div className="text-xs text-zinc-500 uppercase">Red Flags</div>
                     </div>
                     <div className="space-y-1">
-                        <div className="text-2xl font-black text-yellow-500">{Math.floor(Math.random() * 8) + 2}</div>
+                        <div className="text-2xl font-black text-zinc-500">{Math.floor(Math.random() * 8) + 2}</div>
                         <div className="text-xs text-zinc-500 uppercase">Cringe Level</div>
                     </div>
                 </div>
@@ -249,21 +249,21 @@ export const RoastPage = () => {
                     {/* Enhanced Scoreboard */}
                     <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
                         {/* Main Score */}
-                        <div className="lg:col-span-2 bg-gradient-to-br from-zinc-900 via-zinc-900 to-red-950/20 border border-red-900/30 p-6 sm:p-8 rounded-2xl flex flex-col items-center justify-center text-center shadow-2xl relative overflow-hidden">
-                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-600 via-orange-500 to-red-600"></div>
+                        <div className="lg:col-span-2 bg-gradient-to-br from-zinc-900 via-zinc-900 to-orange-950/20 border border-orange-900/30 p-6 sm:p-8 rounded-2xl flex flex-col items-center justify-center text-center shadow-2xl relative overflow-hidden">
+                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-600 via-orange-500 to-orange-600"></div>
                             <div className="absolute top-4 right-4">
-                                <Skull className="w-8 h-8 text-red-500/20" />
+                                <Skull className="w-8 h-8 text-orange-500/20" />
                             </div>
                             
                             <div className="text-zinc-400 text-xs font-bold uppercase tracking-widest mb-3">Employability Score</div>
                             <div className="relative mb-4">
-                                <div className="text-5xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-red-400 to-red-600">
+                                <div className="text-5xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-orange-400 to-orange-600">
                                     {roastScore}
                                 </div>
                                 <div className="text-xl font-bold text-zinc-500 absolute -bottom-1 -right-8">/100</div>
                             </div>
                             
-                            <div className="flex items-center gap-2 text-red-400 text-sm font-bold bg-red-950/40 px-4 py-2 rounded-full border border-red-500/20">
+                            <div className="flex items-center gap-2 text-orange-400 text-sm font-bold bg-orange-950/40 px-4 py-2 rounded-full border border-orange-500/20">
                                 <TrendingDown className="w-4 h-4" />
                                 {roastScore < 25 ? "Medically Unhireable" : 
                                  roastScore < 40 ? "Spiritually Unemployable" : 
@@ -313,8 +313,8 @@ export const RoastPage = () => {
                                     <AreaChart data={roastData}>
                                         <defs>
                                             <linearGradient id="colorCringe" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#ef4444" stopOpacity={0.4}/>
-                                                <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                                                <stop offset="5%" stopColor="#f97316" stopOpacity={0.4}/>
+                                                <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
                                             </linearGradient>
                                         </defs>
                                         <XAxis dataKey="name" hide />
@@ -329,7 +329,7 @@ export const RoastPage = () => {
                                         <Area 
                                             type="monotone" 
                                             dataKey="value" 
-                                            stroke="#ef4444" 
+                                            stroke="#f97316" 
                                             strokeWidth={2} 
                                             fillOpacity={1} 
                                             fill="url(#colorCringe)" 
@@ -343,10 +343,10 @@ export const RoastPage = () => {
                     {/* Quick Stats */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                         {[
-                            { icon: Target, label: 'Buzzword Density', value: `${Math.floor(Math.random() * 40) + 20}%`, color: 'text-red-500' },
-                            { icon: Zap, label: 'Cringe Factor', value: `${Math.floor(Math.random() * 30) + 70}/100`, color: 'text-orange-500' },
-                            { icon: Star, label: 'Originality', value: `${Math.floor(Math.random() * 15) + 5}%`, color: 'text-yellow-500' },
-                            { icon: Award, label: 'Hire Probability', value: `${Math.floor(Math.random() * 20) + 10}%`, color: 'text-green-500' },
+                            { icon: Target, label: 'Buzzword Density', value: `${Math.floor(Math.random() * 40) + 20}%`, color: 'text-orange-500' },
+                            { icon: Zap, label: 'Cringe Factor', value: `${Math.floor(Math.random() * 30) + 70}/100`, color: 'text-zinc-400' },
+                            { icon: Star, label: 'Originality', value: `${Math.floor(Math.random() * 15) + 5}%`, color: 'text-orange-400' },
+                            { icon: Award, label: 'Hire Probability', value: `${Math.floor(Math.random() * 20) + 10}%`, color: 'text-zinc-500' },
                         ].map((stat, index) => (
                             <motion.div
                                 key={index}
@@ -367,16 +367,16 @@ export const RoastPage = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.6, duration: 0.8 }}
-                        className="bg-gradient-to-br from-zinc-900 via-zinc-900 to-red-950/10 border border-zinc-800 rounded-2xl p-6 sm:p-8 md:p-12 shadow-2xl relative overflow-hidden"
+                        className="bg-gradient-to-br from-zinc-900 via-zinc-900 to-orange-950/10 border border-zinc-800 rounded-2xl p-6 sm:p-8 md:p-12 shadow-2xl relative overflow-hidden"
                     >
-                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-600 via-orange-600 to-red-600"></div>
+                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-600 via-orange-600 to-orange-600"></div>
                         <div className="absolute top-6 right-6">
-                            <Flame className="w-10 h-10 text-red-500/20" />
+                            <Flame className="w-10 h-10 text-orange-500/20" />
                         </div>
                         
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="p-3 bg-red-500/10 rounded-xl border border-red-500/20">
-                                <Skull className="w-6 h-6 text-red-500" />
+                            <div className="p-3 bg-orange-500/10 rounded-xl border border-orange-500/20">
+                                <Skull className="w-6 h-6 text-orange-500" />
                             </div>
                             <div>
                                 <h2 className="text-3xl font-bold text-white">The Verdict</h2>
@@ -385,19 +385,19 @@ export const RoastPage = () => {
                         </div>
                         
                         <div className="roast-content prose prose-invert max-w-none
-                            prose-headings:text-red-400 prose-headings:font-bold prose-headings:tracking-tight
-                            prose-h1:text-3xl prose-h1:mb-8 prose-h1:pb-4 prose-h1:border-b prose-h1:border-red-500/20
-                            prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-6 prose-h2:pb-2 prose-h2:border-b prose-h2:border-red-500/10 prose-h2:text-orange-400
+                            prose-headings:text-orange-400 prose-headings:font-bold prose-headings:tracking-tight
+                            prose-h1:text-3xl prose-h1:mb-8 prose-h1:pb-4 prose-h1:border-b prose-h1:border-orange-500/20
+                            prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-6 prose-h2:pb-2 prose-h2:border-b prose-h2:border-orange-500/10 prose-h2:text-orange-400
                             prose-h3:text-lg prose-h3:font-bold prose-h3:text-orange-300 prose-h3:mt-6 prose-h3:mb-3
                             prose-p:text-zinc-300 prose-p:leading-relaxed prose-p:text-sm sm:prose-p:text-base prose-p:mb-6 prose-p:font-medium
-                            prose-strong:text-white prose-strong:font-bold prose-strong:bg-red-950/40 prose-strong:px-1.5 prose-strong:py-0.5 prose-strong:rounded prose-strong:border prose-strong:border-red-500/20
+                            prose-strong:text-white prose-strong:font-bold prose-strong:bg-orange-950/40 prose-strong:px-1.5 prose-strong:py-0.5 prose-strong:rounded prose-strong:border prose-strong:border-orange-500/20
                             prose-em:text-orange-400 prose-em:not-italic prose-em:font-semibold
                             prose-ul:my-6 prose-ul:space-y-4
                             prose-li:text-zinc-300 prose-li:text-sm sm:prose-li:text-base prose-li:leading-relaxed prose-li:pl-2
-                            prose-li:marker:text-red-500
+                            prose-li:marker:text-orange-500
                             prose-ol:my-6 prose-ol:space-y-4
                             prose-hr:my-10 prose-hr:border-zinc-800
-                            prose-blockquote:border-l-4 prose-blockquote:border-red-500 prose-blockquote:bg-gradient-to-r prose-blockquote:from-red-950/20 prose-blockquote:to-transparent prose-blockquote:p-6 prose-blockquote:rounded-r-lg prose-blockquote:my-8 prose-blockquote:shadow-sm
+                            prose-blockquote:border-l-4 prose-blockquote:border-orange-500 prose-blockquote:bg-gradient-to-r prose-blockquote:from-orange-950/20 prose-blockquote:to-transparent prose-blockquote:p-6 prose-blockquote:rounded-r-lg prose-blockquote:my-8 prose-blockquote:shadow-sm
                             prose-code:bg-zinc-800 prose-code:text-orange-400 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-sm
                             [&_ul]:list-disc [&_ul]:pl-5
                             [&_li_strong]:text-orange-200 [&_li_strong]:bg-transparent [&_li_strong]:border-none [&_li_strong]:px-0
@@ -405,7 +405,7 @@ export const RoastPage = () => {
                             <ReactMarkdown 
                                 remarkPlugins={[remarkGfm]}
                                 components={{
-                                    h1: ({node, ...props}) => <h1 className="text-3xl font-bold text-red-500 mb-6 pb-4 border-b border-red-500/20 tracking-tight" {...props} />,
+                                    h1: ({node, ...props}) => <h1 className="text-3xl font-bold text-orange-500 mb-6 pb-4 border-b border-orange-500/20 tracking-tight" {...props} />,
                                     h2: ({node, ...props}) => <h2 className="text-2xl font-bold text-orange-500 mt-10 mb-4 pb-2 border-b border-white/5" {...props} />,
                                     h3: ({node, ...props}) => <h3 className="text-lg font-bold text-orange-400 mt-6 mb-2" {...props} />,
                                     p: ({node, ...props}) => <p className="text-zinc-300 leading-relaxed mb-4 text-sm sm:text-base" {...props} />,
@@ -413,7 +413,7 @@ export const RoastPage = () => {
                                     ol: ({node, ...props}) => <ol className="space-y-3 my-4 list-decimal pl-5 text-zinc-300 text-sm sm:text-base" {...props} />,
                                     li: ({node, ...props}) => <li className="pl-1" {...props} />,
                                     blockquote: ({node, ...props}) => (
-                                        <blockquote className="my-8 border-l-4 border-red-500 bg-gradient-to-r from-red-950/30 to-transparent p-6 rounded-r-lg shadow-sm" {...props} />
+                                        <blockquote className="my-8 border-l-4 border-orange-500 bg-gradient-to-r from-orange-950/30 to-transparent p-6 rounded-r-lg shadow-sm" {...props} />
                                     ),
                                     strong: ({node, ...props}) => <strong className="font-bold text-white bg-white/5 px-1.5 py-0.5 rounded border border-white/10" {...props} />,
                                     hr: ({node, ...props}) => <hr className="my-10 border-zinc-800" {...props} />

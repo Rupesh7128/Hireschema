@@ -63,7 +63,7 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
   ];
   
   const COLORS = ['#F97316', '#27272A'];
-  const COLORS_RELEVANCE = ['#2563EB', '#27272A'];
+  const COLORS_RELEVANCE = ['#F97316', '#27272A'];
 
   // EDIT MODE STATE
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -176,7 +176,7 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
         <div className="flex gap-2 shrink-0">
             {isEditingProfile ? (
                 <>
-                    <button onClick={handleSaveProfile} className="p-2 bg-green-600 hover:bg-green-500 text-white rounded-lg transition-colors"><Check className="w-4 h-4" /></button>
+                    <button onClick={handleSaveProfile} className="p-2 bg-orange-600 hover:bg-orange-500 text-white rounded-lg transition-colors"><Check className="w-4 h-4" /></button>
                     <button onClick={handleCancelEdit} className="p-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-lg transition-colors"><X className="w-4 h-4" /></button>
                 </>
             ) : (
@@ -193,11 +193,11 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
 
       {/* Role Mismatch Warning */}
       {isLowRelevance && (
-        <div className="col-span-1 md:col-span-2 lg:col-span-4 bg-red-950/20 border border-red-900/40 p-4 rounded-xl flex items-start gap-3">
-             <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+        <div className="col-span-1 md:col-span-2 lg:col-span-4 bg-zinc-900 border border-orange-500/20 p-4 rounded-xl flex items-start gap-3">
+             <AlertTriangle className="w-5 h-5 text-orange-500 shrink-0 mt-0.5" />
              <div>
-                 <h4 className="text-red-400 font-bold text-sm uppercase mb-1">Role Mismatch Detected</h4>
-                 <p className="text-red-300/80 text-xs">{result.roleFitAnalysis || "Candidate profile does not strongly align with the Job Description requirements."}</p>
+                 <h4 className="text-orange-400 font-bold text-sm uppercase mb-1">Role Mismatch Detected</h4>
+                 <p className="text-zinc-400 text-xs">{result.roleFitAnalysis || "Candidate profile does not strongly align with the Job Description requirements."}</p>
              </div>
         </div>
       )}
@@ -259,10 +259,10 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
           <div className="flex items-center gap-2">
               <h3 className="text-xs font-mono font-bold text-zinc-500 uppercase tracking-wider">Skill Match</h3>
               <HoverTooltip content="0-100 score based on keyword presence and experience relevance.">
-                  <Info className="w-3.5 h-3.5 text-zinc-600 hover:text-blue-500 transition-colors" />
+                  <Info className="w-3.5 h-3.5 text-zinc-600 hover:text-orange-500 transition-colors" />
               </HoverTooltip>
           </div>
-          <BrainCircuit className="w-4 h-4 text-blue-500" />
+          <BrainCircuit className="w-4 h-4 text-orange-500" />
         </div>
         <div className="w-32 h-32 relative my-auto">
           <ResponsiveContainer width="100%" height="100%">
@@ -311,56 +311,32 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
         </p>
         <div className="p-3 bg-zinc-950/50 rounded-lg border border-white/5">
              <h4 className="text-xs font-bold text-zinc-500 uppercase mb-1">Role Fit Verdict</h4>
-             <p className={`text-sm font-medium ${isLowRelevance ? 'text-red-400' : 'text-green-400'}`}>
+             <p className={`text-sm font-medium ${isLowRelevance ? 'text-orange-400' : 'text-zinc-300'}`}>
                  {result.roleFitAnalysis || "Analysis pending."}
              </p>
         </div>
       </div>
 
-      {/* Market Analysis - NEW */}
-      {result.marketAnalysis && (
-        <div className="col-span-1 md:col-span-2 lg:col-span-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-zinc-900/60 border border-white/10 rounded-xl p-4 flex flex-col">
-                <div className="flex items-center gap-2 mb-2 text-zinc-500 uppercase text-xs font-bold">
-                    <DollarSign className="w-4 h-4 text-green-500" /> Est. Salary
-                </div>
-                <div className="text-xl font-bold text-white mt-auto">{result.marketAnalysis.salary || "N/A"}</div>
-            </div>
-            <div className="bg-zinc-900/60 border border-white/10 rounded-xl p-4 flex flex-col">
-                <div className="flex items-center gap-2 mb-2 text-zinc-500 uppercase text-xs font-bold">
-                    <Briefcase className="w-4 h-4 text-blue-500" /> Verdict
-                </div>
-                <div className="text-sm font-medium text-zinc-200 mt-auto leading-tight">{result.marketAnalysis.verdict || "N/A"}</div>
-            </div>
-            <div className="bg-zinc-900/60 border border-white/10 rounded-xl p-4 flex flex-col">
-                <div className="flex items-center gap-2 mb-2 text-zinc-500 uppercase text-xs font-bold">
-                    <Globe className="w-4 h-4 text-purple-500" /> Culture/WFH
-                </div>
-                <div className="text-sm font-medium text-zinc-200 mt-auto leading-tight">{result.marketAnalysis.culture || "N/A"}</div>
-            </div>
-        </div>
-      )}
-
       {/* Missing Keywords */}
       <div className="col-span-1 md:col-span-1 lg:col-span-2 bg-zinc-900/60 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-xl">
         <div className="flex items-center gap-2 mb-3">
-          <FileSearch className="w-4 h-4 text-red-500" />
+          <FileSearch className="w-4 h-4 text-orange-500" />
            <div className="flex items-center gap-2">
                 <h3 className="text-xs font-mono font-bold text-zinc-500 uppercase tracking-wider">Gap Analysis</h3>
                 <HoverTooltip content="High-value keywords found in the Job Description but missing from your resume.">
-                    <Info className="w-3.5 h-3.5 text-zinc-600 hover:text-red-500 transition-colors" />
+                    <Info className="w-3.5 h-3.5 text-zinc-600 hover:text-orange-500 transition-colors" />
                 </HoverTooltip>
             </div>
         </div>
         <div className="flex flex-wrap gap-2">
           {result.missingKeywords.length > 0 ? (
             result.missingKeywords.map((keyword, idx) => (
-              <span key={idx} className="px-2.5 py-1 bg-red-500/5 text-red-400 border border-red-500/20 rounded-md text-xs">
+              <span key={idx} className="px-2.5 py-1 bg-zinc-900 text-orange-400 border border-orange-500/20 rounded-md text-xs">
                 {keyword}
               </span>
             ))
           ) : (
-            <span className="text-green-500 text-sm italic flex items-center gap-2">
+            <span className="text-zinc-400 text-sm italic flex items-center gap-2">
                 <CheckCircle className="w-4 h-4" /> No major keywords missing. Great job!
             </span>
           )}
@@ -370,7 +346,7 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
       {/* Critical Issues - Honest Reporting */}
       <div className="col-span-1 md:col-span-1 bg-zinc-900/60 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-xl">
         <div className="flex items-center gap-2 mb-3">
-          <ShieldAlert className={`w-4 h-4 ${result.atsScore > 85 ? 'text-green-500' : 'text-yellow-500'}`} />
+          <ShieldAlert className={`w-4 h-4 ${result.atsScore > 85 ? 'text-orange-500' : 'text-orange-500'}`} />
            <div className="flex items-center gap-2">
                 <h3 className="text-xs font-mono font-bold text-zinc-500 uppercase tracking-wider">
                     {result.atsScore > 85 ? 'Health Check' : 'Risks'}
@@ -381,12 +357,12 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
           {result.criticalIssues.length > 0 ? (
             result.criticalIssues.slice(0, 3).map((issue, idx) => (
               <li key={idx} className="flex items-start gap-2 text-xs text-zinc-400">
-                <AlertTriangle className="w-3 h-3 text-yellow-600 shrink-0 mt-0.5" />
+                <AlertTriangle className="w-3 h-3 text-orange-500 shrink-0 mt-0.5" />
                 <span className="leading-tight">{issue}</span>
               </li>
             ))
           ) : (
-            <li className="text-green-400 text-xs flex items-center gap-2">
+            <li className="text-zinc-400 text-xs flex items-center gap-2">
                 <CheckCircle className="w-3 h-3" /> No critical errors found.
             </li>
           )}
@@ -398,13 +374,13 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
                  <div className="flex items-center gap-2 mb-3">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
+                    <CheckCircle className="w-4 h-4 text-orange-500" />
                     <h3 className="text-xs font-mono font-bold text-zinc-500 uppercase tracking-wider">Core Strengths</h3>
                 </div>
                 <div className="flex flex-wrap gap-2">
                 {result.keyStrengths.map((strength, idx) => (
                     <div key={idx} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-950/30 border border-white/5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0"></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0"></div>
                         <span className="text-xs text-zinc-300 font-medium">{strength}</span>
                     </div>
                 ))}
@@ -413,13 +389,13 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
 
             <div>
                  <div className="flex items-center gap-2 mb-3">
-                    <Globe className="w-4 h-4 text-blue-500" />
+                    <Globe className="w-4 h-4 text-zinc-500" />
                     <h3 className="text-xs font-mono font-bold text-zinc-500 uppercase tracking-wider">Languages Detected</h3>
                 </div>
                 <div className="flex flex-wrap gap-2">
                     {result.languages && result.languages.length > 0 ? (
                         result.languages.map((lang, idx) => (
-                            <span key={idx} className="px-3 py-1.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-lg text-xs font-medium">
+                            <span key={idx} className="px-3 py-1.5 bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-lg text-xs font-medium">
                                 {lang}
                             </span>
                         ))

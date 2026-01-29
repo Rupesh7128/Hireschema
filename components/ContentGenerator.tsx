@@ -23,10 +23,8 @@ interface ContentGeneratorProps {
 
 const ACCENT_COLORS = [
     { name: 'Executive Orange', value: '#F97316' },
-    { name: 'Deep Blue', value: '#2563EB' },
-    { name: 'Emerald', value: '#059669' },
-    { name: 'Purple', value: '#7C3AED' },
     { name: 'Slate', value: '#475569' },
+    { name: 'Charcoal', value: '#18181B' },
 ];
 
 const LANGUAGES = [
@@ -621,7 +619,7 @@ const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, resumeT
                     initial={{ opacity: 0, y: -20 }} 
                     animate={{ opacity: 1, y: 0 }} 
                     exit={{ opacity: 0, y: -20 }}
-                    className="absolute top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-xs font-bold rounded-full shadow-lg"
+                    className="absolute top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2 bg-orange-600 text-white text-xs font-bold rounded-full shadow-lg"
                 >
                     <Check className="w-3.5 h-3.5" /> Copied to Clipboard
                 </motion.div>

@@ -107,8 +107,8 @@ const StepGraphic = ({ step }: { step: 1 | 2 | 3 }) => {
          <>
             {/* Upload UI */}
             <div className="w-12 h-16 bg-zinc-800 rounded border border-zinc-700 flex flex-col items-center justify-center gap-1 z-10 shadow-lg group-hover:scale-110 transition-transform">
-                <Upload className="w-4 h-4 text-zinc-500 group-hover:text-blue-500 transition-colors" />
-                <div className="w-8 h-1 bg-zinc-700 rounded-full group-hover:bg-blue-500/50 transition-colors"></div>
+                <Upload className="w-4 h-4 text-zinc-500 group-hover:text-orange-500 transition-colors" />
+                <div className="w-8 h-1 bg-zinc-700 rounded-full group-hover:bg-orange-500/50 transition-colors"></div>
             </div>
             {/* Floating particles */}
             <div className="absolute top-4 right-4 w-1.5 h-1.5 bg-orange-500 rounded-full animate-bounce"></div>
@@ -121,9 +121,9 @@ const StepGraphic = ({ step }: { step: 1 | 2 | 3 }) => {
              <div className="w-12 h-16 bg-zinc-800 rounded border border-zinc-700 flex flex-col p-1.5 gap-1.5 z-10 shadow-lg relative overflow-hidden group-hover:scale-110 transition-transform">
                 <div className="w-8 h-1 bg-zinc-600 rounded-full"></div>
                 <div className="w-6 h-1 bg-zinc-600 rounded-full"></div>
-                <div className="w-full h-1 bg-red-500/50 rounded-full"></div>
+                <div className="w-full h-1 bg-orange-500/50 rounded-full"></div>
                 <div className="w-5 h-1 bg-zinc-600 rounded-full"></div>
-                <div className="w-full h-1 bg-red-500/50 rounded-full"></div>
+                <div className="w-full h-1 bg-orange-500/50 rounded-full"></div>
                 {/* Scanner Line */}
                 <div className="absolute top-0 left-0 w-full h-1 bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,1)] animate-[scan_1.5s_ease-in-out_infinite]"></div>
             </div>
@@ -133,13 +133,13 @@ const StepGraphic = ({ step }: { step: 1 | 2 | 3 }) => {
        {step === 3 && (
          <>
             {/* Optimized UI */}
-             <div className="w-12 h-16 bg-zinc-800 rounded border border-green-900/50 flex flex-col p-1.5 gap-1.5 z-10 shadow-lg group-hover:scale-110 transition-transform">
+             <div className="w-12 h-16 bg-zinc-800 rounded border border-orange-900/50 flex flex-col p-1.5 gap-1.5 z-10 shadow-lg group-hover:scale-110 transition-transform">
                 <div className="w-8 h-1 bg-zinc-500 rounded-full"></div>
-                <div className="w-full h-1 bg-green-500/80 rounded-full shadow-[0_0_5px_rgba(34,197,94,0.5)]"></div>
+                <div className="w-full h-1 bg-orange-500/80 rounded-full shadow-[0_0_5px_rgba(249,115,22,0.5)]"></div>
                 <div className="w-6 h-1 bg-zinc-500 rounded-full"></div>
-                <div className="w-full h-1 bg-green-500/80 rounded-full shadow-[0_0_5px_rgba(34,197,94,0.5)]"></div>
+                <div className="w-full h-1 bg-orange-500/80 rounded-full shadow-[0_0_5px_rgba(249,115,22,0.5)]"></div>
                 
-                <div className="absolute -bottom-2 -right-2 bg-green-500 text-black p-1 rounded-full border-2 border-zinc-900">
+                <div className="absolute -bottom-2 -right-2 bg-orange-500 text-black p-1 rounded-full border-2 border-zinc-900">
                     <Check className="w-2 h-2" />
                 </div>
             </div>
@@ -298,10 +298,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               <AnimatedLogo />
           </div>
           <div className="flex items-center gap-2 sm:gap-6">
-              <button onClick={() => onStart('roast')} className="hidden sm:flex items-center gap-2 text-xs font-bold text-red-500 hover:text-red-400 active:text-red-300 transition-colors uppercase tracking-widest border border-red-500/20 px-3 py-1.5 rounded bg-red-500/5 hover:bg-red-500/10 cursor-pointer touch-target">
+              <button onClick={() => onStart('roast')} className="hidden sm:flex items-center gap-2 text-xs font-bold text-orange-500 hover:text-orange-400 active:text-orange-300 transition-colors uppercase tracking-widest border border-orange-500/20 px-3 py-1.5 rounded bg-orange-500/5 hover:bg-orange-500/10 cursor-pointer touch-target">
                     <Zap className="w-3 h-3" /> Roast My Resume
                  </button>
-              <button onClick={() => onStart('roast')} className="sm:hidden flex items-center gap-1 text-xs font-bold text-red-500 hover:text-red-400 active:text-red-300 transition-colors border border-red-500/20 px-2 py-1 rounded bg-red-500/5 hover:bg-red-500/10 cursor-pointer touch-target">
+              <button onClick={() => onStart('roast')} className="sm:hidden flex items-center gap-1 text-xs font-bold text-orange-500 hover:text-orange-400 active:text-orange-300 transition-colors border border-orange-500/20 px-2 py-1 rounded bg-orange-500/5 hover:bg-orange-500/10 cursor-pointer touch-target">
                     <Flame className="w-3 h-3" /> Roast
                  </button>
               <button 
@@ -320,7 +320,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         <div className="absolute inset-0 bg-zinc-950 overflow-hidden pointer-events-none">
             {/* Dynamic Moving Orbs/Mesh - Simplified on mobile */}
             <div className="absolute top-[-50%] left-[-20%] w-[80%] h-[80%] rounded-full bg-orange-600/20 blur-[100px] sm:blur-[150px] sm:animate-[spin_40s_linear_infinite]" />
-            <div className="absolute bottom-[-30%] right-[-10%] w-[60%] h-[60%] rounded-full bg-indigo-900/20 blur-[150px] animate-[spin_50s_linear_infinite_reverse]" />
+            <div className="absolute bottom-[-30%] right-[-10%] w-[60%] h-[60%] rounded-full bg-zinc-800/20 blur-[150px] animate-[spin_50s_linear_infinite_reverse]" />
             <div className="absolute top-[30%] right-[20%] w-[50%] h-[50%] rounded-full bg-orange-900/10 blur-[100px] animate-pulse" />
             
             <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-soft-light"></div>
@@ -343,10 +343,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1.2 }}
-                className="mb-6 px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-full inline-flex items-center gap-2"
+                className="mb-6 px-4 py-2 bg-orange-500/10 border border-orange-500/20 rounded-full inline-flex items-center gap-2"
             >
-                <XCircle className="w-4 h-4 text-red-500" />
-                <span className="text-red-400 text-xs sm:text-sm font-medium">75% of resumes are rejected by robots before a human sees them</span>
+                <XCircle className="w-4 h-4 text-orange-500" />
+                <span className="text-orange-400 text-xs sm:text-sm font-medium">75% of resumes are rejected by robots before a human sees them</span>
             </motion.div>
 
             <motion.h1 
@@ -377,15 +377,15 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 className="flex flex-wrap justify-center gap-3 mb-10 text-sm"
             >
                 <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-full">
-                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                    <CheckCircle2 className="w-4 h-4 text-orange-500" />
                     <span className="text-zinc-300">See your ATS score</span>
                 </div>
                 <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-full">
-                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                    <CheckCircle2 className="w-4 h-4 text-orange-500" />
                     <span className="text-zinc-300">Find missing keywords</span>
                 </div>
                 <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-full">
-                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                    <CheckCircle2 className="w-4 h-4 text-orange-500" />
                     <span className="text-zinc-300">Fix & download optimized resume</span>
                 </div>
             </motion.div>
@@ -410,7 +410,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 transition={{ delay: 1.2 }}
                 className="flex flex-wrap justify-center gap-4 sm:gap-6 text-[10px] sm:text-xs text-zinc-500 font-mono items-center px-4"
             >
-                <span className="flex items-center gap-2 whitespace-nowrap"><ShieldCheck className="w-3.5 h-3.5 text-green-500" /> 50,000+ resumes scanned</span>
+                <span className="flex items-center gap-2 whitespace-nowrap"><ShieldCheck className="w-3.5 h-3.5 text-orange-500" /> 50,000+ resumes scanned</span>
                 <span className="w-1 h-1 rounded-full bg-zinc-800 hidden sm:block"></span>
                 <span className="flex items-center gap-2 whitespace-nowrap"><CreditCard className="w-3.5 h-3.5 text-zinc-400" /> Free scan • $1 to download fix</span>
                 <span className="w-1 h-1 rounded-full bg-zinc-800 hidden sm:block"></span>
@@ -455,8 +455,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                     </ul>
                 </div>
                 
-                <div className="p-6 bg-zinc-900/50 border border-green-500/20 rounded-xl inline-block">
-                    <div className="text-3xl font-bold text-green-500 mb-1">80–90+</div>
+                <div className="p-6 bg-zinc-900/50 border border-orange-500/20 rounded-xl inline-block">
+                    <div className="text-3xl font-bold text-orange-500 mb-1">80–90+</div>
                     <p className="text-sm text-zinc-300 font-medium">Average score after our fix</p>
                     <p className="text-[10px] text-zinc-500 mt-2 font-mono">Most users start at 40-60. We get you interview-ready.</p>
                 </div>
@@ -475,7 +475,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                         className="bg-zinc-900 border border-zinc-800 p-6 rounded-lg opacity-60"
                     >
                         <div className="flex justify-between mb-2">
-                            <span className="text-[10px] font-bold text-red-500 uppercase tracking-widest">Original</span>
+                            <span className="text-[10px] font-bold text-orange-500 uppercase tracking-widest">Original</span>
                         </div>
                         <p className="text-zinc-500 text-sm line-through">Managed a team of 5 people to build the product.</p>
                     </motion.div>
@@ -493,14 +493,14 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.4, duration: 0.8 }}
-                        className="bg-zinc-900 border border-green-500/30 p-6 rounded-lg shadow-[0_0_30px_rgba(34,197,94,0.1)] relative overflow-hidden"
+                        className="bg-zinc-900 border border-orange-500/30 p-6 rounded-lg shadow-[0_0_30px_rgba(249,115,22,0.1)] relative overflow-hidden"
                     >
-                         <div className="absolute top-0 left-0 w-1 h-full bg-green-500"></div>
+                         <div className="absolute top-0 left-0 w-1 h-full bg-orange-500"></div>
                         <div className="flex justify-between mb-2">
-                            <span className="text-[10px] font-bold text-green-500 uppercase tracking-widest">Optimized</span>
+                            <span className="text-[10px] font-bold text-orange-500 uppercase tracking-widest">Optimized</span>
                         </div>
                         <p className="text-zinc-200 text-sm leading-relaxed">
-                            Spearheaded a cross-functional <span className="text-green-400 font-bold bg-green-500/10 px-1 rounded">team of 5</span>, deploying the <span className="text-green-400 font-bold bg-green-500/10 px-1 rounded">SaaS platform</span>, increasing <span className="text-green-400 font-bold bg-green-500/10 px-1 rounded">user retention by 20%</span>.
+                            Spearheaded a cross-functional <span className="text-orange-400 font-bold bg-orange-500/10 px-1 rounded">team of 5</span>, deploying the <span className="text-orange-400 font-bold bg-orange-500/10 px-1 rounded">SaaS platform</span>, increasing <span className="text-orange-400 font-bold bg-orange-500/10 px-1 rounded">user retention by 20%</span>.
                         </p>
                     </motion.div>
                 </div>
@@ -677,8 +677,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                   <div className="flex-1 w-full flex justify-center">
                       <div className="w-64 h-64 bg-zinc-950 border border-zinc-800 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden">
                            <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.05)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] animate-[shimmer_3s_linear_infinite]"></div>
-                           <ShieldCheck className="w-20 h-20 text-green-500 mb-4" />
-                           <div className="px-4 py-1 bg-green-500/10 rounded-full text-green-500 text-xs font-bold">Zero storage</div>
+                           <ShieldCheck className="w-20 h-20 text-orange-500 mb-4" />
+                           <div className="px-4 py-1 bg-orange-500/10 rounded-full text-orange-500 text-xs font-bold">Zero storage</div>
                            <p className="text-[10px] text-zinc-500 mt-2">Ephemeral processing</p>
                       </div>
                   </div>
@@ -722,8 +722,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                             </div>
                             <ArrowRight className="w-4 h-4 text-zinc-600" />
                             <div className="text-center">
-                                <div className="text-[10px] text-green-500 uppercase font-bold tracking-wider">After</div>
-                                <div className="text-xl font-mono text-green-400 font-bold">{c.after}</div>
+                                <div className="text-[10px] text-orange-500 uppercase font-bold tracking-wider">After</div>
+                                <div className="text-xl font-mono text-orange-400 font-bold">{c.after}</div>
                             </div>
                         </div>
 
