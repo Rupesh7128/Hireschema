@@ -20,6 +20,7 @@ const ContentGenerator = lazy(() => import('./components/ContentGenerator'));
 const LandingPage = lazy(() => import('./components/LandingPage'));
 const LegalPages = lazy(() => import('./components/LegalPages'));
 const RoastPage = lazy(() => import('./components/RoastPage').then(m => ({ default: m.RoastPage })));
+const BlogPage = lazy(() => import('./components/BlogPage').then(m => ({ default: m.BlogPage })));
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -58,9 +59,10 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
 
 const AppContent: React.FC = () => {
   // --- VIEWS ---
-  const [view, setView] = useState<'landing' | 'dashboard' | 'legal' | 'roast'>('landing');
+  const [view, setView] = useState<'landing' | 'dashboard' | 'legal' | 'roast' | 'blog'>('landing');
   const [legalPage, setLegalPage] = useState<'privacy' | 'terms' | 'cookies' | null>(null);
   const [dashboardView, setDashboardView] = useState<'scan' | 'result'>('scan');
+  const [blogSlug, setBlogSlug] = useState<string | null>(null);
 
   // --- DATA ---
   const [history, setHistory] = useState<HistoryItem[]>([]);
@@ -262,6 +264,10 @@ const AppContent: React.FC = () => {
            setLegalPage(path.substring(1) as any);
         } else if (path === '/roast') {
            setView('roast');
+        } else if (path.startsWith('/blog')) {
+           setView('blog');
+           const slug = path.replace(/^\/blog\/?/, '');
+           if (slug) setBlogSlug(slug);
         } else if (path === '/app') {
            setView('dashboard'); // Direct link to app
         }
@@ -404,6 +410,7 @@ const AppContent: React.FC = () => {
 
   if (view === 'landing') return <Suspense fallback={<LoadingFallback />}><LandingPage onStart={handleLandingStart} /></Suspense>;
   if (view === 'roast') return <Suspense fallback={<LoadingFallback />}><RoastPage /></Suspense>;
+  if (view === 'blog') return <Suspense fallback={<LoadingFallback />}><BlogPage onBack={() => { setView('landing'); window.history.pushState({}, '', '/'); }} initialSlug={blogSlug} /></Suspense>;
   if (view === 'legal' && legalPage) return <Suspense fallback={<LoadingFallback />}><LegalPages page={legalPage} onBack={() => { setView('landing'); window.history.pushState({}, '', '/'); }} /></Suspense>;
 
   return (
