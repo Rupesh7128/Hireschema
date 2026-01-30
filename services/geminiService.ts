@@ -3,8 +3,8 @@ import { GoogleGenerativeAI, GenerativeModel, GenerationConfig, HarmCategory, Ha
 import { AnalysisResult, FileData, GeneratorType, ContactProfile } from "../types";
 
 // --- CONFIGURATION ---
-const MODEL_PRIMARY = "gemini-1.5-flash"; 
-const MODEL_FALLBACK = "gemini-1.5-flash"; // Use flash as fallback too for speed/reliability
+const MODEL_PRIMARY = "gemini-1.5-flash-latest"; 
+const MODEL_FALLBACK = "gemini-1.5-flash-latest"; 
 
 // Safety settings to allow more "roast-like" content without triggering blocks
 const SAFETY_SETTINGS = [
@@ -96,34 +96,57 @@ const listAvailableModels = async (): Promise<string[]> => {
     const key = getApiKey();
     if (!key) return [];
     try {
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+        // Try v1 first as it's more stable for GA models
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1/models?key=${key}`);
+        if (!res.ok) throw new Error('v1 failed');
         const data = await res.json();
-        const names = (data.models || []).map((m: any) => (m.name || '').replace(/^models\//, ''));
-        return names;
+        return (data.models || []).map((m: any) => (m.name || '').replace(/^models\//, ''));
     } catch {
-        return [];
+        try {
+            // Fallback to v1beta if v1 fails
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+            const data = await res.json();
+            return (data.models || []).map((m: any) => (m.name || '').replace(/^models\//, ''));
+        } catch {
+            return [];
+        }
     }
 };
 
 const resolveModelName = async (preferred: string[]): Promise<string> => {
-    if (!cachedModels) {
-        cachedModels = await listAvailableModels();
-    }
-    if (cachedModels.length === 0) {
-        for (const base of preferred) {
-            if (base.endsWith('-001') || base.endsWith('-002')) return base;
-            if (base.includes('1.5-flash')) return 'gemini-1.5-flash-001';
-            if (base.includes('1.5-pro')) return 'gemini-1.5-pro-001';
+    try {
+        if (!cachedModels) {
+            cachedModels = await listAvailableModels();
         }
-        return 'gemini-1.5-flash-001';
+        
+        if (!cachedModels || cachedModels.length === 0) {
+            // Fallback to hardcoded safe defaults if listing fails
+            for (const base of preferred) {
+                if (base.includes('flash')) return 'gemini-1.5-flash-latest';
+                if (base.includes('pro')) return 'gemini-1.5-pro-latest';
+            }
+            return 'gemini-1.5-flash-latest';
+        }
+
+        // Try to find the best match in the available models
+        for (const base of preferred) {
+            // 1. Exact match
+            if (cachedModels.includes(base)) return base;
+            
+            // 2. Base name match (e.g. "gemini-1.5-flash" matches "gemini-1.5-flash-001")
+            const baseName = base.replace(/-latest$|-[0-9]{3}$/, '');
+            const match = cachedModels.find(m => m === baseName || m.startsWith(`${baseName}-`));
+            if (match) return match;
+        }
+
+        // 3. Last resort: return the first available flash model
+        const anyFlash = cachedModels.find(m => m.includes('1.5-flash'));
+        if (anyFlash) return anyFlash;
+
+        return cachedModels[0] || preferred[0];
+    } catch (e) {
+        return preferred[0];
     }
-    for (const base of preferred) {
-        if (cachedModels.includes(base)) return base;
-        if (cachedModels.includes(`${base}-001`)) return `${base}-001`;
-        if (cachedModels.includes(`${base}-002`)) return `${base}-002`;
-        if (cachedModels.includes(`${base}-latest`)) return `${base}-latest`;
-    }
-    return preferred[0];
 };
 
 const NON_RESUME_MESSAGE = "That file screams 'not a resume.' Upload a real resume (PDF) and we’ll work our magic.";
