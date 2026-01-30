@@ -4,7 +4,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
-    <meta name="description" content="75% of resumes are rejected by ATS robots. Scan your resume, find missing keywords, and download an optimized version for $1." />
+    <meta name="description" content="75% of resumes are rejected by ATS robots. Scan your resume, find missing keywords, and download an optimized version for $1. Get a free resume roast now." />
+    <meta name="keywords" content="resume roast, roast my resume, ats resume checker, resume optimization, free resume review, ai resume roast" />
     <meta name="theme-color" content="#EA580C" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -72,15 +73,16 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-sans/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-mono/style.css">
     <script>
       tailwind.config = {
         darkMode: 'class',
         theme: {
           extend: {
             fontFamily: {
-              sans: ['Inter', 'sans-serif'],
-              mono: ['JetBrains Mono', 'monospace'],
+              sans: ['Geist Sans', 'Inter', 'sans-serif'],
+              mono: ['Geist Mono', 'JetBrains Mono', 'monospace'],
             },
             colors: {
               orange: {
@@ -135,9 +137,28 @@
         -webkit-tap-highlight-color: transparent;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+        font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+        letter-spacing: -0.015em;
+        line-height: 1.5;
+      }
+      h1, h2, h3, h4, h5, h6 {
+        letter-spacing: -0.03em !important;
+        font-weight: 700;
       }
       html {
         scroll-behavior: smooth;
+        font-size: 14px; /* Slightly smaller base font like in dashboards */
+      }
+      @media (min-width: 640px) {
+        html {
+          font-size: 15px;
+        }
+      }
+      @media (min-width: 1024px) {
+        html {
+          font-size: 16px;
+        }
       }
       /* Custom Scrollbar */
       ::-webkit-scrollbar {

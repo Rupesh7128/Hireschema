@@ -13,9 +13,10 @@ import { Footer } from './Footer';
 
 interface RoastPageProps {
   onNavigate: (view: 'landing' | 'blog' | 'pricing' | 'roast' | 'scan') => void;
+  appLanguage?: string;
 }
 
-export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate }) => {
+export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = "English" }) => {
   const [isRoasting, setIsRoasting] = useState(false);
   const [roastResult, setRoastResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -46,6 +47,53 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate }) => {
     'Preparing surgical burns...',
     'Finalizing career destruction...'
   ];
+
+  useEffect(() => {
+    // SEO: Dynamic Page Metadata
+    document.title = "Roast My Resume | Brutally Honest AI Resume Feedback | HireSchema";
+    
+    // Meta Description
+    let metaDescription = document.querySelector('meta[name="description"]');
+    if (!metaDescription) {
+      metaDescription = document.createElement('meta');
+      metaDescription.setAttribute('name', 'description');
+      document.head.appendChild(metaDescription);
+    }
+    metaDescription.setAttribute('content', 'Get a brutally honest, AI-powered roast of your resume. Discover red flags, cringe-worthy buzzwords, and actual fixes to get hired. Start your resume roast now.');
+
+    // Canonical Link
+    let canonicalLink = document.querySelector('link[rel="canonical"]');
+    if (!canonicalLink) {
+      canonicalLink = document.createElement('link');
+      canonicalLink.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonicalLink);
+    }
+    canonicalLink.setAttribute('href', window.location.origin + '/roast-my-resume');
+
+    // Structured Data (JSON-LD)
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.innerHTML = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Roast My Resume - HireSchema",
+      "description": "Brutally honest AI resume feedback and roast machine.",
+      "url": window.location.origin + "/roast-my-resume",
+      "mainEntity": {
+        "@type": "Service",
+        "name": "AI Resume Roast",
+        "serviceType": "Resume Review",
+        "description": "Automated AI-driven resume roasting and feedback service."
+      }
+    });
+    document.head.appendChild(script);
+
+    return () => {
+      // Cleanup on unmount
+      document.head.removeChild(script);
+      // Reset title if needed (LandingPage handles its own)
+    };
+  }, []);
 
   useEffect(() => {
     if (roastResult) {
@@ -123,7 +171,7 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate }) => {
             fileData,
             '', // No job description for roast
             { missingKeywords: [], contactProfile: { name: 'Candidate', email: '', phone: '', linkedin: '', location: '' }, atsScore: 0, relevanceScore: 0, roleFitAnalysis: '', languages: [], criticalIssues: [], keyStrengths: [], summary: '' }, 
-            { language: 'English', resumeText: text }
+            { language: appLanguage, resumeText: text }
         );
         
         console.log('Roast generated successfully');
@@ -144,6 +192,21 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate }) => {
 
       <main className="pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 container mx-auto max-w-5xl min-h-screen min-h-[100dvh] flex flex-col">
         
+        {/* SEO Hidden Semantic Content */}
+        <div className="sr-only">
+            <section>
+                <h2>How our AI Resume Roast Works</h2>
+                <p>Our resume roast engine uses advanced natural language processing to identify common pitfalls in modern resumes. We look for:</p>
+                <ul>
+                    <li>Excessive buzzword density (synergy, thought-leader, etc.)</li>
+                    <li>Vague bullet points without quantified impact</li>
+                    <li>Poor formatting that confuses ATS (Applicant Tracking Systems)</li>
+                    <li>Generic objective statements that add no value</li>
+                </ul>
+                <p>By identifying these issues, you can improve your resume's performance in job applications and get more interviews.</p>
+            </section>
+        </div>
+
         {!roastResult && !isRoasting && (
             <div className="flex-1 flex flex-col items-center justify-center text-center space-y-6 sm:space-y-8 px-2">
                 <motion.div 
@@ -158,8 +221,13 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate }) => {
                         Roast My <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-300">Resume</span>
                     </h1>
                     <p className="text-zinc-400 text-sm sm:text-lg max-w-md mx-auto leading-relaxed px-2">
-                        Your resume is about to have a very bad day. Get brutally honest feedback that's <span className="text-white font-bold">surgically mean and commercially effective.</span>
+                        Get the internet's most <span className="text-white font-bold">brutally honest AI resume roast</span>. Our engine scans for cringe, red flags, and employment gaps to help you build a better career.
                     </p>
+                    {/* SEO Hidden Content for crawlers */}
+                    <div className="sr-only">
+                        <h2>Free Resume Roast Online</h2>
+                        <p>Upload your PDF resume to get instant AI feedback. We analyze your formatting, keyword density, and overall hireability. Perfect for software engineers, product managers, and designers looking to improve their ATS score.</p>
+                    </div>
                 </motion.div>
 
                 <motion.div 

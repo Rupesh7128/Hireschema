@@ -14,6 +14,8 @@ import { logEvent } from '../services/analytics';
 
 interface LandingPageProps {
   onStart: (intent: 'scan' | 'optimize' | 'launch' | 'roast' | 'blog' | 'feature' | 'pricing', file?: FileData, featureSlug?: string) => void;
+  appLanguage?: string;
+  onLanguageChange?: (lang: string) => void;
 }
 
 // Consistent Global Button Styles - Mobile optimized with active states
@@ -98,6 +100,31 @@ const FeatureMarquee = () => {
              </motion.div>
         </div>
     );
+};
+
+// --- SEO COMPONENT ---
+const SEO = ({ title, description, path }: { title: string, description: string, path: string }) => {
+    useEffect(() => {
+        document.title = title;
+        
+        let metaDescription = document.querySelector('meta[name="description"]');
+        if (!metaDescription) {
+            metaDescription = document.createElement('meta');
+            metaDescription.setAttribute('name', 'description');
+            document.head.appendChild(metaDescription);
+        }
+        metaDescription.setAttribute('content', description);
+
+        let canonicalLink = document.querySelector('link[rel="canonical"]');
+        if (!canonicalLink) {
+            canonicalLink = document.createElement('link');
+            canonicalLink.setAttribute('rel', 'canonical');
+            document.head.appendChild(canonicalLink);
+        }
+        canonicalLink.setAttribute('href', window.location.origin + path);
+    }, [title, description, path]);
+
+    return null;
 };
 
 // --- VISUAL STEP GRAPHIC ---
@@ -188,7 +215,7 @@ const FAQItem: React.FC<{ question: string; answer: string }> = ({ question, ans
     );
 }
 
-const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
+const LandingPage: React.FC<LandingPageProps> = ({ onStart, appLanguage, onLanguageChange }) => {
   const { scrollY } = useScroll();
   const yHero = useTransform(scrollY, [0, 500], [0, 100]);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -333,10 +360,19 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
   return (
     <div className="relative w-full bg-black text-white selection:bg-orange-500/30 font-sans overflow-x-hidden pb-0">
       
+      <SEO 
+        title="HireSchema | Beat the ATS - Get Your Resume Past the Robots" 
+        description="75% of resumes are rejected by ATS robots. Scan your resume, find missing keywords, and download an optimized version for $1. Get hired faster with HireSchema."
+        path="/"
+      />
+
       <MouseTrail />
 
       {/* --- HEADER --- */}
-      <Header onNavigate={(view) => {
+      <Header 
+        appLanguage={appLanguage}
+        onLanguageChange={onLanguageChange}
+        onNavigate={(view) => {
           if (view === 'landing') window.scrollTo(0, 0);
           else onStart(view as any);
       }} />
@@ -477,78 +513,144 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
       <FeatureMarquee />
 
       {/* --- VALUE + PROOF BLOCK --- */}
-      <section className="py-24 px-6 bg-zinc-950 border-b border-white/5">
-        <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-16">
-                <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">Why 75% of resumes get rejected</h2>
-                <p className="text-zinc-400 max-w-2xl mx-auto">ATS software is ruthless. Small mistakes lead to instant rejection.</p>
+      <section className="py-24 px-6 bg-zinc-950 border-b border-white/5 relative overflow-hidden">
+        {/* Decorative background elements */}
+        <div className="absolute top-1/4 -left-20 w-96 h-96 bg-orange-500/5 rounded-full blur-[120px] pointer-events-none"></div>
+        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-orange-600/5 rounded-full blur-[120px] pointer-events-none"></div>
+
+        <div className="max-w-7xl mx-auto relative z-10">
+            <div className="text-center mb-20">
+                <h2 className="text-4xl sm:text-5xl font-black text-white mb-6 tracking-tight">How we get you past the <span className="text-orange-500">ATS robots</span></h2>
+                <p className="text-zinc-400 max-w-2xl mx-auto text-lg font-light">We don't just "check" your resume. We re-engineer it to match exactly what recruiters are looking for.</p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20">
-                {/* Problem List */}
-                <div className="space-y-6">
-                    <div className="bg-zinc-900/50 border border-zinc-800 p-6 rounded-xl flex gap-4 hover:border-orange-500/30 transition-colors">
-                        <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center shrink-0">
-                            <XCircle className="w-5 h-5 text-red-500" />
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+                {/* Problem/Solution Cards */}
+                <div className="lg:col-span-5 space-y-5">
+                    {/* Missing Keywords */}
+                    <motion.div 
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        className="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl hover:border-red-500/20 transition-all duration-500 group"
+                    >
+                        <div className="flex gap-5">
+                            <div className="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                                <XCircle className="w-6 h-6 text-red-500" />
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-bold text-white mb-2">Missing Keywords</h3>
+                                <p className="text-zinc-400 text-sm leading-relaxed">
+                                    If you don't have the exact keywords from the job description (e.g., "Agile", "SaaS"), the ATS scores you zero.
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <h3 className="text-lg font-bold text-white mb-2">Missing Keywords</h3>
-                            <p className="text-zinc-400 text-sm leading-relaxed">If you don't have the exact keywords from the job description (e.g., "Agile", "SaaS"), the ATS scores you zero.</p>
-                        </div>
-                    </div>
+                    </motion.div>
 
-                    <div className="bg-zinc-900/50 border border-zinc-800 p-6 rounded-xl flex gap-4 hover:border-orange-500/30 transition-colors">
-                        <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center shrink-0">
-                            <FileText className="w-5 h-5 text-red-500" />
+                    {/* Bad Formatting */}
+                    <motion.div 
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.1 }}
+                        className="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl hover:border-orange-500/20 transition-all duration-500 group"
+                    >
+                        <div className="flex gap-5">
+                            <div className="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                                <FileText className="w-6 h-6 text-orange-500" />
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-bold text-white mb-2">Bad Formatting</h3>
+                                <p className="text-zinc-400 text-sm leading-relaxed">
+                                    Columns, graphics, and tables confuse the parser. Your resume ends up looking like gibberish to the robot.
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <h3 className="text-lg font-bold text-white mb-2">Bad Formatting</h3>
-                            <p className="text-zinc-400 text-sm leading-relaxed">Columns, graphics, and tables confuse the parser. Your resume ends up looking like gibberish to the robot.</p>
-                        </div>
-                    </div>
+                    </motion.div>
 
-                    <div className="bg-zinc-900/50 border border-zinc-800 p-6 rounded-xl flex gap-4 hover:border-orange-500/30 transition-colors">
-                        <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center shrink-0">
-                            <CheckCircle2 className="w-5 h-5 text-green-500" />
+                    {/* The HireSchema Fix */}
+                    <motion.div 
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.2 }}
+                        className="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl hover:border-green-500/20 transition-all duration-500 group"
+                    >
+                        <div className="flex gap-5">
+                            <div className="w-12 h-12 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                                <CheckCircle2 className="w-6 h-6 text-green-500" />
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-bold text-white mb-2">The HireSchema Fix</h3>
+                                <p className="text-zinc-400 text-sm leading-relaxed">
+                                    We rewrite your bullets to include high-value keywords naturally, boosting your match score to 90%+.
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <h3 className="text-lg font-bold text-white mb-2">The HireSchema Fix</h3>
-                            <p className="text-zinc-400 text-sm leading-relaxed">We rewrite your bullets to include high-value keywords naturally, boosting your match score to 90%+.</p>
-                        </div>
-                    </div>
+                    </motion.div>
                 </div>
 
-                {/* Visual Proof */}
-                <div className="relative">
-                    <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-transparent blur-3xl rounded-full opacity-20"></div>
-                    
-                    {/* Before Card */}
-                    <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-4 relative z-10 opacity-50 scale-95 origin-bottom">
-                         <div className="flex justify-between items-center mb-3">
-                             <span className="text-xs font-bold text-red-500 uppercase tracking-wider flex items-center gap-1"><XCircle className="w-3 h-3" /> Before</span>
-                             <span className="text-xs font-mono text-zinc-600">Score: 42/100</span>
-                         </div>
-                         <p className="text-zinc-500 text-sm line-through">Responsible for sales and managing the team.</p>
-                    </div>
+                {/* Visual Proof - Layered Mockup */}
+                <div className="lg:col-span-7 relative h-[450px] sm:h-[500px] flex items-center justify-center lg:justify-end">
+                    {/* Background Glow */}
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-orange-500/10 blur-[120px] rounded-full"></div>
 
-                    {/* Arrow */}
-                    <div className="flex justify-center -my-6 relative z-20">
-                        <div className="bg-zinc-950 border border-zinc-800 p-1.5 rounded-full text-zinc-500">
-                            <ArrowDownIcon />
+                    {/* Before Card (Behind) */}
+                    <motion.div 
+                        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                        whileInView={{ opacity: 0.4, y: -60, scale: 0.95 }}
+                        viewport={{ once: true }}
+                        className="absolute w-full max-w-[480px] bg-zinc-900/80 border border-white/5 rounded-2xl p-6 shadow-2xl z-10 backdrop-blur-md"
+                    >
+                        <div className="flex justify-between items-center mb-4 border-b border-white/5 pb-4">
+                            <div className="flex items-center gap-2">
+                                <XCircle className="w-4 h-4 text-red-500/50" />
+                                <span className="text-[10px] font-bold text-red-500/50 uppercase tracking-widest">Before</span>
+                            </div>
+                            <div className="text-[10px] font-mono text-zinc-600 uppercase">Score: 42/100</div>
                         </div>
-                    </div>
+                        <p className="text-zinc-500 text-sm italic font-serif leading-relaxed line-through decoration-red-500/30">
+                            Responsible for sales and managing the team during the quarter.
+                        </p>
+                    </motion.div>
 
-                    {/* After Card */}
-                    <div className="bg-zinc-950 border border-orange-500/50 rounded-xl p-8 relative z-30 shadow-2xl">
-                         <div className="absolute top-0 left-0 w-1.5 h-full bg-orange-500 rounded-l-xl"></div>
-                         <div className="flex justify-between items-center mb-4">
-                             <span className="text-xs font-bold text-green-500 uppercase tracking-wider flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Optimized</span>
-                             <span className="text-xs font-mono text-orange-500 font-bold">Score: 94/100</span>
-                         </div>
-                         <p className="text-zinc-200 text-base leading-relaxed">
-                             Led a <span className="bg-orange-500/20 text-orange-200 px-1 rounded font-medium">sales team of 10</span>, achieving <span className="bg-orange-500/20 text-orange-200 px-1 rounded font-medium">150% of quota</span> ($2M ARR) through strategic <span className="bg-orange-500/20 text-orange-200 px-1 rounded font-medium">CRM implementation</span>.
-                         </p>
-                    </div>
+                    {/* Optimized Card (Front) */}
+                    <motion.div 
+                        initial={{ opacity: 0, y: 40, scale: 1 }}
+                        whileInView={{ opacity: 1, y: 30, scale: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.3, type: "spring", stiffness: 50 }}
+                        className="absolute w-full max-w-[520px] bg-zinc-900 border border-orange-500/40 rounded-3xl p-8 sm:p-10 shadow-[0_0_80px_rgba(234,88,12,0.2)] z-20 backdrop-blur-xl"
+                    >
+                        <div className="flex justify-between items-center mb-8 border-b border-white/5 pb-5">
+                            <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                                <span className="text-[11px] font-bold text-green-500 uppercase tracking-widest">Optimized</span>
+                            </div>
+                            <div className="text-[11px] font-mono text-orange-400 font-bold uppercase tracking-tight">Score: 94/100</div>
+                        </div>
+                        
+                        <p className="text-white text-lg sm:text-xl leading-relaxed font-medium">
+                            Led a <span className="text-orange-200 border-b-2 border-orange-500/50 pb-0.5 px-0.5 font-bold">sales team of 10</span>, achieving <span className="text-orange-200 border-b-2 border-orange-500/50 pb-0.5 px-0.5 font-bold">150% of quota</span> ($2M ARR) through strategic <span className="text-orange-200 border-b-2 border-orange-500/50 pb-0.5 px-0.5 font-bold">CRM implementation</span>.
+                        </p>
+                        
+                        {/* Keyword highlight explanation */}
+                        <div className="mt-8 flex flex-wrap gap-2">
+                            <span className="text-[9px] bg-green-500/10 text-green-400 px-2.5 py-1 rounded-full border border-green-500/20 font-mono uppercase tracking-wider">Quantified Impact</span>
+                            <span className="text-[9px] bg-green-500/10 text-green-400 px-2.5 py-1 rounded-full border border-green-500/20 font-mono uppercase tracking-wider">ATS Keywords Found</span>
+                        </div>
+
+                        {/* Floating Success Badge */}
+                        <motion.div 
+                            initial={{ scale: 0, rotate: -5 }}
+                            whileInView={{ scale: 1, rotate: 12 }}
+                            viewport={{ once: true }}
+                            transition={{ type: "spring", delay: 1, damping: 10 }}
+                            className="absolute -right-4 -bottom-4 bg-green-500 text-black font-black px-6 py-3 rounded-xl shadow-2xl z-40 border-4 border-zinc-950 text-base"
+                        >
+                            ATS PASS
+                        </motion.div>
+                    </motion.div>
                 </div>
             </div>
         </div>

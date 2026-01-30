@@ -1,10 +1,30 @@
 
-import { GoogleGenerativeAI, GenerativeModel, GenerationConfig } from "@google/generative-ai";
+import { GoogleGenerativeAI, GenerativeModel, GenerationConfig, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 import { AnalysisResult, FileData, GeneratorType, ContactProfile } from "../types";
 
 // --- CONFIGURATION ---
 const MODEL_PRIMARY = "gemini-1.5-flash"; 
-const MODEL_FALLBACK = "gemini-pro";
+const MODEL_FALLBACK = "gemini-1.5-flash"; // Use flash as fallback too for speed/reliability
+
+// Safety settings to allow more "roast-like" content without triggering blocks
+const SAFETY_SETTINGS = [
+  {
+    category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+    threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+  },
+  {
+    category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+    threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+  },
+  {
+    category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+    threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+  },
+  {
+    category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+    threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+  },
+];
 
 // Deterministic generation config for consistent results
 // temperature=0 ensures the same input produces the same output
@@ -213,13 +233,14 @@ const generateWithFallback = async (
     fallbackModelName: string = MODEL_FALLBACK
 ): Promise<any> => {
     const ai = getGenAI();
-    const resolvedPrimary = await resolveModelName([primaryModelName, MODEL_PRIMARY, "gemini-1.5-pro", "gemini-pro-vision", MODEL_FALLBACK]);
+    const resolvedPrimary = await resolveModelName([primaryModelName, MODEL_PRIMARY, "gemini-1.5-pro", "gemini-1.5-flash"]);
     const jsonWanted = config?.generationConfig?.responseMimeType === 'application/json';
     const strPrompt = Array.isArray(prompt) ? JSON.stringify(prompt) : String(prompt);
     
-    // Merge deterministic config with any provided config
+    // Merge deterministic config with any provided config and safety settings
     const mergedConfig = {
         ...config,
+        safetySettings: SAFETY_SETTINGS,
         generationConfig: {
             ...DETERMINISTIC_CONFIG,
             ...config?.generationConfig,
@@ -230,29 +251,49 @@ const generateWithFallback = async (
     if (orKey) {
         try {
             return await openrouterGenerateContent(strPrompt, jsonWanted);
-        } catch {}
+        } catch (e) {
+            console.warn("[Gemini Service] OpenRouter fallback failed", e);
+        }
     }
     
     try {
         const model = ai.getGenerativeModel({ model: resolvedPrimary, ...mergedConfig });
-        return await model.generateContent(prompt);
+        const result = await model.generateContent(prompt);
+        
+        // Check if the content was blocked by safety filters
+        if (result.response.promptFeedback?.blockReason) {
+            console.error("[Gemini Service] Content blocked by safety filters:", result.response.promptFeedback.blockReason);
+            throw new Error(`Content blocked: ${result.response.promptFeedback.blockReason}`);
+        }
+        
+        return result;
     } catch (error: any) {
-        const msg = (error.message || '') + JSON.stringify(error);
+        console.error("[Gemini Service] Primary model failed:", error);
+        const msg = error.message || '';
+        
         if (msg.includes('401') || msg.includes('API key') || msg.includes('PERMISSION_DENIED')) {
             throw error;
         }
-        const resolvedFallback = await resolveModelName([fallbackModelName, MODEL_FALLBACK, "gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"]);
+        
+        const resolvedFallback = await resolveModelName([fallbackModelName, MODEL_FALLBACK, "gemini-1.5-flash", "gemini-1.5-pro"]);
         if (resolvedFallback !== resolvedPrimary) {
             try {
+                console.log(`[Gemini Service] Attempting fallback to ${resolvedFallback}...`);
                 const fallbackModel = ai.getGenerativeModel({ model: resolvedFallback, ...mergedConfig });
                 return await fallbackModel.generateContent(prompt);
-            } catch {}
+            } catch (fallbackErr) {
+                console.error("[Gemini Service] Fallback model failed:", fallbackErr);
+            }
         }
+        
         const openaiKey = getOpenAIKey();
         if (openaiKey) {
             try {
+                console.log("[Gemini Service] Attempting fallback to OpenAI...");
                 return await openaiGenerateContent(strPrompt, jsonWanted);
-            } catch {}
+            } catch (openaiErr) {
+                console.error("[Gemini Service] OpenAI fallback failed:", openaiErr);
+            }
         }
         throw error;
     }
@@ -435,8 +476,9 @@ export const refineContent = async (
     try {
         const response = await generateWithFallback(MODEL_PRIMARY, prompt);
         return cleanMarkdownOutput(response.response.text() || currentContent);
-    } catch (error) {
-         throw new Error("Unable to refine content.");
+    } catch (error: any) {
+         console.error("Refine content failed:", error);
+         throw new Error(getActionableError(error) || "Unable to refine content.");
     }
 };
 
@@ -458,8 +500,9 @@ export const regenerateSection = async (
     try {
         const response = await generateWithFallback(MODEL_PRIMARY, prompt);
         return cleanMarkdownOutput(response.response.text() || currentContent);
-    } catch (error) {
-        throw new Error("Unable to regenerate section.");
+    } catch (error: any) {
+        console.error("Regenerate section failed:", error);
+        throw new Error(getActionableError(error) || "Unable to regenerate section.");
     }
 }
 
@@ -588,7 +631,7 @@ export const generateContent = async (
   const originalResumeText = options?.resumeText || '';
   
   const langInstruction = language !== "English" 
-    ? `IMPORTANT: TRANSLATE final output to ${language}.` 
+    ? `CRITICAL: The ENTIRE output MUST be written in ${language}. This includes all headers, section titles, and content. DO NOT use any English in the final output.` 
     : `Write in professional English.`;
 
   let userPrompt = "";
@@ -841,8 +884,10 @@ ${userPrompt}
     }
     return cleanMarkdownOutput(text);
 
-  } catch (error) {
-      console.error("Generation failed", error);
-      throw new Error("Failed to generate content.");
+  } catch (error: any) {
+      console.error("Generation failed:", error);
+      // Provide more context in the error message
+      const actionableMsg = getActionableError(error);
+      throw new Error(actionableMsg || "Failed to generate content. Please check your internet connection and try again.");
   }
 };

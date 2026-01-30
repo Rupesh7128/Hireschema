@@ -265,8 +265,9 @@ const AppContent: React.FC = () => {
         if (['/privacy', '/terms', '/cookies'].includes(path)) {
            setView('legal');
            setLegalPage(path.substring(1) as any);
-        } else if (path === '/roast') {
+        } else if (path === '/roast' || path === '/roast-my-resume') {
            setView('roast');
+           if (path === '/roast') window.history.replaceState({}, '', '/roast-my-resume');
         } else if (path === '/pricing') {
            setView('pricing');
         } else if (path.startsWith('/feature/')) {
@@ -306,7 +307,7 @@ const AppContent: React.FC = () => {
   const handleLandingStart = async (intent: 'scan' | 'optimize' | 'launch' | 'roast' | 'blog' | 'feature' | 'pricing', file?: FileData, featureSlug?: string) => {
     if (intent === 'roast') {
       setView('roast');
-      window.history.pushState({}, '', '/roast');
+      window.history.pushState({}, '', '/roast-my-resume');
       return;
     }
 
@@ -343,6 +344,11 @@ const AppContent: React.FC = () => {
     setAnalysisResult(null);
     setInputWizardStep(file ? 1 : 0);
     setDashboardView('scan');
+  };
+
+  // Type-safe wrapper for components that expect a simpler navigation function
+  const handleNav = (target: any) => {
+    handleLandingStart(target);
   };
 
   const startNewScan = () => {
@@ -435,10 +441,10 @@ const AppContent: React.FC = () => {
     return () => clearInterval(interval);
   }, [isAnalyzing, analysisStartTs]);
 
-  if (view === 'landing') return <Suspense fallback={<LoadingFallback />}><LandingPage onStart={handleLandingStart} /></Suspense>;
-  if (view === 'roast') return <Suspense fallback={<LoadingFallback />}><RoastPage onNavigate={handleLandingStart} /></Suspense>;
-  if (view === 'pricing') return <Suspense fallback={<LoadingFallback />}><PricingPage onBack={() => { setView('landing'); window.history.pushState({}, '', '/'); }} onStart={handleLandingStart} /></Suspense>;
-  if (view === 'blog') return <Suspense fallback={<LoadingFallback />}><BlogPage onBack={() => { setView('landing'); window.history.pushState({}, '', '/'); }} initialSlug={blogSlug} onNavigate={handleLandingStart} /></Suspense>;
+  if (view === 'landing') return <Suspense fallback={<LoadingFallback />}><LandingPage onStart={handleLandingStart} appLanguage={appLanguage} onLanguageChange={setAppLanguage} /></Suspense>;
+  if (view === 'roast') return <Suspense fallback={<LoadingFallback />}><RoastPage onNavigate={handleNav} appLanguage={appLanguage} /></Suspense>;
+  if (view === 'pricing') return <Suspense fallback={<LoadingFallback />}><PricingPage onBack={() => { setView('landing'); window.history.pushState({}, '', '/'); }} onStart={handleNav} /></Suspense>;
+  if (view === 'blog') return <Suspense fallback={<LoadingFallback />}><BlogPage onBack={() => { setView('landing'); window.history.pushState({}, '', '/'); }} initialSlug={blogSlug} onNavigate={handleNav} /></Suspense>;
   
   if (view === 'feature' && featureId) {
      const features = {
@@ -619,6 +625,18 @@ const AppContent: React.FC = () => {
              <div className="cursor-pointer touch-target flex items-center" onClick={() => { setView('landing'); window.history.pushState({}, '', '/'); }}><AnimatedLogo /></div>
              
              <div className="flex items-center gap-2 sm:gap-4">
+                 <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-lg">
+                    <Globe className="w-3.5 h-3.5 text-zinc-500" />
+                    <select 
+                        value={appLanguage}
+                        onChange={(e) => setAppLanguage(e.target.value)}
+                        className="bg-transparent text-white text-xs font-bold outline-none cursor-pointer"
+                    >
+                        {["English", "Spanish", "French", "German", "Hindi", "Portuguese", "Japanese", "Korean", "Arabic"].map(lang => (
+                            <option key={lang} value={lang} className="bg-zinc-900">{lang}</option>
+                        ))}
+                    </select>
+                 </div>
                  {isPaid && (
                      <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full">
                          <CheckCircle className="w-3.5 h-3.5 text-green-500" />

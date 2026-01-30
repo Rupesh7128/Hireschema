@@ -28,7 +28,7 @@ const ACCENT_COLORS = [
 ];
 
 const LANGUAGES = [
-    "English", "Spanish", "French", "German", "Hindi", "Mandarin", "Portuguese", "Arabic"
+    "English", "Spanish", "French", "German", "Hindi", "Portuguese", "Japanese", "Korean", "Arabic"
 ];
 
 const TEMPLATES = [
@@ -540,7 +540,15 @@ const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, resumeT
 
     if (isResume && analysis.contactProfile.photo) {
         return (
-            <div className={`${bgClass} transition-colors duration-500 p-6 rounded-sm`}>
+            <div className={`${bgClass} transition-colors duration-500 p-6 rounded-sm relative group/content`}>
+                {/* Quick Copy Button */}
+                <button 
+                    onClick={handleCopyText}
+                    className="absolute top-4 right-4 p-2 bg-orange-600/10 hover:bg-orange-600 text-orange-600 hover:text-white rounded-lg opacity-0 group-hover/content:opacity-100 transition-all z-20 shadow-xl border border-orange-600/20"
+                    title="Copy to Clipboard"
+                >
+                    <Copy className="w-4 h-4" />
+                </button>
                 <div className="flex justify-center mb-6">
                     <div className="p-1 rounded-full shadow-lg" style={{ backgroundColor: accentColor.value }}>
                         <img src={analysis.contactProfile.photo} alt="Profile" className={`w-24 h-24 rounded-full object-cover border-4 border-white`} />
@@ -551,7 +559,20 @@ const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, resumeT
         );
     }
     
-    return <div className={`${bgClass} transition-colors duration-500 p-6 rounded-sm`}>{content}</div>;
+    return (
+        <div className={`${bgClass} transition-colors duration-500 p-6 rounded-sm relative group/content`}>
+            {/* Quick Copy Button */}
+            <button 
+                onClick={handleCopyText}
+                className="absolute top-4 right-4 p-2 bg-orange-600/10 hover:bg-orange-600 text-orange-600 hover:text-white rounded-lg opacity-0 group-hover/content:opacity-100 transition-all z-20 shadow-xl border border-orange-600/20"
+                title="Copy to Clipboard"
+            >
+                <Copy className="w-4 h-4" />
+            </button>
+            {content}
+        </div>
+    );
+
   };
 
   return (

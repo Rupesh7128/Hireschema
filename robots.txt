@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Allow: /roast-my-resume
+Allow: /blog
+Allow: /pricing
+
+Sitemap: https://hireschema.com/sitemap.xml
