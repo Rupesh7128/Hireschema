@@ -1,7 +1,8 @@
 import React from 'react';
 import { ArrowLeft, Check, LucideIcon, Upload, Zap, BookOpen, Flame } from 'lucide-react';
-import { AnimatedLogo } from './AnimatedLogo';
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
+import { Header } from './Header';
+import { Footer } from './Footer';
 
 export interface FeaturePageProps {
   title: string;
@@ -27,117 +28,6 @@ export interface FeaturePageProps {
 // Shared Button Style (Square/Techy)
 const ORANGE_BUTTON_STYLE = "px-6 sm:px-10 py-3.5 sm:py-4 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 sm:gap-3 shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[2px] active:translate-y-[2px] transition-all rounded-sm cursor-pointer border-none touch-target";
 
-// Reusable Header Component (Matches LandingPage)
-const Header = ({ onBack, onNavigate }: { onBack: () => void, onNavigate: (v: string) => void }) => {
-    const { scrollY } = useScroll();
-    const [isScrolled, setIsScrolled] = React.useState(false);
-
-    useMotionValueEvent(scrollY, "change", (latest) => {
-        setIsScrolled(latest > 50);
-    });
-
-    return (
-        <motion.nav 
-          initial={{ y: 0, width: "100%", borderRadius: "0px", top: 0, borderColor: "rgba(255,255,255,0.05)", backgroundColor: "rgba(9,9,11,0.0)" }}
-          animate={isScrolled ? { 
-              width: "90%",
-              maxWidth: "1024px", 
-              borderRadius: "4px", // Square look
-              top: 24,
-              borderColor: "rgba(255,255,255,0.1)",
-              backgroundColor: "rgba(9,9,11,0.8)",
-              backdropFilter: "blur(16px)"
-          } : {
-              width: "100%",
-              maxWidth: "100%",
-              borderRadius: "0px",
-              top: 0,
-              borderColor: "rgba(255,255,255,0.05)",
-              backgroundColor: "rgba(9,9,11,0.5)",
-              backdropFilter: "blur(8px)"
-          }}
-          transition={{ duration: 0.8, type: "spring", damping: 25, stiffness: 60 }}
-          style={{
-              left: '50%',
-              x: '-50%',
-              position: 'fixed',
-              zIndex: 50
-          }}
-          className="h-16 sm:h-20 flex items-center justify-between px-4 sm:px-6 md:px-8 border-b safe-area-inset"
-      >
-          <div className="cursor-pointer touch-target flex items-center gap-2" onClick={onBack}>
-              <AnimatedLogo />
-          </div>
-          <div className="flex items-center gap-2 sm:gap-6">
-              <button onClick={() => onNavigate('blog')} className="hidden sm:flex items-center gap-2 text-xs font-bold text-zinc-400 hover:text-white transition-colors uppercase tracking-widest px-3 py-1.5 cursor-pointer touch-target font-mono">
-                  <BookOpen className="w-3 h-3" /> Blog
-              </button>
-              <button onClick={() => onNavigate('roast')} className="hidden sm:flex items-center gap-2 text-xs font-bold text-orange-500 hover:text-orange-400 active:text-orange-300 transition-colors uppercase tracking-widest border border-orange-500/20 px-3 py-1.5 rounded-sm bg-orange-500/5 hover:bg-orange-500/10 cursor-pointer touch-target font-mono">
-                    <Zap className="w-3 h-3" /> Roast
-                 </button>
-              <button 
-                  onClick={onBack}
-                  className="text-xs font-bold text-zinc-500 hover:text-white transition-colors flex items-center gap-1 uppercase tracking-wider font-mono"
-              >
-                  <ArrowLeft className="w-4 h-4" /> Back
-              </button>
-          </div>
-      </motion.nav>
-    );
-}
-
-// Reusable Footer Component (Matches LandingPage)
-const Footer = ({ onBack, onNavigate }: { onBack: () => void, onNavigate: (v: string) => void }) => (
-    <footer className="bg-gradient-to-b from-zinc-950 via-zinc-900 to-orange-900 border-t border-orange-900/30 pt-12 sm:pt-20 pb-8 sm:pb-10 px-4 sm:px-6 w-full relative overflow-hidden safe-area-inset-bottom mt-24">
-         {/* Subtle overlay */}
-         <div className="absolute inset-0 bg-black/20 pointer-events-none"></div>
-         
-         <div className="max-w-7xl mx-auto w-full relative z-10">
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 mb-12 sm:mb-16">
-                <div className="col-span-2 sm:col-span-2 md:col-span-1">
-                    <AnimatedLogo className="mb-4 sm:mb-6" />
-                    <p className="text-zinc-400 text-sm leading-relaxed max-w-xs">
-                        HireSchema is built by KoK Labs.
-                    </p>
-                </div>
-                
-                <div>
-                    <h4 className="text-orange-100 font-bold mb-4 sm:mb-6 text-sm uppercase tracking-wider">Product</h4>
-                    <ul className="space-y-2 sm:space-y-3 text-sm text-zinc-400">
-                        <li><span onClick={onBack} className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">Resume Scanner</span></li>
-                        <li><span onClick={onBack} className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">Cover Letter Engine</span></li>
-                        <li><span onClick={onBack} className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">Interview Prep</span></li>
-                        <li><span onClick={() => onNavigate('blog')} className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">Blog</span></li>
-                        <li><span onClick={onBack} className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">$1 per download</span></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h4 className="text-orange-100 font-bold mb-6 text-sm uppercase tracking-wider">Legal</h4>
-                    <ul className="space-y-3 text-sm text-zinc-400">
-                        <li><a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                        <li><a href="/terms" className="hover:text-white transition-colors">Terms & Conditions</a></li>
-                        <li><a href="/cookies" className="hover:text-white transition-colors">Cookie Policy</a></li>
-                    </ul>
-                </div>
-
-                 <div>
-                    <h4 className="text-orange-100 font-bold mb-6 text-sm uppercase tracking-wider">Connect</h4>
-                    <ul className="space-y-3 text-sm text-zinc-400">
-                        <li><span className="hover:text-white transition-colors cursor-pointer">Twitter / X</span></li>
-                        <li><span className="hover:text-white transition-colors cursor-pointer">LinkedIn</span></li>
-                        <li><span className="hover:text-white transition-colors cursor-pointer">GitHub</span></li>
-                    </ul>
-                </div>
-            </div>
-
-            <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p className="text-zinc-500 text-xs">© 2026 HireSchema. All rights reserved.</p>
-            </div>
-         </div>
-      </footer>
-);
-
 export const FeaturePage: React.FC<FeaturePageProps> = ({
   title,
   subtitle,
@@ -156,7 +46,7 @@ export const FeaturePage: React.FC<FeaturePageProps> = ({
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-orange-500/30">
       
-      <Header onBack={onBack} onNavigate={onNavigate} />
+      <Header onNavigate={onNavigate as any} />
 
       <main className="container mx-auto max-w-5xl px-6 pt-32 sm:pt-40">
         
@@ -343,7 +233,7 @@ export const FeaturePage: React.FC<FeaturePageProps> = ({
 
       </main>
       
-      <Footer onBack={onBack} onNavigate={onNavigate} />
+      <Footer onNavigate={onNavigate as any} />
     </div>
   );
 };

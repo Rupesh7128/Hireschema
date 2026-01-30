@@ -8,8 +8,14 @@ import { AnimatedLogo } from './AnimatedLogo';
 import { FileData, GeneratorType } from '../types';
 import { generateContent, extractTextFromPdf } from '../services/geminiService';
 import { Area, AreaChart, ResponsiveContainer, XAxis, Tooltip, PieChart, Pie, Cell, RadialBarChart, RadialBar } from 'recharts';
+import { Header } from './Header';
+import { Footer } from './Footer';
 
-export const RoastPage = () => {
+interface RoastPageProps {
+  onNavigate: (view: 'landing' | 'blog' | 'pricing' | 'roast' | 'scan') => void;
+}
+
+export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate }) => {
   const [isRoasting, setIsRoasting] = useState(false);
   const [roastResult, setRoastResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -134,11 +140,7 @@ export const RoastPage = () => {
   return (
     <div className="min-h-screen min-h-[100dvh] bg-black text-white font-sans selection:bg-orange-500/30">
       {/* Header - Mobile optimized */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/5 h-14 sm:h-16 flex items-center justify-between px-4 sm:px-6 safe-area-inset">
-        <div className="cursor-pointer" onClick={() => window.location.href = '/'}>
-          <AnimatedLogo />
-        </div>
-      </header>
+      <Header onNavigate={onNavigate} />
 
       <main className="pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 container mx-auto max-w-5xl min-h-screen min-h-[100dvh] flex flex-col">
         
@@ -465,7 +467,7 @@ export const RoastPage = () => {
                                     <span>Roast Another</span>
                                 </button>
                                 <button 
-                                    onClick={() => window.location.href = 'https://www.hireschema.com'}
+                                    onClick={() => onNavigate('scan')}
                                     className="px-6 sm:px-10 py-3.5 sm:py-4 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 active:from-orange-700 active:to-red-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-all hover:scale-105 shadow-lg shadow-orange-900/30 touch-target"
                                 >
                                     Fix It Fast <ArrowRight className="w-4 h-4" />
@@ -478,6 +480,8 @@ export const RoastPage = () => {
         )}
 
       </main>
+      
+      <Footer onNavigate={onNavigate} />
     </div>
   );
 };

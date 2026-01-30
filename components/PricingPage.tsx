@@ -1,29 +1,20 @@
 import React from 'react';
-import { CheckCircle2, XCircle, ArrowLeft, Check, Minus, Zap, BookOpen } from 'lucide-react';
-import { AnimatedLogo } from './AnimatedLogo';
+import { CheckCircle2, XCircle, ArrowLeft, Check, Minus, Zap, BookOpen, Lock } from 'lucide-react';
+import { Header } from './Header';
+import { Footer } from './Footer';
 
 interface PricingPageProps {
   onBack: () => void;
-  onStart: (intent: 'scan' | 'optimize') => void;
+  onStart: (intent: 'scan' | 'optimize' | 'launch' | 'roast' | 'blog' | 'feature' | 'pricing') => void;
 }
 
 const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStart }) => {
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-orange-500/30">
       {/* Header */}
-      <nav className="h-20 flex items-center justify-between px-6 border-b border-white/10 bg-zinc-950/50 backdrop-blur-md sticky top-0 z-50">
-        <div className="cursor-pointer" onClick={onBack}>
-          <AnimatedLogo />
-        </div>
-        <button 
-          onClick={onBack}
-          className="text-sm font-bold text-zinc-400 hover:text-white transition-colors flex items-center gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" /> Back
-        </button>
-      </nav>
+      <Header onNavigate={onStart as any} />
 
-      <main className="max-w-7xl mx-auto px-6 py-20">
+      <main className="max-w-7xl mx-auto px-6 py-20 pt-32">
         {/* Hero Section */}
         <div className="text-center mb-20">
           <h1 className="text-4xl sm:text-6xl font-black tracking-tighter mb-6">
@@ -221,9 +212,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStart }) => {
 
       </main>
 
-      <footer className="py-12 border-t border-white/10 text-center">
-        <p className="text-zinc-600 text-sm">© 2026 HireSchema. Built by KoK Labs.</p>
-      </footer>
+      <Footer onNavigate={onStart as any} />
     </div>
   );
 };

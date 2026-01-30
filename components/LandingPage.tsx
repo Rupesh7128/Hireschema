@@ -7,7 +7,8 @@ import {
   BrainCircuit, ShieldCheck, CheckCircle2, XCircle, 
   Check, Award, Lock, CreditCard, Database, Activity, Zap, Flame, BookOpen 
 } from 'lucide-react';
-import { AnimatedLogo } from './AnimatedLogo';
+import { Header } from './Header';
+import { Footer } from './Footer';
 import { FileData } from '../types';
 import { logEvent } from '../services/analytics';
 
@@ -17,7 +18,6 @@ interface LandingPageProps {
 
 // Consistent Global Button Styles - Mobile optimized with active states
 const ORANGE_BUTTON_STYLE = "px-6 sm:px-10 py-3.5 sm:py-4 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 sm:gap-3 shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[2px] active:translate-y-[2px] transition-all rounded-sm cursor-pointer border-none touch-target";
-const HEADER_BUTTON_STYLE = "px-4 sm:px-6 py-2 sm:py-2.5 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-xs uppercase tracking-wide flex items-center gap-1.5 sm:gap-2 shadow-[3px_3px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none active:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] active:translate-x-[1px] active:translate-y-[1px] transition-all rounded-sm cursor-pointer border-none touch-target";
 
 // --- MOUSE TRAIL COMPONENT ---
 const ArrowDownIcon = () => (
@@ -155,14 +155,35 @@ const StepGraphic = ({ step }: { step: 1 | 2 | 3 }) => {
 
 // --- FAQ ITEM COMPONENT ---
 const FAQItem: React.FC<{ question: string; answer: string }> = ({ question, answer }) => {
+    const [isOpen, setIsOpen] = useState(false);
+
     return (
-        <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-xl p-6 hover:bg-zinc-900/70 hover:border-zinc-700/50 transition-all duration-500 group h-full">
-            <h3 className="text-base font-semibold text-white mb-3 leading-relaxed group-hover:text-orange-100 transition-colors">
-                {question}
-            </h3>
-            <p className="text-zinc-400 text-sm leading-relaxed group-hover:text-zinc-300 transition-colors">
-                {answer}
-            </p>
+        <div 
+            className="bg-zinc-900/50 border border-zinc-800/50 rounded-xl overflow-hidden hover:bg-zinc-900/70 hover:border-zinc-700/50 transition-all duration-300 group cursor-pointer"
+            onClick={() => setIsOpen(!isOpen)}
+        >
+            <div className="p-6 flex justify-between items-center gap-4">
+                <h3 className="text-base font-semibold text-white leading-relaxed group-hover:text-orange-100 transition-colors">
+                    {question}
+                </h3>
+                <div className={`shrink-0 text-zinc-500 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
+                    <ArrowDownIcon />
+                </div>
+            </div>
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                    >
+                        <div className="px-6 pb-6 text-zinc-400 text-sm leading-relaxed border-t border-white/5 pt-4">
+                            {answer}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
@@ -315,58 +336,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
       <MouseTrail />
 
       {/* --- HEADER --- */}
-      <motion.nav 
-          initial={{ y: 0, width: "100%", borderRadius: "0px", top: 0, borderColor: "rgba(255,255,255,0.0)", backgroundColor: "rgba(9,9,11,0.0)" }}
-          animate={isScrolled ? { 
-              width: "90%",
-              maxWidth: "1024px", 
-              borderRadius: "9999px",
-              top: 24,
-              borderColor: "rgba(255,255,255,0.1)",
-              backgroundColor: "rgba(9,9,11,0.6)",
-              backdropFilter: "blur(16px)"
-          } : {
-              width: "100%",
-              maxWidth: "100%",
-              borderRadius: "0px",
-              top: 0,
-              borderColor: "rgba(255,255,255,0.0)",
-              backgroundColor: "rgba(9,9,11,0.0)", // Fully transparent at top
-              backdropFilter: "blur(0px)"
-          }}
-          transition={{ duration: 1.2, type: "spring", damping: 30, stiffness: 50 }}
-          style={{
-              left: '50%',
-              x: '-50%',
-              position: 'fixed',
-              zIndex: 50
-          }}
-          className="h-16 sm:h-20 flex items-center justify-between px-4 sm:px-6 md:px-8 border-b safe-area-inset"
-      >
-          <div className="cursor-pointer touch-target" onClick={() => window.scrollTo(0, 0)}>
-              <AnimatedLogo />
-          </div>
-          <div className="flex items-center gap-2 sm:gap-6">
-              <button onClick={() => onStart('blog')} className="hidden sm:flex items-center gap-2 text-xs font-bold text-zinc-400 hover:text-white transition-colors uppercase tracking-widest px-3 py-1.5 cursor-pointer touch-target">
-                  <BookOpen className="w-3 h-3" /> Blog
-              </button>
-              <button onClick={() => onStart('pricing')} className="hidden sm:flex items-center gap-2 text-xs font-bold text-zinc-400 hover:text-white transition-colors uppercase tracking-widest px-3 py-1.5 cursor-pointer touch-target">
-                  Pricing
-              </button>
-              <button onClick={() => onStart('roast')} className="hidden sm:flex items-center gap-2 text-xs font-bold text-orange-500 hover:text-orange-400 active:text-orange-300 transition-colors uppercase tracking-widest border border-orange-500/20 px-3 py-1.5 rounded bg-orange-500/5 hover:bg-orange-500/10 cursor-pointer touch-target">
-                    <Zap className="w-3 h-3" /> Roast My Resume
-                 </button>
-              <button onClick={() => onStart('roast')} className="sm:hidden flex items-center gap-1 text-xs font-bold text-orange-500 hover:text-orange-400 active:text-orange-300 transition-colors border border-orange-500/20 px-2 py-1 rounded bg-orange-500/5 hover:bg-orange-500/10 cursor-pointer touch-target">
-                    <Flame className="w-3 h-3" /> Roast
-                 </button>
-              <button 
-                  onClick={() => onStart('scan')}
-                  className={HEADER_BUTTON_STYLE}
-              >
-                  <span className="hidden xs:inline">Start</span> Analysis
-              </button>
-          </div>
-      </motion.nav>
+      <Header onNavigate={(view) => {
+          if (view === 'landing') window.scrollTo(0, 0);
+          else onStart(view as any);
+      }} />
 
       {/* --- HERO SECTION --- */}
       <section className="relative min-h-[100vh] sm:min-h-[100vh] min-h-[100dvh] sm:min-h-[100dvh] flex flex-col items-center justify-center pt-20 sm:pt-24 px-4 sm:px-6 border-b border-white/10 overflow-hidden bg-zinc-950 pb-20">
@@ -389,10 +362,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             style={{ y: yHero }}
             className="relative z-10 max-w-5xl mx-auto text-center flex flex-col items-center"
         >
-            <p className="text-zinc-500 font-mono text-xs sm:text-sm mb-6 flex items-center gap-2">
-                HireSchema is built by <span className="text-white font-bold">KoK Labs</span>
-            </p>
-
             {/* Problem Statement - What ATS is */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -509,141 +478,79 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
 
       {/* --- VALUE + PROOF BLOCK --- */}
       <section className="py-24 px-6 bg-zinc-950 border-b border-white/5">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            
-            <div className="space-y-10">
-                <div className="space-y-6">
-                    <h2 className="text-3xl font-bold text-white">Why your resume gets rejected</h2>
-                    <p className="text-zinc-400 text-sm mb-4">ATS software scans for specific keywords from the job description. If your resume doesn't match, it's auto-rejected — even if you're qualified.</p>
-                    <ul className="space-y-8">
-                        {/* Point 1 */}
-                        <li className="group">
-                             <div className="flex gap-4 items-start mb-3">
-                                <div className="w-8 h-8 rounded bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0 text-orange-500 font-bold font-mono group-hover:border-orange-500/50 transition-colors">1</div>
-                                <div>
-                                    <h3 className="text-lg font-bold text-white mb-1 group-hover:text-orange-100 transition-colors">Missing keywords = instant rejection</h3>
-                                    <p className="text-zinc-500 text-sm">Don’t spend hours tweaking. We match context instantly.</p>
-                                </div>
-                             </div>
-                             {/* Mini Visual for Point 1 */}
-                             <div className="ml-12 p-4 bg-zinc-900/30 border border-zinc-800 rounded-lg relative overflow-hidden group-hover:border-orange-500/20 transition-all">
-                                 <div className="flex gap-2 items-center text-xs font-mono text-zinc-500 mb-2">
-                                     <XCircle className="w-3 h-3 text-red-500" /> Missing: "React", "TypeScript"
-                                 </div>
-                                 <div className="h-1 w-full bg-zinc-800 rounded-full overflow-hidden">
-                                     <motion.div 
-                                        className="h-full bg-red-500" 
-                                        initial={{ width: "100%" }}
-                                        whileInView={{ width: "40%" }}
-                                        transition={{ duration: 1.5, repeat: Infinity, repeatType: "reverse" }}
-                                     />
-                                 </div>
-                             </div>
-                        </li>
-
-                         {/* Point 2 */}
-                        <li className="group">
-                             <div className="flex gap-4 items-start mb-3">
-                                <div className="w-8 h-8 rounded bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0 text-orange-500 font-bold font-mono group-hover:border-orange-500/50 transition-colors">2</div>
-                                <div>
-                                    <h3 className="text-lg font-bold text-white mb-1 group-hover:text-orange-100 transition-colors">Wrong format = unreadable</h3>
-                                    <p className="text-zinc-500 text-sm">Tables, columns, and fancy designs confuse ATS parsers.</p>
-                                </div>
-                             </div>
-                             {/* Mini Visual for Point 2 */}
-                             <div className="ml-12 p-4 bg-zinc-900/30 border border-zinc-800 rounded-lg relative overflow-hidden group-hover:border-orange-500/20 transition-all">
-                                 <div className="flex gap-2 mb-2">
-                                     <div className="w-8 h-10 bg-zinc-800 border border-zinc-700 rounded-sm opacity-50 skew-x-12 origin-bottom-left"></div>
-                                     <div className="w-8 h-10 bg-zinc-800 border border-red-500/50 rounded-sm flex items-center justify-center">
-                                         <span className="text-[8px] text-red-500 font-bold">ERROR</span>
-                                     </div>
-                                 </div>
-                                 <div className="text-[10px] text-zinc-600 font-mono">Parsing failed: Complex layout detected.</div>
-                             </div>
-                        </li>
-
-                         {/* Point 3 */}
-                        <li className="group">
-                             <div className="flex gap-4 items-start mb-3">
-                                <div className="w-8 h-8 rounded bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0 text-orange-500 font-bold font-mono group-hover:border-orange-500/50 transition-colors">3</div>
-                                <div>
-                                    <h3 className="text-lg font-bold text-white mb-1 group-hover:text-orange-100 transition-colors">We fix it for you</h3>
-                                    <p className="text-zinc-500 text-sm">Upload your resume + job description. Get optimized instantly.</p>
-                                </div>
-                             </div>
-                             {/* Mini Visual for Point 3 */}
-                             <div className="ml-12 p-4 bg-zinc-900/30 border border-zinc-800 rounded-lg relative overflow-hidden group-hover:border-orange-500/20 transition-all">
-                                 <div className="flex justify-between items-center mb-2">
-                                     <div className="flex gap-1">
-                                         <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                                         <span className="text-[10px] text-green-500 font-bold uppercase">Optimized</span>
-                                     </div>
-                                     <span className="text-[10px] text-white font-bold">Score: 94/100</span>
-                                 </div>
-                                 <div className="h-1 w-full bg-zinc-800 rounded-full overflow-hidden">
-                                     <motion.div 
-                                        className="h-full bg-green-500" 
-                                        initial={{ width: "0%" }}
-                                        whileInView={{ width: "94%" }}
-                                        transition={{ duration: 1 }}
-                                     />
-                                 </div>
-                             </div>
-                        </li>
-                    </ul>
-                </div>
-                
-                <div className="p-6 bg-zinc-900/50 border border-orange-500/20 rounded-xl inline-block mt-4">
-                    <div className="text-3xl font-bold text-orange-500 mb-1">80–90+</div>
-                    <p className="text-sm text-zinc-300 font-medium">Average score after our fix</p>
-                    <p className="text-[10px] text-zinc-500 mt-2 font-mono">Most users start at 40-60. We get you interview-ready.</p>
-                </div>
+        <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-16">
+                <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">Why 75% of resumes get rejected</h2>
+                <p className="text-zinc-400 max-w-2xl mx-auto">ATS software is ruthless. Small mistakes lead to instant rejection.</p>
             </div>
 
-            {/* Visual Proof Component */}
-            <div className="relative">
-                <div className="absolute top-0 left-0 w-full h-full bg-orange-500/5 blur-3xl rounded-full"></div>
-                <div className="relative z-10 space-y-4">
-                    {/* Before Card */}
-                    <motion.div 
-                        initial={{ opacity: 0, x: -20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.8 }}
-                        className="bg-zinc-900 border border-zinc-800 p-6 rounded-lg opacity-60"
-                    >
-                        <div className="flex justify-between mb-2">
-                            <span className="text-[10px] font-bold text-orange-500 uppercase tracking-widest">Original</span>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20">
+                {/* Problem List */}
+                <div className="space-y-6">
+                    <div className="bg-zinc-900/50 border border-zinc-800 p-6 rounded-xl flex gap-4 hover:border-orange-500/30 transition-colors">
+                        <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center shrink-0">
+                            <XCircle className="w-5 h-5 text-red-500" />
                         </div>
-                        <p className="text-zinc-500 text-sm line-through">Managed a team of 5 people to build the product.</p>
-                    </motion.div>
+                        <div>
+                            <h3 className="text-lg font-bold text-white mb-2">Missing Keywords</h3>
+                            <p className="text-zinc-400 text-sm leading-relaxed">If you don't have the exact keywords from the job description (e.g., "Agile", "SaaS"), the ATS scores you zero.</p>
+                        </div>
+                    </div>
 
-                     {/* Arrow */}
-                    <div className="flex justify-center -my-2 relative z-20">
-                        <div className="bg-zinc-950 border border-zinc-800 rounded-full p-2">
+                    <div className="bg-zinc-900/50 border border-zinc-800 p-6 rounded-xl flex gap-4 hover:border-orange-500/30 transition-colors">
+                        <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center shrink-0">
+                            <FileText className="w-5 h-5 text-red-500" />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-bold text-white mb-2">Bad Formatting</h3>
+                            <p className="text-zinc-400 text-sm leading-relaxed">Columns, graphics, and tables confuse the parser. Your resume ends up looking like gibberish to the robot.</p>
+                        </div>
+                    </div>
+
+                    <div className="bg-zinc-900/50 border border-zinc-800 p-6 rounded-xl flex gap-4 hover:border-orange-500/30 transition-colors">
+                        <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center shrink-0">
+                            <CheckCircle2 className="w-5 h-5 text-green-500" />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-bold text-white mb-2">The HireSchema Fix</h3>
+                            <p className="text-zinc-400 text-sm leading-relaxed">We rewrite your bullets to include high-value keywords naturally, boosting your match score to 90%+.</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Visual Proof */}
+                <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-transparent blur-3xl rounded-full opacity-20"></div>
+                    
+                    {/* Before Card */}
+                    <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-4 relative z-10 opacity-50 scale-95 origin-bottom">
+                         <div className="flex justify-between items-center mb-3">
+                             <span className="text-xs font-bold text-red-500 uppercase tracking-wider flex items-center gap-1"><XCircle className="w-3 h-3" /> Before</span>
+                             <span className="text-xs font-mono text-zinc-600">Score: 42/100</span>
+                         </div>
+                         <p className="text-zinc-500 text-sm line-through">Responsible for sales and managing the team.</p>
+                    </div>
+
+                    {/* Arrow */}
+                    <div className="flex justify-center -my-6 relative z-20">
+                        <div className="bg-zinc-950 border border-zinc-800 p-1.5 rounded-full text-zinc-500">
                             <ArrowDownIcon />
                         </div>
                     </div>
 
                     {/* After Card */}
-                    <motion.div 
-                        initial={{ opacity: 0, x: 20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.4, duration: 0.8 }}
-                        className="bg-zinc-900 border border-orange-500/30 p-6 rounded-lg shadow-[0_0_30px_rgba(249,115,22,0.1)] relative overflow-hidden"
-                    >
-                         <div className="absolute top-0 left-0 w-1 h-full bg-orange-500"></div>
-                        <div className="flex justify-between mb-2">
-                            <span className="text-[10px] font-bold text-orange-500 uppercase tracking-widest">Optimized</span>
-                        </div>
-                        <p className="text-zinc-200 text-sm leading-relaxed">
-                            Spearheaded a cross-functional <span className="text-orange-400 font-bold bg-orange-500/10 px-1 rounded">team of 5</span>, deploying the <span className="text-orange-400 font-bold bg-orange-500/10 px-1 rounded">SaaS platform</span>, increasing <span className="text-orange-400 font-bold bg-orange-500/10 px-1 rounded">user retention by 20%</span>.
-                        </p>
-                    </motion.div>
+                    <div className="bg-zinc-950 border border-orange-500/50 rounded-xl p-8 relative z-30 shadow-2xl">
+                         <div className="absolute top-0 left-0 w-1.5 h-full bg-orange-500 rounded-l-xl"></div>
+                         <div className="flex justify-between items-center mb-4">
+                             <span className="text-xs font-bold text-green-500 uppercase tracking-wider flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Optimized</span>
+                             <span className="text-xs font-mono text-orange-500 font-bold">Score: 94/100</span>
+                         </div>
+                         <p className="text-zinc-200 text-base leading-relaxed">
+                             Led a <span className="bg-orange-500/20 text-orange-200 px-1 rounded font-medium">sales team of 10</span>, achieving <span className="bg-orange-500/20 text-orange-200 px-1 rounded font-medium">150% of quota</span> ($2M ARR) through strategic <span className="bg-orange-500/20 text-orange-200 px-1 rounded font-medium">CRM implementation</span>.
+                         </p>
+                    </div>
                 </div>
             </div>
-
         </div>
       </section>
 
@@ -900,54 +807,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
       </section>
       
       {/* --- FOOTER --- */}
-      <footer className="bg-gradient-to-b from-zinc-950 via-zinc-900 to-orange-900 border-t border-orange-900/30 pt-12 sm:pt-20 pb-8 sm:pb-10 px-4 sm:px-6 w-full relative overflow-hidden safe-area-inset-bottom">
-         {/* Subtle overlay */}
-         <div className="absolute inset-0 bg-black/20 pointer-events-none"></div>
-         
-         <div className="max-w-7xl mx-auto w-full relative z-10">
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 mb-12 sm:mb-16">
-                <div className="col-span-2 sm:col-span-2 md:col-span-1">
-                    <AnimatedLogo className="mb-4 sm:mb-6" />
-                    <p className="text-zinc-400 text-sm leading-relaxed max-w-xs">
-                        HireSchema is built by KoK Labs.
-                    </p>
-                </div>
-                
-                <div>
-                    <h4 className="text-orange-100 font-bold mb-4 sm:mb-6 text-sm uppercase tracking-wider">Product</h4>
-                    <ul className="space-y-2 sm:space-y-3 text-sm text-zinc-400">
-                        <li><span className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">Resume Scanner</span></li>
-                        <li><span className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">Cover Letter Engine</span></li>
-                        <li><span className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">Interview Prep</span></li>
-                        <li><span onClick={() => onStart('blog')} className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">Blog</span></li>
-                        <li><span className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">$1 per download</span></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h4 className="text-orange-100 font-bold mb-6 text-sm uppercase tracking-wider">Legal</h4>
-                    <ul className="space-y-3 text-sm text-zinc-400">
-                        <li><a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                        <li><a href="/terms" className="hover:text-white transition-colors">Terms & Conditions</a></li>
-                        <li><a href="/cookies" className="hover:text-white transition-colors">Cookie Policy</a></li>
-                    </ul>
-                </div>
-
-                 <div>
-                    <h4 className="text-orange-100 font-bold mb-6 text-sm uppercase tracking-wider">Connect</h4>
-                    <ul className="space-y-3 text-sm text-zinc-400">
-                        <li><span className="hover:text-white transition-colors cursor-pointer">Twitter / X</span></li>
-                        <li><span className="hover:text-white transition-colors cursor-pointer">LinkedIn</span></li>
-                        <li><span className="hover:text-white transition-colors cursor-pointer">GitHub</span></li>
-                    </ul>
-                </div>
-            </div>
-
-            <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p className="text-zinc-500 text-xs">© 2026 HireSchema. All rights reserved.</p>
-            </div>
-         </div>
-      </footer>
+      <Footer onNavigate={(view) => {
+          if (view === 'landing') window.scrollTo(0, 0);
+          else onStart(view as any);
+      }} />
     </div>
   );
 };

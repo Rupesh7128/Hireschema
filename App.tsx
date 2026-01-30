@@ -436,9 +436,9 @@ const AppContent: React.FC = () => {
   }, [isAnalyzing, analysisStartTs]);
 
   if (view === 'landing') return <Suspense fallback={<LoadingFallback />}><LandingPage onStart={handleLandingStart} /></Suspense>;
-  if (view === 'roast') return <Suspense fallback={<LoadingFallback />}><RoastPage /></Suspense>;
-  if (view === 'pricing') return <Suspense fallback={<LoadingFallback />}><PricingPage onBack={() => { setView('landing'); window.history.pushState({}, '', '/'); }} onStart={(intent) => handleLandingStart(intent)} /></Suspense>;
-  if (view === 'blog') return <Suspense fallback={<LoadingFallback />}><BlogPage onBack={() => { setView('landing'); window.history.pushState({}, '', '/'); }} initialSlug={blogSlug} /></Suspense>;
+  if (view === 'roast') return <Suspense fallback={<LoadingFallback />}><RoastPage onNavigate={handleLandingStart} /></Suspense>;
+  if (view === 'pricing') return <Suspense fallback={<LoadingFallback />}><PricingPage onBack={() => { setView('landing'); window.history.pushState({}, '', '/'); }} onStart={handleLandingStart} /></Suspense>;
+  if (view === 'blog') return <Suspense fallback={<LoadingFallback />}><BlogPage onBack={() => { setView('landing'); window.history.pushState({}, '', '/'); }} initialSlug={blogSlug} onNavigate={handleLandingStart} /></Suspense>;
   
   if (view === 'feature' && featureId) {
      const features = {

@@ -2,14 +2,17 @@
 import React, { useState, useEffect } from 'react';
 import { getBlogPosts, getBlogPost, getInternalLinks, BlogPost } from '../services/blogService';
 import { Loader2, ArrowLeft, ArrowRight } from 'lucide-react';
-import { AnimatedLogo } from './AnimatedLogo';
+import { Header } from './Header';
+import { Footer } from './Footer';
+import { FileData } from '../types';
 
 interface BlogPageProps {
   onBack: () => void;
   initialSlug?: string | null;
+  onNavigate: (intent: 'scan' | 'optimize' | 'launch' | 'roast' | 'blog' | 'feature' | 'pricing', file?: FileData, featureSlug?: string) => void;
 }
 
-export const BlogPage: React.FC<BlogPageProps> = ({ onBack, initialSlug }) => {
+export const BlogPage: React.FC<BlogPageProps> = ({ onBack, initialSlug, onNavigate }) => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [currentPost, setCurrentPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
@@ -42,9 +45,10 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onBack, initialSlug }) => {
       
       setLoading(true);
       try {
-        const [post, internalLinks] = await Promise.all([
+        const [post, internalLinks, allPosts] = await Promise.all([
           getBlogPost(initialSlug),
-          getInternalLinks()
+          getInternalLinks(),
+          getBlogPosts()
         ]);
 
         if (post) {
@@ -59,6 +63,7 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onBack, initialSlug }) => {
           post.content = content;
           
           setCurrentPost(post);
+          setPosts(allPosts);
           setView('detail');
         } else {
           setError('Post not found.');
@@ -76,6 +81,24 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onBack, initialSlug }) => {
       fetchSinglePost();
     }
   }, [initialSlug]);
+
+  const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
+
+  useEffect(() => {
+    if (currentPost && posts.length > 0) {
+        const otherPosts = posts.filter(p => p.slug !== currentPost.slug);
+        const sameCategory = otherPosts.filter(p => p.category === currentPost.category);
+        const diffCategory = otherPosts.filter(p => p.category !== currentPost.category);
+        
+        // Simple shuffle
+        const shuffledSame = [...sameCategory].sort(() => 0.5 - Math.random());
+        const shuffledDiff = [...diffCategory].sort(() => 0.5 - Math.random());
+        
+        // Prioritize same category, then fill with others
+        const combined = [...shuffledSame, ...shuffledDiff];
+        setRelatedPosts(combined.slice(0, 3));
+    }
+  }, [currentPost, posts]);
 
   const handlePostClick = async (slug: string) => {
     setLoading(true);
@@ -120,22 +143,6 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onBack, initialSlug }) => {
       day: 'numeric'
     });
   };
-
-  // HEADER COMPONENT
-  const Header = () => (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-xl border-b border-white/5 h-16 flex items-center justify-between px-6 safe-area-inset transition-all duration-300">
-      <div className="cursor-pointer flex items-center gap-3 group" onClick={onBack}>
-         <AnimatedLogo className="w-8 h-8 opacity-90 group-hover:opacity-100 transition-opacity" />
-         <span className="text-zinc-400 text-sm font-medium tracking-tight group-hover:text-white transition-colors">/ blog</span>
-      </div>
-      <button 
-        onClick={onBack}
-        className="text-xs font-medium text-zinc-500 hover:text-white transition-colors flex items-center gap-2 group px-3 py-1.5 rounded-full hover:bg-white/5"
-      >
-        <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" /> Back
-      </button>
-    </header>
-  );
 
   // Featured Carousel Component
   const FeaturedCarousel = ({ featuredPosts }: { featuredPosts: BlogPost[] }) => {
@@ -246,7 +253,7 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onBack, initialSlug }) => {
   if (loading && !posts.length && !currentPost) {
     return (
       <div className="min-h-screen bg-black text-white font-sans selection:bg-orange-500/30">
-        <Header />
+        <Header onNavigate={onNavigate as any} />
         <div className="flex items-center justify-center h-screen">
           <Loader2 className="w-6 h-6 text-zinc-600 animate-spin" />
         </div>
@@ -256,7 +263,7 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onBack, initialSlug }) => {
 
   return (
     <div className="min-h-screen bg-black text-zinc-100 font-sans selection:bg-orange-500/30 pt-24 pb-12">
-      <Header />
+      <Header onNavigate={onNavigate as any} />
       
       {/* Background Gradients */}
       <div className="fixed inset-0 z-0 pointer-events-none">
@@ -380,7 +387,7 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onBack, initialSlug }) => {
                 </header>
 
                 <div 
-                  className="prose prose-invert prose-lg max-w-none 
+                  className="prose prose-invert prose-sm sm:prose-lg max-w-none 
                     prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-white
                     prose-p:text-zinc-400 prose-p:leading-8 prose-p:font-light
                     prose-a:text-white prose-a:underline prose-a:decoration-zinc-700 prose-a:underline-offset-4 hover:prose-a:decoration-orange-500 hover:prose-a:text-orange-400 transition-all
@@ -394,12 +401,42 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onBack, initialSlug }) => {
                   dangerouslySetInnerHTML={{ __html: currentPost.content || '' }}
                 />
                 
-                <div className="mt-20 pt-12 border-t border-white/5 flex justify-between items-center">
-                    <button onClick={handleBackToList} className="text-zinc-500 hover:text-white transition-colors text-sm font-medium">
-                        &larr; More Articles
-                    </button>
-                    <div className="flex gap-4">
-                        {/* Share buttons could go here */}
+                <div className="mt-20 pt-12 border-t border-white/5">
+                    <h3 className="text-2xl font-bold text-white mb-8">Read Next</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {relatedPosts.map((post) => (
+                             <article 
+                                key={post.slug}
+                                className="group cursor-pointer flex flex-col bg-zinc-900/20 border border-white/5 rounded-xl overflow-hidden hover:border-orange-500/30 transition-all duration-300 hover:bg-zinc-900/40"
+                                onClick={() => handlePostClick(post.slug)}
+                             >
+                                {post.featuredImage && (
+                                    <div className="aspect-[16/10] w-full overflow-hidden bg-zinc-900 relative">
+                                        <img 
+                                            src={post.featuredImage} 
+                                            alt={post.title}
+                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-90 group-hover:opacity-100"
+                                        />
+                                    </div>
+                                )}
+                                <div className="p-4 flex flex-col gap-2 flex-1">
+                                    <div className="flex items-center justify-between text-[10px] text-zinc-500 mb-1">
+                                        <span className="font-semibold text-orange-400 uppercase tracking-wider">
+                                            {post.category || 'Career'}
+                                        </span>
+                                        <span>{formatDate(post.createdAt)}</span>
+                                    </div>
+                                    <h4 className="text-base font-bold text-zinc-100 group-hover:text-white transition-colors leading-snug line-clamp-2">
+                                        {post.title}
+                                    </h4>
+                                </div>
+                             </article>
+                        ))}
+                    </div>
+                    <div className="mt-12 text-center">
+                        <button onClick={handleBackToList} className="text-zinc-500 hover:text-white transition-colors text-sm font-medium">
+                            &larr; View All Articles
+                        </button>
                     </div>
                 </div>
               </>
@@ -408,20 +445,7 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onBack, initialSlug }) => {
         )}
       </main>
 
-      {/* Minimal Footer */}
-      <footer className="mt-32 border-t border-white/5 py-12 px-6">
-         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-6 text-zinc-600 text-sm">
-            <div className="flex items-center gap-2">
-                <AnimatedLogo className="w-5 h-5 opacity-50 grayscale" />
-                <span>© 2026 HireSchema</span>
-            </div>
-            <div className="flex gap-6">
-                <span onClick={onBack} className="hover:text-zinc-400 cursor-pointer transition-colors">Home</span>
-                <span className="hover:text-zinc-400 cursor-pointer transition-colors">Twitter</span>
-                <span className="hover:text-zinc-400 cursor-pointer transition-colors">GitHub</span>
-            </div>
-         </div>
-      </footer>
+      <Footer onNavigate={onNavigate as any} />
     </div>
   );
 };
