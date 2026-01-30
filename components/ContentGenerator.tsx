@@ -293,24 +293,28 @@ const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, resumeT
   // EAGER LOADING - wait for text extraction before generating
   useEffect(() => {
     if (isPaid && !isExtractingText && localResumeText) {
-        console.log('[ContentGenerator] Starting content generation with resumeText length:', localResumeText.length);
+        console.log('[ContentGenerator] appLanguage or text changed, restarting generation. Language:', appLanguage);
+        // Clear previous results to force a fresh start in the new language
+        setGeneratedData({});
         generateAllContent();
     }
   }, [appLanguage, isPaid, isExtractingText, localResumeText]);
 
   const generateAllContent = async () => {
+    // Start with the main resume immediately
     await handleGenerate(GeneratorType.ATS_RESUME, true);
     
     const queue = [
-        { type: GeneratorType.COVER_LETTER, delay: 3000 },
-        { type: GeneratorType.INTERVIEW_PREP, delay: 6000 },
-        { type: GeneratorType.LEARNING_PATH, delay: 9000 },
-        { type: GeneratorType.EMAIL_TEMPLATE, delay: 12000 }
+        { type: GeneratorType.COVER_LETTER, delay: 2000 },
+        { type: GeneratorType.INTERVIEW_PREP, delay: 4000 },
+        { type: GeneratorType.LEARNING_PATH, delay: 6000 },
+        { type: GeneratorType.EMAIL_TEMPLATE, delay: 8000 }
     ];
 
     queue.forEach(item => {
         setTimeout(() => {
-             if (!generatedData[item.type]) handleGenerate(item.type, true);
+             // Always force refresh when generateAllContent is called (usually due to lang change or first load)
+             handleGenerate(item.type, true);
         }, item.delay);
     });
   };

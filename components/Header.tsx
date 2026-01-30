@@ -7,6 +7,7 @@ interface HeaderProps {
   onNavigate: (view: 'landing' | 'blog' | 'pricing' | 'roast' | 'scan') => void;
   appLanguage?: string;
   onLanguageChange?: (lang: string) => void;
+  showLanguage?: boolean;
 }
 
 const LANGUAGES = [
@@ -16,7 +17,7 @@ const LANGUAGES = [
 // Consistent Global Button Styles - Mobile optimized with active states
 const HEADER_BUTTON_STYLE = "px-4 sm:px-6 py-2 sm:py-2.5 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-xs uppercase tracking-wide flex items-center gap-1.5 sm:gap-2 shadow-[3px_3px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none active:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] active:translate-x-[1px] active:translate-y-[1px] transition-all rounded-sm cursor-pointer border-none touch-target";
 
-export const Header: React.FC<HeaderProps> = ({ onNavigate, appLanguage = "English", onLanguageChange }) => {
+export const Header: React.FC<HeaderProps> = ({ onNavigate, appLanguage = "English", onLanguageChange, showLanguage = true }) => {
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -75,36 +76,38 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, appLanguage = "Engli
         
         {/* Desktop Nav */}
         <div className="hidden sm:flex items-center gap-2 sm:gap-6">
-            <div className="relative">
-                <button 
-                    onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-                    className="flex items-center gap-1.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors uppercase tracking-widest px-3 py-1.5 cursor-pointer touch-target"
-                >
-                    <Globe className="w-3.5 h-3.5" />
-                    <span>{appLanguage}</span>
-                    <ChevronDown className="w-3 h-3 opacity-50" />
-                </button>
-                <AnimatePresence>
-                    {isLangMenuOpen && (
-                        <motion.div 
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: 10 }}
-                            className="absolute top-full mt-2 right-0 w-32 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl overflow-hidden z-50 py-1"
-                        >
-                            {LANGUAGES.map(lang => (
-                                <button 
-                                    key={lang}
-                                    onClick={() => { onLanguageChange?.(lang); setIsLangMenuOpen(false); }}
-                                    className={`w-full text-left px-4 py-2 text-[10px] font-bold uppercase tracking-wider transition-colors ${appLanguage === lang ? 'text-orange-500 bg-orange-500/10' : 'text-zinc-400 hover:bg-zinc-800'}`}
-                                >
-                                    {lang}
-                                </button>
-                            ))}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
+            {showLanguage && (
+                <div className="relative">
+                    <button 
+                        onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
+                        className="flex items-center gap-1.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors uppercase tracking-widest px-3 py-1.5 cursor-pointer touch-target"
+                    >
+                        <Globe className="w-3.5 h-3.5" />
+                        <span>{appLanguage}</span>
+                        <ChevronDown className="w-3 h-3 opacity-50" />
+                    </button>
+                    <AnimatePresence>
+                        {isLangMenuOpen && (
+                            <motion.div 
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 10 }}
+                                className="absolute top-full mt-2 right-0 w-32 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl overflow-hidden z-50 py-1"
+                            >
+                                {LANGUAGES.map(lang => (
+                                    <button 
+                                        key={lang}
+                                        onClick={() => { onLanguageChange?.(lang); setIsLangMenuOpen(false); }}
+                                        className={`w-full text-left px-4 py-2 text-[10px] font-bold uppercase tracking-wider transition-colors ${appLanguage === lang ? 'text-orange-500 bg-orange-500/10' : 'text-zinc-400 hover:bg-zinc-800'}`}
+                                    >
+                                        {lang}
+                                    </button>
+                                ))}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+            )}
             <button onClick={() => { window.history.pushState({}, '', '/blog'); onNavigate('blog'); }} className="flex items-center gap-2 text-xs font-bold text-zinc-400 hover:text-white transition-colors uppercase tracking-widest px-3 py-1.5 cursor-pointer touch-target">
                 <BookOpen className="w-3 h-3" /> Blog
             </button>
@@ -149,16 +152,18 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, appLanguage = "Engli
                 className="fixed inset-0 z-40 bg-zinc-950/95 backdrop-blur-xl pt-24 px-6 sm:hidden flex flex-col gap-8"
             >
                 <div className="flex flex-col gap-6">
-                    <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-2">
-                        <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Language</span>
-                        <select 
-                            value={appLanguage}
-                            onChange={(e) => onLanguageChange?.(e.target.value)}
-                            className="bg-zinc-900 text-white text-sm font-bold p-2 rounded border border-zinc-800 outline-none"
-                        >
-                            {LANGUAGES.map(lang => <option key={lang} value={lang}>{lang}</option>)}
-                        </select>
-                    </div>
+                    {showLanguage && (
+                        <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-2">
+                            <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Language</span>
+                            <select 
+                                value={appLanguage}
+                                onChange={(e) => onLanguageChange?.(e.target.value)}
+                                className="bg-zinc-900 text-white text-sm font-bold p-2 rounded border border-zinc-800 outline-none"
+                            >
+                                {LANGUAGES.map(lang => <option key={lang} value={lang}>{lang}</option>)}
+                            </select>
+                        </div>
+                    )}
                     <button onClick={() => { window.history.pushState({}, '', '/app'); handleMobileNav('scan'); }} className="text-2xl font-bold text-white text-left flex items-center gap-4">
                         <span className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center text-black"><Zap className="w-5 h-5" /></span>
                         Start Analysis

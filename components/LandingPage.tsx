@@ -14,8 +14,6 @@ import { logEvent } from '../services/analytics';
 
 interface LandingPageProps {
   onStart: (intent: 'scan' | 'optimize' | 'launch' | 'roast' | 'blog' | 'feature' | 'pricing', file?: FileData, featureSlug?: string) => void;
-  appLanguage?: string;
-  onLanguageChange?: (lang: string) => void;
 }
 
 // Consistent Global Button Styles - Mobile optimized with active states
@@ -73,7 +71,7 @@ const MouseTrail = () => {
 const FeatureMarquee = () => {
     const items = [
         "Find Missing Keywords", "Get Your ATS Score", "Fix Resume Gaps", "Generate Cover Letters", 
-        "Prepare for Interviews", "Learn Missing Skills", "Translate to 8 Languages", "100% Secure",
+        "Prepare for Interviews", "Learn Missing Skills", "100% Secure",
         "Download as PDF", "Instant Results"
     ];
 
@@ -215,7 +213,7 @@ const FAQItem: React.FC<{ question: string; answer: string }> = ({ question, ans
     );
 }
 
-const LandingPage: React.FC<LandingPageProps> = ({ onStart, appLanguage, onLanguageChange }) => {
+const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
   const { scrollY } = useScroll();
   const yHero = useTransform(scrollY, [0, 500], [0, 100]);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -323,13 +321,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, appLanguage, onLangu
       desc: "If you're missing a skill, we show you free resources to learn it quickly.",
       micro: "Turn weaknesses into strengths.",
       icon: GraduationCap
-    },
-    {
-      id: "translate",
-      title: "Works in 8 Languages",
-      desc: "Applying for jobs abroad? Translate your resume and cover letter instantly.",
-      micro: "English, Spanish, French, German, Hindi, Portuguese, Japanese, Korean.",
-      icon: Globe,
     }
   ];
 
@@ -353,8 +344,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, appLanguage, onLangu
       { q: "Can I download the optimized resume?", a: "Yes. There is a $1 fee per download for the optimized resume PDF. A tailored cover letter PDF is included." },
       { q: "Does it work for all industries?", a: "It is most effective for roles with explicit hard skills (engineering, product, design, marketing, operations). Generalist roles are supported, though scoring precision may vary." },
       { q: "Is this free to use?", a: "The analysis is free. Payment is only required when you choose to download the optimized files." },
-      { q: "Can I edit the suggestions?", a: "Yes. You can edit bullet points inline before exporting; your personal voice is preserved." },
-      { q: "What languages are supported?", a: "English, Spanish, French, German, Hindi, Portuguese, Japanese, Korean." }
+      { q: "Can I edit the suggestions?", a: "Yes. You can edit bullet points inline before exporting; your personal voice is preserved." }
   ];
 
   return (
@@ -370,8 +360,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, appLanguage, onLangu
 
       {/* --- HEADER --- */}
       <Header 
-        appLanguage={appLanguage}
-        onLanguageChange={onLanguageChange}
+        showLanguage={false}
         onNavigate={(view) => {
           if (view === 'landing') window.scrollTo(0, 0);
           else onStart(view as any);
