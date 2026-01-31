@@ -449,3 +449,5 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onBack, initialSlug, onNavig
     </div>
   );
 };
+
+export default BlogPage;

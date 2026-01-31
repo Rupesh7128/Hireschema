@@ -248,3 +248,5 @@ export const FeaturePage: React.FC<FeaturePageProps> = ({
   );
 };
 
+export default FeaturePage;
+

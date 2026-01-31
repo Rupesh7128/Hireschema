@@ -566,3 +566,5 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
   );
 };
 
+export default RoastPage;
+
