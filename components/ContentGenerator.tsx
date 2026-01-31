@@ -11,6 +11,7 @@ import { MessageSquare, FileText, Mail, FileDown, FileOutput, X, Loader2, Minimi
 import PaymentLock from './PaymentLock';
 
 interface ContentGeneratorProps {
+  analysisId?: string | null;
   resumeFile: FileData;
   resumeText?: string; // Extracted text from PDF for content generation
   jobDescription: string;
@@ -141,7 +142,7 @@ const ChatSidebar = ({
     );
 };
 
-const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, resumeText = '', jobDescription, analysis, isPaid, onPaymentSuccess, appLanguage, setAppLanguage }) => {
+const ContentGenerator: React.FC<ContentGeneratorProps> = ({ analysisId, resumeFile, resumeText = '', jobDescription, analysis, isPaid, onPaymentSuccess, appLanguage, setAppLanguage }) => {
   
   // Local state for resume text - allows fallback extraction if prop is empty
   const [localResumeText, setLocalResumeText] = useState<string>(resumeText);
@@ -197,6 +198,7 @@ const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, resumeT
     const textToSave = localResumeText || resumeText;
     console.log('=== handleBeforePaymentRedirect called ===');
     console.log('Saving state:', {
+      analysisId,
       hasResumeFile: !!resumeFile,
       resumeFileName: resumeFile?.name || 'none',
       localResumeTextLength: localResumeText?.length || 0,
@@ -213,6 +215,7 @@ const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, resumeT
     }
     
     saveStateBeforePayment({
+      analysisId: analysisId || undefined,
       resumeFile,
       resumeText: textToSave,
       jobDescription,
@@ -707,7 +710,7 @@ const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, resumeT
                 {/* ... existing buttons ... */}
                 <button
                     onClick={() => setShowChat(!showChat)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-[10px] sm:text-xs font-medium border transition-colors ${showChat ? 'bg-orange-500 text-white border-orange-600' : 'bg-zinc-800 text-zinc-300 border-zinc-700'}`}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-[10px] sm:text-xs font-mono font-bold uppercase tracking-widest border transition-all ${showChat ? 'bg-orange-600 text-white border-orange-700 shadow-[2px_2px_0px_0px_rgba(255,255,255,0.1)]' : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:bg-zinc-800'}`}
                 >
                     <PenTool className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Editor</span>
                 </button>
@@ -745,11 +748,18 @@ const ContentGenerator: React.FC<ContentGeneratorProps> = ({ resumeFile, resumeT
                     </AnimatePresence>
                </div>
 
-                 <div className="flex gap-1">
-                    <button onClick={handlePrint} className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 text-[10px] sm:text-xs font-bold rounded transition-colors">
+                 <div className="flex gap-2">
+                    <button 
+                        onClick={handlePrint} 
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-800 text-[10px] sm:text-xs font-mono font-bold uppercase tracking-widest shadow-[2px_2px_0px_0px_rgba(255,255,255,0.05)] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all rounded-sm"
+                    >
                         <Printer className="w-3.5 h-3.5" /> Print
                     </button>
-                    <button onClick={handleDownloadPDF} disabled={!!isDownloading} className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 hover:bg-white text-black text-[10px] sm:text-xs font-bold rounded transition-colors disabled:opacity-50 relative">
+                    <button 
+                        onClick={handleDownloadPDF} 
+                        disabled={!!isDownloading} 
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-orange-600 hover:bg-orange-500 text-white text-[10px] sm:text-xs font-mono font-bold uppercase tracking-widest shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none active:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] active:translate-x-[1px] active:translate-y-[1px] transition-all rounded-sm border-none disabled:opacity-50 relative"
+                    >
                         {isDownloading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />} PDF
                     </button>
                 </div>

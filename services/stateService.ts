@@ -14,6 +14,7 @@ const STATE_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
  * State that needs to be persisted across payment redirect
  */
 export interface PersistedState {
+  analysisId?: string; // ID of the history item
   resumeFile: FileData;
   resumeText: string;
   jobDescription: string;

@@ -355,9 +355,9 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onBack, initialSlug, onNavig
           <article className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-700">
              <button 
                 onClick={handleBackToList}
-                className="mb-12 text-sm font-medium text-zinc-500 hover:text-white transition-colors flex items-center gap-2 group"
+                className="mb-12 px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 rounded-sm text-[10px] font-mono font-bold uppercase tracking-[0.2em] shadow-[2px_2px_0px_0px_rgba(255,255,255,0.05)] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center gap-2 group"
               >
-                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" /> Back to Articles
+                <ArrowLeft className="w-3 h-3 group-hover:-translate-x-0.5 transition-transform" /> Back to Articles
               </button>
 
             {currentPost && (

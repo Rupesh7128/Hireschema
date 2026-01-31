@@ -1,59 +1,128 @@
 import React from 'react';
 import { AnimatedLogo } from './AnimatedLogo';
+import { ArrowRight, Zap, Mail } from 'lucide-react';
 
 interface FooterProps {
-  onNavigate: (view: 'landing' | 'blog' | 'pricing' | 'roast' | 'scan') => void;
+  onNavigate: (view: 'landing' | 'blog' | 'pricing' | 'roast' | 'scan' | 'changelog' | 'success-stories') => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
+  const currentYear = new Date().getFullYear();
+
+  const handleNavClick = (e: React.MouseEvent, view: 'landing' | 'blog' | 'pricing' | 'roast' | 'scan' | 'changelog' | 'success-stories') => {
+    if (e.metaKey || e.ctrlKey) return;
+    e.preventDefault();
+    onNavigate(view);
+  };
+
+  const footerLinkClasses = "text-zinc-500 hover:text-orange-500 transition-all duration-300 text-sm flex items-center gap-2 group cursor-pointer";
+  const columnHeaderClasses = "text-[10px] font-black uppercase tracking-[0.25em] text-zinc-300 mb-8";
+
   return (
-    <footer className="bg-gradient-to-b from-zinc-950 via-zinc-900 to-orange-900 border-t border-orange-900/30 pt-12 sm:pt-20 pb-8 sm:pb-10 px-4 sm:px-6 w-full relative overflow-hidden safe-area-inset-bottom">
-         {/* Subtle overlay */}
-         <div className="absolute inset-0 bg-black/20 pointer-events-none"></div>
-         
-         <div className="max-w-7xl mx-auto w-full relative z-10">
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 mb-12 sm:mb-16">
-                <div className="col-span-2 sm:col-span-2 md:col-span-1">
-                    <AnimatedLogo className="mb-4 sm:mb-6" />
-                    <p className="text-zinc-400 text-sm leading-relaxed max-w-xs">
-                        HireSchema is built by <a href="https://kingdomofkumar.com/" target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:text-orange-400 hover:underline">KoK Labs</a>.
+    <footer className="relative bg-zinc-950 border-t border-white/5 pt-24 pb-12 overflow-hidden">
+        {/* Decorative Background Elements */}
+        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-orange-600/5 rounded-full blur-[120px] pointer-events-none translate-x-1/2 translate-y-1/2"></div>
+        <div className="absolute top-0 left-0 w-[300px] h-[300px] bg-blue-600/5 rounded-full blur-[100px] pointer-events-none -translate-x-1/2 -translate-y-1/2"></div>
+
+        <div className="max-w-7xl mx-auto px-6 sm:px-10 relative z-10">
+            <div className="grid grid-cols-2 md:grid-cols-12 gap-y-16 gap-x-8 mb-24">
+                {/* Brand Column */}
+                <div className="col-span-2 md:col-span-4 flex flex-col items-start">
+                    <a href="/" className="cursor-pointer mb-8" onClick={(e) => { 
+                        if (e.metaKey || e.ctrlKey) return;
+                        e.preventDefault();
+                        window.scrollTo({ top: 0, behavior: 'smooth' }); 
+                        onNavigate('landing'); 
+                    }}>
+                        <AnimatedLogo />
+                    </a>
+                    <p className="text-zinc-500 text-sm leading-relaxed max-w-xs">
+                        The internet's most powerful ATS optimization engine. We don't just build resumes; we engineer careers.
                     </p>
                 </div>
-                
-                <div>
-                    <h4 className="text-orange-100 font-bold mb-4 sm:mb-6 text-sm uppercase tracking-wider">Product</h4>
-                    <ul className="space-y-2 sm:space-y-3 text-sm text-zinc-400">
-                        <li><span onClick={() => onNavigate('scan')} className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">Resume Scanner</span></li>
-                        <li><span onClick={() => onNavigate('scan')} className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">Cover Letter Engine</span></li>
-                        <li><span onClick={() => onNavigate('scan')} className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">Interview Prep</span></li>
-                        <li><span onClick={() => onNavigate('blog')} className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">Blog</span></li>
-                        <li><span onClick={() => onNavigate('pricing')} className="hover:text-white active:text-white transition-colors cursor-pointer touch-target py-1 block">$1 per download</span></li>
+
+                {/* Product Column */}
+                <div className="col-span-1 md:col-span-2">
+                    <h4 className={columnHeaderClasses}>Product</h4>
+                    <ul className="space-y-4">
+                        <li>
+                            <a href="/app" className={footerLinkClasses} onClick={(e) => handleNavClick(e, 'scan')}>
+                                Resume Scanner <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/roast-my-resume" className={footerLinkClasses} onClick={(e) => handleNavClick(e, 'roast')}>
+                                Resume Roast <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/pricing" className={footerLinkClasses} onClick={(e) => handleNavClick(e, 'pricing')}>
+                                Pricing <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                            </a>
+                        </li>
                     </ul>
                 </div>
 
-                <div>
-                    <h4 className="text-orange-100 font-bold mb-6 text-sm uppercase tracking-wider">Legal</h4>
-                    <ul className="space-y-3 text-sm text-zinc-400">
-                        <li><a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                        <li><a href="/terms" className="hover:text-white transition-colors">Terms & Conditions</a></li>
-                        <li><a href="/cookies" className="hover:text-white transition-colors">Cookie Policy</a></li>
+                {/* Resources Column */}
+                <div className="col-span-1 md:col-span-2">
+                    <h4 className={columnHeaderClasses}>Resources</h4>
+                    <ul className="space-y-4">
+                        <li>
+                            <a href="/blog" className={footerLinkClasses} onClick={(e) => handleNavClick(e, 'blog')}>
+                                Blog
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/changelog" className={footerLinkClasses} onClick={(e) => handleNavClick(e, 'changelog')}>
+                                Changelog
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/success-stories" className={footerLinkClasses} onClick={(e) => handleNavClick(e, 'success-stories')}>
+                                Success Stories
+                            </a>
+                        </li>
                     </ul>
                 </div>
 
-                 <div>
-                    <h4 className="text-orange-100 font-bold mb-6 text-sm uppercase tracking-wider">Connect</h4>
-                    <ul className="space-y-3 text-sm text-zinc-400">
-                        <li><span className="hover:text-white transition-colors cursor-pointer">Twitter / X</span></li>
-                        <li><span className="hover:text-white transition-colors cursor-pointer">LinkedIn</span></li>
-                        <li><span className="hover:text-white transition-colors cursor-pointer">GitHub</span></li>
+                {/* Legal Column */}
+                <div className="col-span-1 md:col-span-2">
+                    <h4 className={columnHeaderClasses}>Legal</h4>
+                    <ul className="space-y-4">
+                        <li><a href="/privacy" className={footerLinkClasses}>Privacy Policy</a></li>
+                        <li><a href="/terms" className={footerLinkClasses}>Terms of Service</a></li>
+                        <li><a href="/cookies" className={footerLinkClasses}>Cookie Policy</a></li>
+                    </ul>
+                </div>
+
+                {/* Contact Column */}
+                <div className="col-span-1 md:col-span-2">
+                    <h4 className={columnHeaderClasses}>Connect</h4>
+                    <ul className="space-y-4">
+                        <li>
+                            <a href="mailto:support@hireschema.com" className={footerLinkClasses}>
+                                <Mail className="w-3.5 h-3.5" /> Support
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/roadmap" className={footerLinkClasses} onClick={(e) => e.preventDefault()}>
+                                <Zap className="w-3.5 h-3.5" /> Roadmap
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>
 
-            <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p className="text-zinc-500 text-xs">© 2026 HireSchema. All rights reserved.</p>
+            {/* Bottom Bar */}
+            <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+                <div className="text-zinc-600 text-[10px] font-bold uppercase tracking-widest">
+                    © {currentYear} HireSchema. All rights reserved.
+                </div>
+                <div className="flex items-center gap-2 text-zinc-600 text-[10px] font-bold uppercase tracking-widest">
+                    Built by <a href="https://kingdomofkumar.com/" target="_blank" rel="noopener noreferrer" className="text-orange-500/80 hover:text-orange-500 transition-colors">KoK Labs</a>
+                </div>
             </div>
-         </div>
-      </footer>
+        </div>
+    </footer>
   );
 };

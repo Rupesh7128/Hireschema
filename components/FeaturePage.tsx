@@ -65,12 +65,17 @@ export const FeaturePage: React.FC<FeaturePageProps> = ({
             {subtitle}
           </p>
           
-          <button 
-            onClick={onCtaClick}
+          <a 
+            href="/app"
+            onClick={(e) => {
+              if (e.metaKey || e.ctrlKey) return;
+              e.preventDefault();
+              onCtaClick();
+            }}
             className={ORANGE_BUTTON_STYLE}
           >
             Start Analyzing for Free
-          </button>
+          </a>
         </div>
 
         {/* SECTION 1: THE PROBLEM */}
@@ -222,12 +227,17 @@ export const FeaturePage: React.FC<FeaturePageProps> = ({
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">Ready to fix your resume?</h2>
             <p className="text-zinc-400 mb-8 max-w-xl mx-auto">Join 50,000+ job seekers who are landing more interviews with HireSchema.</p>
             <div className="flex justify-center">
-                <button 
-                    onClick={onCtaClick}
-                    className="px-8 py-4 bg-white hover:bg-zinc-200 text-black font-mono font-bold text-base tracking-wide flex items-center justify-center gap-3 shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-sm cursor-pointer border-none touch-target"
+                <a 
+                    href="/app"
+                    onClick={(e) => {
+                        if (e.metaKey || e.ctrlKey) return;
+                        e.preventDefault();
+                        onCtaClick();
+                    }}
+                    className={ORANGE_BUTTON_STYLE}
                 >
                     Get Started Now
-                </button>
+                </a>
             </div>
         </div>
 

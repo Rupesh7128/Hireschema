@@ -8,6 +8,8 @@ interface PricingPageProps {
   onStart: (intent: 'scan' | 'optimize' | 'launch' | 'roast' | 'blog' | 'feature' | 'pricing') => void;
 }
 
+const ORANGE_BUTTON_STYLE = "px-6 sm:px-10 py-3.5 sm:py-4 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 sm:gap-3 shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[2px] active:translate-y-[2px] transition-all rounded-sm cursor-pointer border-none touch-target";
+
 const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStart }) => {
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-orange-500/30">
@@ -202,12 +204,17 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStart }) => {
         {/* CTA */}
         <div className="text-center mt-16">
            <h2 className="text-2xl font-bold text-white mb-6">Ready to get hired?</h2>
-           <button 
-              onClick={() => onStart('scan')}
-              className="px-10 py-4 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-lg tracking-wide rounded-sm shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+           <a 
+              href="/app"
+              onClick={(e) => {
+                if (e.metaKey || e.ctrlKey) return;
+                e.preventDefault();
+                onStart('scan');
+              }}
+              className={ORANGE_BUTTON_STYLE}
            >
               Start Free Scan
-           </button>
+           </a>
         </div>
 
       </main>

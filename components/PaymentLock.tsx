@@ -124,12 +124,17 @@ const PaymentLock: React.FC<PaymentLockProps> = ({ onPaymentVerified, onBeforeRe
           </div>
 
           <div className="text-center mb-5 sm:mb-6">
-            <h2 className="text-xl sm:text-2xl font-bold text-white mb-2 tracking-tight">Unlock Downloads</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-white mb-2 tracking-tight">Unlock Premium Content</h2>
             <p className="text-zinc-400 text-sm leading-relaxed">
-              Download your optimized resume PDF for just $1. 
+              Unlock the Full ATS Resume, Cover Letter, and Interview Prep for this specific job.
             </p>
-            <div className="mt-2 inline-block px-3 py-1 bg-orange-500/10 border border-orange-500/20 rounded text-[10px] font-bold text-orange-500 uppercase tracking-widest">
-              One Payment Per Resume
+            <div className="mt-3 flex flex-col gap-2">
+              <div className="inline-block px-3 py-1 bg-orange-500/10 border border-orange-500/20 rounded text-[10px] font-bold text-orange-500 uppercase tracking-widest">
+                One-time payment per analysis
+              </div>
+              <p className="text-[10px] text-zinc-500 italic">
+                (One resume + one job description = one payment)
+              </p>
             </div>
           </div>
 
@@ -142,10 +147,10 @@ const PaymentLock: React.FC<PaymentLockProps> = ({ onPaymentVerified, onBeforeRe
               </div>
               <button 
                 onClick={handlePaymentClick}
-                className="w-full group flex items-center justify-center gap-2 py-3.5 bg-white hover:bg-zinc-200 text-zinc-950 rounded-lg font-bold text-sm transition-all shadow-lg touch-target active:scale-[0.98]"
+                className="w-full py-4 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-sm uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[2px] active:translate-y-[2px] transition-all rounded-sm cursor-pointer border-none flex items-center justify-center gap-3 touch-target"
               >
                 <span>Pay $1 & Unlock</span>
-                <ExternalLink className="w-3.5 h-3.5 opacity-60 group-hover:translate-x-0.5 transition-transform" />
+                <ExternalLink className="w-4 h-4" />
               </button>
             </div>
 
@@ -173,7 +178,7 @@ const PaymentLock: React.FC<PaymentLockProps> = ({ onPaymentVerified, onBeforeRe
                 <button 
                   onClick={handleVerify}
                   disabled={isVerifying || !licenseKey || isLocked}
-                  className="absolute right-1 top-1 bottom-1 px-4 rounded-md font-bold text-xs transition-all bg-zinc-800 hover:bg-zinc-700 text-zinc-300 disabled:opacity-50 disabled:cursor-not-allowed border border-zinc-700"
+                  className="absolute right-1 top-1 bottom-1 px-4 bg-zinc-800 hover:bg-zinc-700 active:bg-zinc-600 text-white font-mono font-bold text-[10px] uppercase tracking-widest shadow-[2px_2px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all rounded-sm disabled:opacity-50 disabled:cursor-not-allowed border border-zinc-700"
                 >
                   {isVerifying ? (
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />

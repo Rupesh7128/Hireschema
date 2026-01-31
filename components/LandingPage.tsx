@@ -360,7 +360,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
 
       {/* --- HEADER --- */}
       <Header 
-        showLanguage={false}
         onNavigate={(view) => {
           if (view === 'landing') window.scrollTo(0, 0);
           else onStart(view as any);
@@ -748,34 +747,46 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                           <li className="flex items-center gap-3 text-sm text-zinc-300"><Check className="w-4 h-4 text-zinc-600" /> Keyword gaps</li>
                           <li className="flex items-center gap-3 text-sm text-zinc-300"><Check className="w-4 h-4 text-zinc-600" /> Preview of rewritten bullets</li>
                       </ul>
-                      <button 
-                        onClick={() => { logEvent('cta_click', { tier: 'free' }); onStart('scan'); }} 
-                        className="w-full py-4 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-sm text-sm transition-colors"
-                      >
+                    <a 
+                        href="/app"
+                        onClick={(e) => { 
+                            if (e.metaKey || e.ctrlKey) return;
+                            e.preventDefault();
+                            logEvent('cta_click', { tier: 'free' }); 
+                            onStart('scan'); 
+                        }} 
+                        className={ORANGE_BUTTON_STYLE + " w-full"}
+                    >
                         Start now
-                      </button>
-                  </div>
+                    </a>
+                </div>
 
-                  {/* Paid Tier */}
-                  <div className="bg-gradient-to-b from-zinc-900 to-zinc-950 border border-orange-500/30 p-8 rounded-2xl flex flex-col items-center relative shadow-2xl">
-                       <div className="absolute top-0 right-0 bg-orange-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg uppercase">
-                           Pay as you go
-                       </div>
-                      <span className="text-orange-500 font-bold uppercase tracking-wider text-xs mb-4">Results</span>
-                      <div className="text-4xl font-black text-white mb-6">$1 <span className="text-base font-normal text-zinc-500">/ download</span></div>
-                      <ul className="space-y-4 text-left w-full mb-8 flex-1">
-                          <li className="flex items-center gap-3 text-sm text-white"><Check className="w-4 h-4 text-orange-500" /> <strong>Optimized Resume PDF</strong></li>
-                          <li className="flex items-center gap-3 text-sm text-white"><Check className="w-4 h-4 text-orange-500" /> Tailored Cover Letter PDF</li>
-                          <li className="flex items-center gap-3 text-sm text-white"><Check className="w-4 h-4 text-orange-500" /> Interview Prep Kit access</li>
-                          <li className="flex items-center gap-3 text-sm text-white"><Check className="w-4 h-4 text-orange-500" /> Skill Assessment quizzes</li>
-                          <li className="flex items-center gap-3 text-xs text-zinc-500 mt-4 border-t border-white/5 pt-4"><Lock className="w-3 h-3" /> Secure payment via Dodo Payments</li>
-                      </ul>
-                      <button 
-                        onClick={() => { logEvent('cta_click', { tier: 'paid' }); onStart('optimize'); }} 
-                        className={ORANGE_BUTTON_STYLE + " w-full shadow-lg shadow-orange-900/20"}
-                      >
+                {/* Paid Tier */}
+                <div className="bg-gradient-to-b from-zinc-900 to-zinc-950 border border-orange-500/30 p-8 rounded-2xl flex flex-col items-center relative shadow-2xl">
+                     <div className="absolute top-0 right-0 bg-orange-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg uppercase">
+                         Pay as you go
+                     </div>
+                    <span className="text-orange-500 font-bold uppercase tracking-wider text-xs mb-4">Results</span>
+                    <div className="text-4xl font-black text-white mb-6">$1 <span className="text-base font-normal text-zinc-500">/ download</span></div>
+                    <ul className="space-y-4 text-left w-full mb-8 flex-1">
+                        <li className="flex items-center gap-3 text-sm text-white"><Check className="w-4 h-4 text-orange-500" /> <strong>Optimized Resume PDF</strong></li>
+                        <li className="flex items-center gap-3 text-sm text-white"><Check className="w-4 h-4 text-orange-500" /> Tailored Cover Letter PDF</li>
+                        <li className="flex items-center gap-3 text-sm text-white"><Check className="w-4 h-4 text-orange-500" /> Interview Prep Kit access</li>
+                        <li className="flex items-center gap-3 text-sm text-white"><Check className="w-4 h-4 text-orange-500" /> Skill Assessment quizzes</li>
+                        <li className="flex items-center gap-3 text-xs text-zinc-500 mt-4 border-t border-white/5 pt-4"><Lock className="w-3 h-3" /> Secure payment via Dodo Payments</li>
+                    </ul>
+                    <a 
+                        href="/app"
+                        onClick={(e) => { 
+                            if (e.metaKey || e.ctrlKey) return;
+                            e.preventDefault();
+                            logEvent('cta_click', { tier: 'paid' }); 
+                            onStart('optimize'); 
+                        }} 
+                        className={ORANGE_BUTTON_STYLE + " w-full"}
+                    >
                         Start now
-                      </button>
+                    </a>
                   </div>
               </div>
           </div>

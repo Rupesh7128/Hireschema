@@ -3,8 +3,10 @@ import * as React from 'react';
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { 
     Plus, Link as LinkIcon, FileText, AlertCircle, Radar, 
-    CheckCircle, Loader2, Search, Sparkles, BrainCircuit, GraduationCap, Globe
+    CheckCircle, Loader2, Search, Sparkles, BrainCircuit, GraduationCap, Globe,
+    History, X, ArrowRight
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { FileData, AnalysisResult, HistoryItem, ContactProfile } from './types';
 import { analyzeResume, extractTextFromPdf } from './services/geminiService';
 import { db } from './services/db';
@@ -12,6 +14,8 @@ import { logEvent, logPageView } from './services/analytics';
 import { verifyDodoPayment, savePaymentState, isIdPaid } from './services/paymentService';
 import { restoreStateAfterPayment, clearPersistedState } from './services/stateService';
 import { AnimatedLogo } from './components/AnimatedLogo';
+import { Header } from './components/Header';
+import { Footer } from './components/Footer';
 
 // Lazy load heavy components for better initial load performance
 const ResumeUploader = lazy(() => import('./components/ResumeUploader'));
@@ -60,8 +64,19 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
 }
 
 const AppContent: React.FC = () => {
+  // --- URL PARAMS (Pre-render check for smoother routing) ---
+  const searchParams = new URLSearchParams(window.location.search);
+  const hasPaymentCallback = !!(
+    searchParams.get('paymentId') || 
+    searchParams.get('payment_id') || 
+    searchParams.get('session_id') ||
+    searchParams.get('session') ||
+    searchParams.get('checkout_session') ||
+    searchParams.get('id')
+  );
+
   // --- VIEWS ---
-  const [view, setView] = useState<'landing' | 'dashboard' | 'legal' | 'roast' | 'blog' | 'feature' | 'pricing'>('landing');
+  const [view, setView] = useState<'landing' | 'dashboard' | 'legal' | 'roast' | 'blog' | 'feature' | 'pricing' | 'changelog' | 'success-stories'>(hasPaymentCallback ? 'dashboard' : 'landing');
   const [legalPage, setLegalPage] = useState<'privacy' | 'terms' | 'cookies' | null>(null);
   const [dashboardView, setDashboardView] = useState<'scan' | 'result'>('scan');
   const [blogSlug, setBlogSlug] = useState<string | null>(null);
@@ -142,40 +157,42 @@ const AppContent: React.FC = () => {
             
             try {
                 // Helper to restore user state after successful payment
-                const restoreUserState = () => {
+                const restoreUserState = (): string | null => {
                     console.log('=== restoreUserState called ===');
                     
                     // First try to restore from persisted state (saved before redirect)
                     const persistedState = restoreStateAfterPayment();
                     console.log('Persisted state:', persistedState ? JSON.stringify({
+                        analysisId: persistedState.analysisId || 'missing',
                         hasResumeFile: !!persistedState.resumeFile,
                         resumeFileName: persistedState.resumeFile?.name || 'none',
                         hasAnalysisResult: !!persistedState.analysisResult,
                         jobDescLength: persistedState.jobDescription?.length || 0,
                         resumeTextLength: persistedState.resumeText?.length || 0,
-                        resumeTextPreview: persistedState.resumeText?.substring(0, 100) || 'EMPTY'
                     }) : 'null');
                     
                     if (persistedState) {
                         console.log('✅ Restoring from persisted state, navigating to editor...');
-                        console.log('resumeText length being restored:', persistedState.resumeText?.length || 0);
-                        console.log('resumeText preview:', persistedState.resumeText?.substring(0, 150) || 'EMPTY');
-                        
-                        if (!persistedState.resumeText || persistedState.resumeText.length < 100) {
-                            console.warn('⚠️ WARNING: Restored resumeText is empty or too short!');
-                        }
                         
                         // Set all state in sequence to ensure proper updates
                         setResumeFile(persistedState.resumeFile);
                         setResumeText(persistedState.resumeText || '');
                         setJobDescription(persistedState.jobDescription);
                         setAnalysisResult(persistedState.analysisResult);
+                        setSelectedHistoryId(persistedState.analysisId || null);
+                        
                         // CRITICAL: Set dashboard view to 'result' and tab to 'generator' (Editor)
                         setDashboardView('result');
                         setResultTab('generator');
+                        
+                        // If it's paid, ensure the UI reflects it
+                        if (persistedState.analysisId && isIdPaid(persistedState.analysisId)) {
+                            setIsPaid(true);
+                        }
+
                         clearPersistedState(); // Clean up after restore
                         console.log('State restored - dashboardView=result, resultTab=generator');
-                        return;
+                        return persistedState.analysisId || null;
                     }
                     
                     // Fallback to history if no persisted state
@@ -192,23 +209,30 @@ const AppContent: React.FC = () => {
                         setResultTab('generator');
                         setSelectedHistoryId(mostRecent.id);
                         console.log('State restored from history - dashboardView=result, resultTab=generator');
-                        return;
+                        return mostRecent.id;
                     }
                     
                     // No state to restore - user paid but has no previous analysis
                     // Show scan view with success message - premium features are now unlocked
                     console.log('No state to restore, showing scan view with premium unlocked');
                     setDashboardView('scan');
+                    return null;
                 };
 
                 // Helper to mark payment as successful
                 const markPaymentSuccess = () => {
-                    if (selectedHistoryId) {
-                        savePaymentState(selectedHistoryId);
+                    const restoredId = restoreUserState();
+                    const idToMark = selectedHistoryId || restoredId;
+
+                    if (idToMark) {
+                        console.log('Marking payment as successful for ID:', idToMark);
+                        savePaymentState(idToMark);
                         setIsPaid(true);
+                    } else {
+                        console.warn('Payment success but no ID found to mark as paid');
                     }
+
                     logEvent('payment_success_auto', { paymentId });
-                    restoreUserState();
                     window.history.replaceState({}, '', '/app');
                     // Show success toast
                     setShowPaymentSuccess(true);
@@ -283,6 +307,10 @@ const AppContent: React.FC = () => {
            if (slug) setBlogSlug(slug);
         } else if (path === '/app') {
            setView('dashboard'); // Direct link to app
+        } else if (path === '/changelog') {
+           setView('changelog');
+        } else if (path === '/success-stories') {
+           setView('success-stories');
         }
     };
     
@@ -308,7 +336,14 @@ const AppContent: React.FC = () => {
     }
   };
 
-  const handleLandingStart = async (intent: 'scan' | 'optimize' | 'launch' | 'roast' | 'blog' | 'feature' | 'pricing', file?: FileData, featureSlug?: string) => {
+  const handleLandingStart = async (intent: 'landing' | 'scan' | 'optimize' | 'launch' | 'roast' | 'blog' | 'feature' | 'pricing' | 'changelog' | 'success-stories', file?: FileData, featureSlug?: string) => {
+    if (intent === 'landing') {
+      setView('landing');
+      window.history.pushState({}, '', '/');
+      window.scrollTo(0, 0);
+      return;
+    }
+
     if (intent === 'roast') {
       setView('roast');
       window.history.pushState({}, '', '/roast-my-resume');
@@ -318,6 +353,18 @@ const AppContent: React.FC = () => {
     if (intent === 'pricing') {
       setView('pricing');
       window.history.pushState({}, '', '/pricing');
+      return;
+    }
+
+    if (intent === 'changelog') {
+      setView('changelog');
+      window.history.pushState({}, '', '/changelog');
+      return;
+    }
+
+    if (intent === 'success-stories') {
+      setView('success-stories');
+      window.history.pushState({}, '', '/success-stories');
       return;
     }
 
@@ -601,10 +648,148 @@ const AppContent: React.FC = () => {
 
   if (view === 'legal' && legalPage) return <Suspense fallback={<LoadingFallback />}><LegalPages page={legalPage} onBack={() => { setView('landing'); window.history.pushState({}, '', '/'); }} /></Suspense>;
 
+  if (view === 'changelog') {
+    return (
+      <div className="min-h-screen bg-black text-white">
+        <Header onNavigate={handleLandingStart} />
+        <main className="pt-32 px-6 max-w-4xl mx-auto">
+          <h1 className="text-4xl font-bold mb-8">Changelog</h1>
+          <div className="space-y-12">
+            <div className="border-l-2 border-orange-500 pl-6 relative">
+              <div className="absolute w-3 h-3 bg-orange-500 rounded-full -left-[7px] top-1"></div>
+              <div className="text-sm text-zinc-500 font-mono mb-2">January 31, 2026</div>
+              <h3 className="text-xl font-bold mb-4">V2.0 - The AI Transformation</h3>
+              <ul className="list-disc list-inside space-y-2 text-zinc-400">
+                <li>Complete redesign of the landing page and dashboard</li>
+                <li>New AI-powered Resume Roast engine</li>
+                <li>Unified button styles and premium tech aesthetic</li>
+                <li>Improved ATS scanning accuracy by 40%</li>
+                <li>Added multilingual support for 8 languages</li>
+              </ul>
+            </div>
+            <div className="border-l-2 border-zinc-800 pl-6 relative">
+              <div className="absolute w-3 h-3 bg-zinc-800 rounded-full -left-[7px] top-1"></div>
+              <div className="text-sm text-zinc-500 font-mono mb-2">December 15, 2025</div>
+              <h3 className="text-xl font-bold mb-4">V1.5 - Smart Keywords</h3>
+              <ul className="list-disc list-inside space-y-2 text-zinc-400">
+                <li>Automatic keyword extraction from job descriptions</li>
+                <li>Real-time score updates during editing</li>
+                <li>Export to PDF and TXT formats</li>
+              </ul>
+            </div>
+          </div>
+        </main>
+        <Footer onNavigate={handleLandingStart} />
+      </div>
+    );
+  }
+
+  if (view === 'success-stories') {
+    return (
+      <div className="min-h-screen bg-black text-white">
+        <Header onNavigate={handleLandingStart} />
+        <main className="pt-32 px-6 max-w-6xl mx-auto">
+          <h1 className="text-4xl font-bold mb-4 text-center">Success Stories</h1>
+          <p className="text-zinc-500 text-center mb-16 max-w-2xl mx-auto">Join thousands of professionals who have transformed their careers with HireSchema.</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              { name: "Sarah J.", role: "Senior Frontend Engineer", company: "Google", quote: "HireSchema's scan revealed that I was missing key cloud-native terms. Fixed it, and got an interview at Google within a week." },
+              { name: "Michael R.", role: "Product Manager", company: "Stripe", quote: "The Resume Roast was brutal but necessary. It pointed out exactly why I was getting ghosted. Now I'm at my dream company." },
+              { name: "Elena K.", role: "UX Designer", company: "Airbnb", quote: "The interview prep feature gave me the confidence I needed. The STAR method breakdown was a game changer." }
+            ].map((story, i) => (
+              <div key={i} className="bg-zinc-900/50 border border-white/5 p-8 rounded-2xl hover:border-orange-500/30 transition-all">
+                <div className="text-orange-500 mb-6">★★★★★</div>
+                <p className="text-zinc-300 italic mb-8 italic">"{story.quote}"</p>
+                <div>
+                  <div className="font-bold text-white">{story.name}</div>
+                  <div className="text-xs text-zinc-500">{story.role} @ {story.company}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </main>
+        <Footer onNavigate={handleLandingStart} />
+      </div>
+    );
+  }
+
+  const [showHistory, setShowHistory] = useState(false);
+
   return (
     <ErrorBoundary>
     <div className="flex h-screen bg-black text-zinc-100 overflow-hidden font-sans">
       
+      {/* HISTORY SIDEBAR */}
+      <AnimatePresence>
+        {showHistory && (
+          <>
+            <motion.div 
+              initial={{ x: -300 }}
+              animate={{ x: 0 }}
+              exit={{ x: -300 }}
+              className="fixed inset-y-0 left-0 w-[300px] bg-zinc-950 border-r border-white/5 z-[60] flex flex-col"
+            >
+              <div className="p-6 border-b border-white/5 flex justify-between items-center">
+                <h2 className="text-sm font-bold uppercase tracking-widest text-zinc-500">History</h2>
+                <button onClick={() => setShowHistory(false)} className="text-zinc-500 hover:text-white transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+                {history.length === 0 ? (
+                  <div className="text-center py-10">
+                    <p className="text-zinc-600 text-xs">No analysis history yet.</p>
+                  </div>
+                ) : (
+                  history.map((item) => {
+                    const isSelected = selectedHistoryId === item.id;
+                    const paid = isIdPaid(item.id);
+                    return (
+                      <button 
+                        key={item.id}
+                        onClick={() => {
+                          setSelectedHistoryId(item.id);
+                          setResumeFile(item.resumeFile);
+                          setResumeText(item.resumeText || '');
+                          setJobDescription(item.jobDescription);
+                          setAnalysisResult(item.analysisResult);
+                          setDashboardView('result');
+                          setResultTab('analysis');
+                          setShowHistory(false);
+                        }}
+                        className={`w-full text-left p-4 rounded-xl border transition-all group ${isSelected ? 'bg-orange-500/10 border-orange-500/50' : 'bg-zinc-900/50 border-white/5 hover:border-white/10'}`}
+                      >
+                        <div className="flex justify-between items-start mb-1">
+                          <span className="text-[10px] font-mono text-zinc-500">{item.date}</span>
+                          {paid && (
+                            <div className="flex items-center gap-1 px-1.5 py-0.5 bg-green-500/10 border border-green-500/20 rounded text-[8px] font-bold text-green-500 uppercase">
+                              <CheckCircle className="w-2 h-2" /> Paid
+                            </div>
+                          )}
+                        </div>
+                        <h4 className={`text-sm font-bold truncate ${isSelected ? 'text-orange-500' : 'text-white'}`}>{item.jobTitle}</h4>
+                        <p className="text-xs text-zinc-500 truncate">{item.company}</p>
+                        <div className="mt-3 flex items-center justify-between">
+                           <div className="text-[10px] font-bold text-zinc-600 uppercase tracking-tighter">ATS Score: <span className="text-white">{item.atsScore}%</span></div>
+                           <ArrowRight className={`w-3 h-3 transition-transform group-hover:translate-x-1 ${isSelected ? 'text-orange-500' : 'text-zinc-700'}`} />
+                        </div>
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+            </motion.div>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowHistory(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[55] md:hidden"
+            />
+          </>
+        )}
+      </AnimatePresence>
+
       {/* GLOBAL OVERLAY: Payment Verification */}
       {isVerifyingPayment && (
           <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex flex-col items-center justify-center">
@@ -626,30 +811,41 @@ const AppContent: React.FC = () => {
       <div className="flex-1 flex flex-col min-w-0 bg-zinc-950">
          {/* HEADER */}
          <header className="h-14 sm:h-16 border-b border-white/5 bg-zinc-950 flex items-center justify-between px-3 sm:px-6 shrink-0 safe-area-inset">
-             <div className="cursor-pointer touch-target flex items-center" onClick={() => { setView('landing'); window.history.pushState({}, '', '/'); }}><AnimatedLogo /></div>
+             <div className="cursor-pointer touch-target flex items-center" onClick={() => { 
+                 setView('landing'); 
+                 window.history.pushState({}, '', '/');
+                 window.scrollTo(0, 0);
+             }}><AnimatedLogo /></div>
              
              <div className="flex items-center gap-2 sm:gap-4">
-                 <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-lg">
-                    <Globe className="w-3.5 h-3.5 text-zinc-500" />
-                    <select 
-                        value={appLanguage}
-                        onChange={(e) => setAppLanguage(e.target.value)}
-                        className="bg-transparent text-white text-xs font-bold outline-none cursor-pointer"
-                    >
-                        {["English", "Spanish", "French", "German", "Hindi", "Portuguese", "Japanese", "Korean", "Arabic"].map(lang => (
-                            <option key={lang} value={lang} className="bg-zinc-900">{lang}</option>
-                        ))}
-                    </select>
-                 </div>
+                 <button 
+                    onClick={() => setShowHistory(true)}
+                    className="p-2 text-zinc-500 hover:text-white hover:bg-white/5 rounded-lg transition-all flex items-center gap-2"
+                    title="View History"
+                 >
+                    <History className="w-5 h-5" />
+                    <span className="hidden md:inline text-xs font-bold uppercase tracking-wider">History</span>
+                 </button>
+                 
+                 <div className="h-6 w-[1px] bg-white/5 mx-1"></div>
+
                  {isPaid && (
                      <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full">
                          <CheckCircle className="w-3.5 h-3.5 text-green-500" />
                          <span className="text-xs font-bold text-green-500 uppercase tracking-wider">Premium</span>
                      </div>
                  )}
-                 <button onClick={startNewScan} className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white text-xs font-bold rounded shadow-lg shadow-orange-900/20 transition-all touch-target">
+                 <a 
+                    href="/app"
+                    onClick={(e) => {
+                        if (e.metaKey || e.ctrlKey) return;
+                        e.preventDefault();
+                        startNewScan();
+                    }} 
+                    className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-xs uppercase tracking-wide shadow-[3px_3px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none active:shadow-none hover:translate-x-[1.5px] hover:translate-y-[1.5px] active:translate-x-[1.5px] active:translate-y-[1.5px] transition-all rounded-sm cursor-pointer border-none touch-target"
+                 >
                      <Plus className="w-3.5 h-3.5" /> <span className="hidden xs:inline">New Scan</span>
-                 </button>
+                 </a>
              </div>
          </header>
 
@@ -698,7 +894,15 @@ const AppContent: React.FC = () => {
                                           <ResumeUploader onFileUpload={handleFileUpload} currentFile={resumeFile} />
                                         </Suspense>
                                     </div>
-                                    <div className="md:hidden mt-4"><button onClick={() => setInputWizardStep(1)} disabled={!resumeFile} className="w-full py-3.5 bg-zinc-800 text-white rounded font-bold touch-target active:bg-zinc-700 disabled:opacity-50">Next</button></div>
+                                    <div className="md:hidden mt-4">
+                                        <button 
+                                            onClick={() => setInputWizardStep(1)} 
+                                            disabled={!resumeFile} 
+                                            className="w-full py-4 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-sm uppercase tracking-wide shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[2px] active:translate-y-[2px] transition-all rounded-sm cursor-pointer border-none disabled:opacity-50 touch-target"
+                                        >
+                                            Next Step
+                                        </button>
+                                    </div>
                                 </div>
                                 <div className={`flex flex-col h-full ${inputWizardStep === 0 ? 'hidden md:flex' : ''}`}>
                                      <div className="md:hidden mb-2"><button onClick={() => setInputWizardStep(0)} className="text-zinc-500 py-2 touch-target">← Back</button></div>
@@ -711,7 +915,15 @@ const AppContent: React.FC = () => {
                                 </div>
                             </div>
                             {error && <div className="p-3 sm:p-4 bg-red-950/20 border border-red-900/30 rounded-lg flex items-start gap-3 text-red-400 text-sm"><AlertCircle className="w-5 h-5 shrink-0 mt-0.5" /> <span>{error}</span></div>}
-                            <div className="flex justify-end pb-4"><button onClick={handleAnalysis} disabled={!resumeFile || isAnalyzing} className="w-full sm:w-auto px-8 py-3.5 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-bold rounded shadow-lg disabled:opacity-50 disabled:cursor-not-allowed touch-target">Start Analysis</button></div>
+                            <div className="flex justify-end pb-4">
+                                <button 
+                                    onClick={handleAnalysis} 
+                                    disabled={!resumeFile || isAnalyzing} 
+                                    className="w-full sm:w-auto px-8 py-3.5 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-sm uppercase tracking-wide shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[2px] active:translate-y-[2px] transition-all rounded-sm cursor-pointer border-none disabled:opacity-50 disabled:cursor-not-allowed touch-target"
+                                >
+                                    Start Analysis
+                                </button>
+                            </div>
                          </div>
                      )}
                  </div>
@@ -738,14 +950,20 @@ const AppContent: React.FC = () => {
                           <ErrorBoundary>
                             <Suspense fallback={<div className="flex items-center justify-center h-64"><Loader2 className="w-8 h-8 text-orange-500 animate-spin" /></div>}>
                               <ContentGenerator 
+                                analysisId={selectedHistoryId}
                                 resumeFile={resumeFile}
                                 resumeText={resumeText}
                                 jobDescription={jobDescription} 
-                                analysis={analysisResult} 
-                                isPaid={isPaid} 
-                                onPaymentSuccess={() => { if (selectedHistoryId) { savePaymentState(selectedHistoryId); setIsPaid(true); } }} 
-                                appLanguage={appLanguage} 
-                                setAppLanguage={setAppLanguage} 
+                                analysis={analysisResult}
+                                isPaid={isPaid}
+                                onPaymentSuccess={() => {
+                                    if (selectedHistoryId) {
+                                        savePaymentState(selectedHistoryId);
+                                        setIsPaid(true);
+                                    }
+                                }}
+                                appLanguage={appLanguage}
+                                setAppLanguage={setAppLanguage}
                               />
                             </Suspense>
                           </ErrorBoundary>

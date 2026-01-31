@@ -527,19 +527,29 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                             </div>
                             
                             <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-                                <button 
-                                    onClick={() => window.location.reload()} 
-                                    className="px-6 sm:px-10 py-3.5 sm:py-4 bg-zinc-800 hover:bg-zinc-700 active:bg-zinc-600 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-all touch-target border border-zinc-700"
+                                <a 
+                                    href="/roast-my-resume"
+                                    onClick={(e) => {
+                                        if (e.metaKey || e.ctrlKey) return;
+                                        e.preventDefault();
+                                        window.location.reload();
+                                    }} 
+                                    className="px-6 sm:px-10 py-3.5 sm:py-4 bg-zinc-900 hover:bg-zinc-800 active:bg-zinc-700 text-white font-mono font-bold text-sm uppercase tracking-wide shadow-[4px_4px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[2px] active:translate-y-[2px] transition-all rounded-sm cursor-pointer border border-zinc-800 flex items-center justify-center gap-2"
                                 >
                                     <RotateCcw className="w-4 h-4" /> 
                                     <span>Roast Another</span>
-                                </button>
-                                <button 
-                                    onClick={() => onNavigate('scan')}
-                                    className="px-6 sm:px-10 py-3.5 sm:py-4 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 active:from-orange-700 active:to-red-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-all hover:scale-105 shadow-lg shadow-orange-900/30 touch-target"
+                                </a>
+                                <a 
+                                    href="/app"
+                                    onClick={(e) => {
+                                        if (e.metaKey || e.ctrlKey) return;
+                                        e.preventDefault();
+                                        onNavigate('scan');
+                                    }}
+                                    className="px-6 sm:px-10 py-3.5 sm:py-4 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-sm sm:text-base uppercase tracking-wide flex items-center justify-center gap-2 sm:gap-3 shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[2px] active:translate-y-[2px] transition-all rounded-sm cursor-pointer border-none touch-target"
                                 >
                                     Fix It Fast <ArrowRight className="w-4 h-4" />
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </motion.div>
