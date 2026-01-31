@@ -722,71 +722,73 @@ const AppContent: React.FC = () => {
       {/* HISTORY SIDEBAR */}
       <AnimatePresence>
         {showHistory && (
-          <>
-            <motion.div 
-              initial={{ x: -300 }}
-              animate={{ x: 0 }}
-              exit={{ x: -300 }}
-              className="fixed inset-y-0 left-0 w-[300px] bg-zinc-950 border-r border-white/5 z-[60] flex flex-col"
-            >
-              <div className="p-6 border-b border-white/5 flex justify-between items-center">
-                <h2 className="text-sm font-bold uppercase tracking-widest text-zinc-500">History</h2>
-                <button onClick={() => setShowHistory(false)} className="text-zinc-500 hover:text-white transition-colors">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
-                {history.length === 0 ? (
-                  <div className="text-center py-10">
-                    <p className="text-zinc-600 text-xs">No analysis history yet.</p>
-                  </div>
-                ) : (
-                  history.map((item) => {
-                    const isSelected = selectedHistoryId === item.id;
-                    const paid = isIdPaid(item.id);
-                    return (
-                      <button 
-                        key={item.id}
-                        onClick={() => {
-                          setSelectedHistoryId(item.id);
-                          setResumeFile(item.resumeFile);
-                          setResumeText(item.resumeText || '');
-                          setJobDescription(item.jobDescription);
-                          setAnalysisResult(item.analysisResult);
-                          setDashboardView('result');
-                          setResultTab('analysis');
-                          setShowHistory(false);
-                        }}
-                        className={`w-full text-left p-4 rounded-xl border transition-all group ${isSelected ? 'bg-orange-500/10 border-orange-500/50' : 'bg-zinc-900/50 border-white/5 hover:border-white/10'}`}
-                      >
-                        <div className="flex justify-between items-start mb-1">
-                          <span className="text-[10px] font-mono text-zinc-500">{item.date}</span>
-                          {paid && (
-                            <div className="flex items-center gap-1 px-1.5 py-0.5 bg-green-500/10 border border-green-500/20 rounded text-[8px] font-bold text-green-500 uppercase">
-                              <CheckCircle className="w-2 h-2" /> Paid
-                            </div>
-                          )}
-                        </div>
-                        <h4 className={`text-sm font-bold truncate ${isSelected ? 'text-orange-500' : 'text-white'}`}>{item.jobTitle}</h4>
-                        <p className="text-xs text-zinc-500 truncate">{item.company}</p>
-                        <div className="mt-3 flex items-center justify-between">
-                           <div className="text-[10px] font-bold text-zinc-600 uppercase tracking-tighter">ATS Score: <span className="text-white">{item.atsScore}%</span></div>
-                           <ArrowRight className={`w-3 h-3 transition-transform group-hover:translate-x-1 ${isSelected ? 'text-orange-500' : 'text-zinc-700'}`} />
-                        </div>
-                      </button>
-                    );
-                  })
-                )}
-              </div>
-            </motion.div>
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setShowHistory(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[55] md:hidden"
-            />
-          </>
+          <motion.div 
+            key="history-sidebar"
+            initial={{ x: -300 }}
+            animate={{ x: 0 }}
+            exit={{ x: -300 }}
+            className="fixed inset-y-0 left-0 w-[300px] bg-zinc-950 border-r border-white/5 z-[60] flex flex-col shadow-2xl"
+          >
+            <div className="p-6 border-b border-white/5 flex justify-between items-center">
+              <h2 className="text-sm font-bold uppercase tracking-widest text-zinc-500">History</h2>
+              <button onClick={() => setShowHistory(false)} className="text-zinc-500 hover:text-white transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+              {history.length === 0 ? (
+                <div className="text-center py-10">
+                  <p className="text-zinc-600 text-xs">No analysis history yet.</p>
+                </div>
+              ) : (
+                history.map((item) => {
+                  const isSelected = selectedHistoryId === item.id;
+                  const paid = isIdPaid(item.id);
+                  return (
+                    <button 
+                      key={item.id}
+                      onClick={() => {
+                        setSelectedHistoryId(item.id);
+                        setResumeFile(item.resumeFile);
+                        setResumeText(item.resumeText || '');
+                        setJobDescription(item.jobDescription);
+                        setAnalysisResult(item.analysisResult);
+                        setDashboardView('result');
+                        setResultTab('analysis');
+                        setShowHistory(false);
+                      }}
+                      className={`w-full text-left p-4 rounded-xl border transition-all group ${isSelected ? 'bg-orange-500/10 border-orange-500/50' : 'bg-zinc-900/50 border-white/5 hover:border-white/10'}`}
+                    >
+                      <div className="flex justify-between items-start mb-1">
+                        <span className="text-[10px] font-mono text-zinc-500">{item.date}</span>
+                        {paid && (
+                          <div className="flex items-center gap-1 px-1.5 py-0.5 bg-green-500/10 border border-green-500/20 rounded text-[8px] font-bold text-green-500 uppercase">
+                            <CheckCircle className="w-2 h-2" /> Paid
+                          </div>
+                        )}
+                      </div>
+                      <h4 className={`text-sm font-bold truncate ${isSelected ? 'text-orange-500' : 'text-white'}`}>{item.jobTitle}</h4>
+                      <p className="text-xs text-zinc-500 truncate">{item.company}</p>
+                      <div className="mt-3 flex items-center justify-between">
+                         <div className="text-[10px] font-bold text-zinc-600 uppercase tracking-tighter">ATS Score: <span className="text-white">{item.atsScore}%</span></div>
+                         <ArrowRight className={`w-3 h-3 transition-transform group-hover:translate-x-1 ${isSelected ? 'text-orange-500' : 'text-zinc-700'}`} />
+                      </div>
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          </motion.div>
+        )}
+        {showHistory && (
+          <motion.div 
+            key="history-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowHistory(false)}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[55]"
+          />
         )}
       </AnimatePresence>
 

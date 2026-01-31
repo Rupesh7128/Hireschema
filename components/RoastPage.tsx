@@ -90,7 +90,9 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
 
     return () => {
       // Cleanup on unmount
-      document.head.removeChild(script);
+      if (script && script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
       // Reset title if needed (LandingPage handles its own)
     };
   }, []);

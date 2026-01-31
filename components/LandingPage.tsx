@@ -33,7 +33,7 @@ const MouseTrail = () => {
         const handleMouseMove = (e: MouseEvent) => {
             setPoints(prev => [
                 ...prev.slice(-12), 
-                { x: e.clientX, y: e.clientY, id: Date.now() }
+                { x: e.clientX, y: e.clientY, id: Math.random() + Date.now() }
             ]);
 
             clearTimeout(timeoutId);
@@ -120,6 +120,11 @@ const SEO = ({ title, description, path }: { title: string, description: string,
             document.head.appendChild(canonicalLink);
         }
         canonicalLink.setAttribute('href', window.location.origin + path);
+
+        return () => {
+            // Optional: Reset title or remove tags on unmount if needed
+            // But usually we just leave them for the next page to overwrite
+        };
     }, [title, description, path]);
 
     return null;
