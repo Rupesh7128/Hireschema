@@ -128,6 +128,9 @@ const PaymentLock: React.FC<PaymentLockProps> = ({ onPaymentVerified, onBeforeRe
             <p className="text-zinc-400 text-sm leading-relaxed">
               Download your optimized resume PDF for just $1. 
             </p>
+            <div className="mt-2 inline-block px-3 py-1 bg-orange-500/10 border border-orange-500/20 rounded text-[10px] font-bold text-orange-500 uppercase tracking-widest">
+              One Payment Per Resume
+            </div>
           </div>
 
           {/* Actions */}

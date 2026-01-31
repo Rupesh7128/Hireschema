@@ -9,7 +9,7 @@ import { FileData, AnalysisResult, HistoryItem, ContactProfile } from './types';
 import { analyzeResume, extractTextFromPdf } from './services/geminiService';
 import { db } from './services/db';
 import { logEvent, logPageView } from './services/analytics';
-import { verifyDodoPayment, savePaymentState, readPaymentState } from './services/paymentService';
+import { verifyDodoPayment, savePaymentState, isIdPaid } from './services/paymentService';
 import { restoreStateAfterPayment, clearPersistedState } from './services/stateService';
 import { AnimatedLogo } from './components/AnimatedLogo';
 
@@ -88,11 +88,13 @@ const AppContent: React.FC = () => {
   const [resultTab, setResultTab] = useState<'analysis' | 'generator'>('analysis');
 
   // --- PERSISTENCE ---
-  const [isPaid, setIsPaid] = useState(() => {
-      // Read payment state from localStorage using the payment service
-      return readPaymentState();
-  });
+  const [isPaid, setIsPaid] = useState(false);
   const [isVerifyingPayment, setIsVerifyingPayment] = useState(false);
+  
+  // Effect to update isPaid state when the selected history item changes
+  useEffect(() => {
+      setIsPaid(isIdPaid(selectedHistoryId));
+  }, [selectedHistoryId]);
   const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
   const [appLanguage, setAppLanguage] = useState("English");
 
@@ -201,8 +203,10 @@ const AppContent: React.FC = () => {
 
                 // Helper to mark payment as successful
                 const markPaymentSuccess = () => {
-                    setIsPaid(true);
-                    savePaymentState(true);
+                    if (selectedHistoryId) {
+                        savePaymentState(selectedHistoryId);
+                        setIsPaid(true);
+                    }
                     logEvent('payment_success_auto', { paymentId });
                     restoreUserState();
                     window.history.replaceState({}, '', '/app');
@@ -739,7 +743,7 @@ const AppContent: React.FC = () => {
                                 jobDescription={jobDescription} 
                                 analysis={analysisResult} 
                                 isPaid={isPaid} 
-                                onPaymentSuccess={() => { setIsPaid(true); savePaymentState(true); }} 
+                                onPaymentSuccess={() => { if (selectedHistoryId) { savePaymentState(selectedHistoryId); setIsPaid(true); } }} 
                                 appLanguage={appLanguage} 
                                 setAppLanguage={setAppLanguage} 
                               />

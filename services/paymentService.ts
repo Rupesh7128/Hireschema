@@ -6,8 +6,6 @@
 
 export const PRODUCT_ID = (import.meta as any).env.VITE_DODO_PRODUCT_ID || '';
 
-// Storage key for payment state
-const PAYMENT_STATE_KEY = 'hireSchema_isPaid';
 
 /**
  * Result of a payment verification request
@@ -104,15 +102,22 @@ export async function verifyDodoPayment(paymentId: string): Promise<VerifyPaymen
   }
 }
 
+// Storage key for payment state
+const PAID_IDS_KEY = 'hireSchema_paidIds';
+
 /**
- * Saves the payment state to localStorage.
+ * Saves a specific analysis ID as "paid" in localStorage.
  * 
- * @param isPaid - Whether the user has paid
+ * @param analysisId - The ID of the analysis being unlocked
  */
-export function savePaymentState(isPaid: boolean): void {
+export function savePaymentState(analysisId: string): void {
   try {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      localStorage.setItem(PAYMENT_STATE_KEY, isPaid ? 'true' : 'false');
+    if (typeof window === 'undefined' || !window.localStorage || !analysisId) return;
+    
+    const currentPaidIds = readPaidIds();
+    if (!currentPaidIds.includes(analysisId)) {
+      currentPaidIds.push(analysisId);
+      localStorage.setItem(PAID_IDS_KEY, JSON.stringify(currentPaidIds));
     }
   } catch (e) {
     console.error('Failed to save payment state:', e);
@@ -120,30 +125,42 @@ export function savePaymentState(isPaid: boolean): void {
 }
 
 /**
- * Reads the payment state from localStorage.
+ * Reads all paid IDs from localStorage.
  * 
- * @returns Whether the user has paid (defaults to false)
+ * @returns Array of paid analysis IDs
  */
-export function readPaymentState(): boolean {
+function readPaidIds(): string[] {
   try {
     if (typeof window !== 'undefined' && window.localStorage) {
-      return localStorage.getItem(PAYMENT_STATE_KEY) === 'true';
+      const data = localStorage.getItem(PAID_IDS_KEY);
+      return data ? JSON.parse(data) : [];
     }
   } catch (e) {
-    console.error('Failed to read payment state:', e);
+    console.error('Failed to read paid IDs:', e);
   }
-  return false;
+  return [];
 }
 
 /**
- * Clears the payment state from localStorage.
+ * Checks if a specific analysis ID has been paid for.
+ * 
+ * @param analysisId - The ID to check
+ * @returns Whether the ID is in the paid list
  */
-export function clearPaymentState(): void {
+export function isIdPaid(analysisId: string | null): boolean {
+  if (!analysisId) return false;
+  return readPaidIds().includes(analysisId);
+}
+
+/**
+ * Clears all paid states (useful for testing or full reset).
+ */
+export function clearAllPayments(): void {
   try {
     if (typeof window !== 'undefined' && window.localStorage) {
-      localStorage.removeItem(PAYMENT_STATE_KEY);
+      localStorage.removeItem(PAID_IDS_KEY);
     }
   } catch (e) {
-    console.error('Failed to clear payment state:', e);
+    console.error('Failed to clear payment states:', e);
   }
 }
