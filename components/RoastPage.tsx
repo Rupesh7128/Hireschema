@@ -192,7 +192,7 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
       {/* Header - Mobile optimized */}
       <Header onNavigate={onNavigate} />
 
-      <main className="pt-16 sm:pt-20 pb-6 sm:pb-10 px-4 container mx-auto max-w-4xl min-h-screen min-h-[100dvh] flex flex-col">
+      <main className="pt-28 sm:pt-36 pb-8 sm:pb-12 px-4 container mx-auto max-w-5xl min-h-screen min-h-[100dvh] flex flex-col">
         
         {/* SEO Hidden Semantic Content */}
         <div className="sr-only">
@@ -318,15 +318,15 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                         <div className="lg:col-span-2 bg-gradient-to-br from-zinc-900 via-zinc-900 to-orange-950/20 border border-orange-900/30 p-5 sm:p-6 rounded-xl flex flex-col items-center justify-center text-center shadow-2xl relative overflow-hidden">
                             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-600 via-orange-500 to-orange-600"></div>
                             
-                            <div className="text-zinc-400 text-[9px] font-bold uppercase tracking-widest mb-2">Employability Score</div>
+                            <div className="text-zinc-400 text-xs font-bold uppercase tracking-widest mb-2">Employability Score</div>
                             <div className="relative mb-3">
-                                <div className="text-4xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-orange-400 to-orange-600">
+                                <div className="text-5xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-orange-400 to-orange-600">
                                     {roastScore}
                                 </div>
-                                <div className="text-lg font-bold text-zinc-500 absolute -bottom-1 -right-6">/100</div>
+                                <div className="text-sm font-bold text-zinc-500 absolute -bottom-1 -right-8">/100</div>
                             </div>
                             
-                            <div className="flex items-center gap-2 text-orange-400 text-[10px] font-black bg-orange-950/40 px-3 py-1.5 rounded-full border border-orange-500/20 uppercase tracking-widest">
+                            <div className="flex items-center gap-2 text-orange-400 text-xs font-black bg-orange-950/40 px-3 py-1.5 rounded-full border border-orange-500/20 uppercase tracking-widest">
                                 {roastScore < 25 ? "Unhireable" : 
                                  roastScore < 40 ? "Unemployable" : 
                                  roastScore < 55 ? "Mediocre" : "Decent"}
@@ -335,7 +335,7 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                         
                         {/* Category Breakdown */}
                         <div className="bg-zinc-900/80 border border-zinc-800 p-3 sm:p-4 rounded-xl relative overflow-hidden flex flex-col items-center">
-                            <div className="text-zinc-400 text-[9px] font-bold uppercase tracking-widest mb-2">Damage Report</div>
+                            <div className="text-zinc-400 text-xs font-bold uppercase tracking-widest mb-2">Damage Report</div>
                             <div className="h-24 w-full">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <PieChart>
@@ -357,7 +357,7 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                                                 backgroundColor: '#18181b', 
                                                 border: '1px solid #27272a', 
                                                 borderRadius: '8px', 
-                                                fontSize: '10px',
+                                                fontSize: '12px',
                                                 color: '#e4e4e7'
                                             }}
                                             itemStyle={{ color: '#e4e4e7' }}
@@ -369,14 +369,14 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                         
                         {/* Cringe Analytics */}
                         <div className="bg-zinc-900/80 border border-zinc-800 p-3 sm:p-4 rounded-xl relative overflow-hidden flex flex-col items-center">
-                            <div className="text-zinc-400 text-[9px] font-bold uppercase tracking-widest mb-2">Cringe Metrics</div>
+                            <div className="text-zinc-400 text-xs font-bold uppercase tracking-widest mb-2">Cringe Metrics</div>
                             <div className="h-24 w-full">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <AreaChart data={roastData}>
                                         <defs>
                                             <linearGradient id="colorCringe" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#f97316" stopOpacity={0.4}/>
-                                                <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
+                                                <stop offset="5%" stopColor="#f97316" stopOpacity="0.4"/>
+                                                <stop offset="95%" stopColor="#f97316" stopOpacity="0"/>
                                             </linearGradient>
                                         </defs>
                                         <XAxis dataKey="name" hide />
@@ -385,7 +385,7 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                                                 backgroundColor: '#18181b', 
                                                 border: '1px solid #27272a', 
                                                 borderRadius: '8px', 
-                                                fontSize: '10px' 
+                                                fontSize: '12px' 
                                             }} 
                                         />
                                         <Area 
@@ -417,8 +417,8 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                                 transition={{ delay: index * 0.1, duration: 0.6 }}
                                 className="bg-zinc-900/60 border border-zinc-800 p-3 rounded-xl text-center"
                             >
-                                <div className="text-base font-black text-white mb-0.5">{stat.value}</div>
-                                <div className="text-[8px] text-zinc-500 uppercase tracking-widest">{stat.label}</div>
+                                <div className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">{stat.label}</div>
+                                <div className={`text-lg font-black ${stat.color}`}>{stat.value}</div>
                             </motion.div>
                         ))}
                     </div>

@@ -365,7 +365,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
       }} />
 
       {/* --- HERO SECTION --- */}
-      <section className="relative min-h-[90vh] sm:min-h-[90vh] flex flex-col items-center justify-center pt-16 sm:pt-20 px-4 sm:px-6 border-b border-white/10 overflow-hidden bg-zinc-950 pb-16">
+      <section className="relative min-h-[90vh] sm:min-h-[90vh] flex flex-col items-center justify-center pt-28 sm:pt-36 px-4 sm:px-6 border-b border-white/10 overflow-hidden bg-zinc-950 pb-16">
         
         {/* Live Animated Gradient Background - Reduced on mobile for performance */}
         <div className="absolute inset-0 bg-zinc-950 overflow-hidden pointer-events-none">
