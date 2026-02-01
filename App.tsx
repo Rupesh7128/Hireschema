@@ -2,7 +2,7 @@ import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { 
     Plus, Link as LinkIcon, FileText, AlertCircle, Radar, 
     CheckCircle, Loader2, Search, Sparkles, BrainCircuit, GraduationCap, Globe,
-    History, X, ArrowRight
+    History, X, ArrowRight, Zap, Target
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FileData, AnalysisResult, HistoryItem, ContactProfile } from './types';
@@ -983,6 +983,39 @@ export default function App() {
                                               </div>
                                               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                                           </button>
+                                      </div>
+
+                                      {/* Why Scan Section */}
+                                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-8 border-t border-white/5">
+                                          <div className="flex flex-col items-center text-center p-4 space-y-2 group hover:bg-white/5 rounded-2xl transition-all">
+                                              <div className="w-8 h-8 rounded-full bg-orange-500/10 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
+                                                  <Zap className="w-4 h-4 text-orange-500" />
+                                              </div>
+                                              <h4 className="text-[10px] font-black text-white uppercase tracking-widest">Beat the ATS</h4>
+                                              <p className="text-zinc-500 text-[9px] font-medium leading-relaxed">
+                                                  75% of resumes are rejected by bots. We ensure yours gets through.
+                                              </p>
+                                          </div>
+                                          
+                                          <div className="flex flex-col items-center text-center p-4 space-y-2 group hover:bg-white/5 rounded-2xl transition-all">
+                                              <div className="w-8 h-8 rounded-full bg-orange-500/10 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
+                                                  <Target className="w-4 h-4 text-orange-500" />
+                                              </div>
+                                              <h4 className="text-[10px] font-black text-white uppercase tracking-widest">Keyword Match</h4>
+                                              <p className="text-zinc-500 text-[9px] font-medium leading-relaxed">
+                                                  Instantly identify and inject the specific skills hiring managers look for.
+                                              </p>
+                                          </div>
+
+                                          <div className="flex flex-col items-center text-center p-4 space-y-2 group hover:bg-white/5 rounded-2xl transition-all">
+                                              <div className="w-8 h-8 rounded-full bg-orange-500/10 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
+                                                  <FileText className="w-4 h-4 text-orange-500" />
+                                              </div>
+                                              <h4 className="text-[10px] font-black text-white uppercase tracking-widest">Role Alignment</h4>
+                                              <p className="text-zinc-500 text-[9px] font-medium leading-relaxed">
+                                                  Tailor your story to perfectly align with the job responsibilities.
+                                              </p>
+                                          </div>
                                       </div>
                                    </div>
                                )}
