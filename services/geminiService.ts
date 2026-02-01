@@ -627,9 +627,19 @@ export const analyzeResume = async (
     4. Contact Profile (Name, Email, Phone, LinkedIn, Location).
     
     Return structured JSON:
-    jobTitle: string, company: string, atsScore: number, relevanceScore: number, roleFitAnalysis: string,
-    contactProfile: object, languages: array, missingKeywords: array, criticalIssues: array, keyStrengths: array,
-    summary: string
+    jobTitle: string, 
+    company: string, 
+    atsScore: number, 
+    relevanceScore: number, 
+    roleFitAnalysis: string (SUPER SHORT, exactly 2-3 concise bullet points separated by dots),
+    contactProfile: object, 
+    languages: array, 
+    missingKeywords: array, 
+    criticalIssues: array, 
+    keyStrengths: array (Limit to exactly 2-3 super short items, max 5 words each),
+    summary: string (SUPER SHORT, exactly 2-3 concise bullet points separated by dots)
+    
+    IMPORTANT: Keep 'roleFitAnalysis', 'keyStrengths', and 'summary' extremely concise. Job seekers want quick, punchy insights, not long paragraphs. Each bullet point should be one short sentence.
   `;
   
   try {

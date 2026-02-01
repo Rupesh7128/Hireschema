@@ -72,7 +72,7 @@ const BulletList = ({ title, items, icon: Icon, color = "zinc" }: { title: strin
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
-        <h3 className="text-xs font-black text-white tracking-tight uppercase">{title}</h3>
+        <h3 className="text-sm font-black text-white tracking-tight uppercase">{title}</h3>
       </div>
       <div className="grid gap-2">
         {items.map((item, idx) => (
@@ -84,7 +84,7 @@ const BulletList = ({ title, items, icon: Icon, color = "zinc" }: { title: strin
             className="flex items-start gap-3 p-3 bg-zinc-950/40 border border-white/5 rounded-xl hover:border-white/10 transition-colors group/item"
           >
             <div className={`mt-1.5 w-1 h-1 rounded-full bg-${color}-500 shrink-0 group-hover/item:scale-125 transition-transform`} />
-            <p className="text-xs text-zinc-300 leading-relaxed font-medium">{item}</p>
+            <p className="text-sm text-zinc-300 leading-relaxed font-medium">{item}</p>
           </motion.div>
         ))}
       </div>
@@ -187,10 +187,10 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
         >
           <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/5 blur-[60px] -mr-16 -mt-16" />
           <div className="relative z-10">
-            <div className="flex items-center gap-2 mb-0.5">
-              <span className="text-[8px] font-black text-zinc-600 uppercase tracking-[0.2em]">Target Opportunity</span>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Target Opportunity</span>
             </div>
-            <h1 className="text-xl font-black text-white tracking-tight flex flex-wrap items-center gap-x-2">
+            <h1 className="text-2xl font-black text-white tracking-tight flex flex-wrap items-center gap-x-2">
               {result.jobTitle || "Target Role"}
               {result.company && (
                 <>
@@ -202,17 +202,17 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
           </div>
           
           <div className="flex items-center gap-3 relative z-10">
-            <div className="px-3 py-1.5 bg-zinc-900/50 border border-white/5 rounded-lg flex items-center gap-3 backdrop-blur-xl">
+            <div className="px-4 py-2 bg-zinc-950/80 border border-white/10 rounded-xl flex items-center gap-4 backdrop-blur-xl shadow-inner">
               <div className="text-center">
-                <span className="block text-[7px] font-black text-zinc-600 uppercase tracking-widest mb-0.5">Date</span>
-                <span className="text-[9px] font-mono font-bold text-zinc-500">{new Date().toLocaleDateString()}</span>
+                <span className="block text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Date</span>
+                <span className="text-[11px] font-mono font-bold text-zinc-400">{new Date().toLocaleDateString()}</span>
               </div>
-              <div className="w-px h-5 bg-white/5" />
+              <div className="w-px h-6 bg-white/10" />
               <div className="text-center">
-                <span className="block text-[7px] font-black text-zinc-600 uppercase tracking-widest mb-0.5">Status</span>
-                <div className="flex items-center gap-1">
-                  <div className="w-1 h-1 rounded-full bg-orange-500" />
-                  <span className="text-[9px] font-bold text-orange-500 uppercase">Live</span>
+                <span className="block text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Status</span>
+                <div className="flex items-center gap-1.5 justify-center">
+                  <div className="w-1.5 h-1.5 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.5)] animate-pulse" />
+                  <span className="text-[11px] font-bold text-orange-500 uppercase tracking-wider">Live</span>
                 </div>
               </div>
             </div>
@@ -319,24 +319,24 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
           </div>
           
           {/* Main Verdict */}
-          <div className="p-4 bg-zinc-900/40 border border-white/5 rounded-2xl shadow-xl relative overflow-hidden group">
+          <div className="p-5 bg-zinc-900/60 border border-white/10 rounded-2xl shadow-xl relative overflow-hidden group">
             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-4">
               <div>
-                <h4 className="text-[8px] font-black text-zinc-600 uppercase tracking-[0.2em] mb-0.5">Master Verdict</h4>
-                <p className="text-lg font-black text-white leading-tight">{result.atsScore >= 70 ? 'Interview Candidate' : 'Optimization Required'}</p>
+                <h4 className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-1">Master Verdict</h4>
+                <p className="text-xl font-black text-white leading-tight">{result.atsScore >= 70 ? 'Interview Candidate' : 'Optimization Required'}</p>
               </div>
 
-              <div className="flex items-center gap-4 px-4 py-2 bg-zinc-950/50 rounded-xl border border-white/5 backdrop-blur-xl">
+              <div className="flex items-center gap-6 px-5 py-2.5 bg-zinc-950/80 rounded-xl border border-white/10 backdrop-blur-xl shadow-inner">
                 <div className="text-center">
-                  <span className="block text-[7px] font-black text-zinc-600 uppercase tracking-widest mb-0.5">Likelihood</span>
-                  <span className={`text-xs font-black ${result.atsScore >= 80 ? 'text-white' : result.atsScore >= 60 ? 'text-orange-400' : 'text-orange-600'}`}>
+                  <span className="block text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Likelihood</span>
+                  <span className={`text-sm font-black tracking-tight ${result.atsScore >= 80 ? 'text-white' : result.atsScore >= 60 ? 'text-orange-400' : 'text-orange-600'}`}>
                     {result.atsScore >= 80 ? 'HIGH' : result.atsScore >= 60 ? 'MEDIUM' : 'LOW'}
                   </span>
                 </div>
-                <div className="w-px h-6 bg-white/10" />
+                <div className="w-px h-8 bg-white/10" />
                 <div className="text-center">
-                  <span className="block text-[7px] font-black text-zinc-600 uppercase tracking-widest mb-0.5">Impact Issues</span>
-                  <span className={`text-xs font-black ${result.criticalIssues.length > 0 ? 'text-orange-500' : 'text-white'}`}>{result.criticalIssues.length + result.missingKeywords.length}</span>
+                  <span className="block text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Impact Issues</span>
+                  <span className={`text-sm font-black ${result.criticalIssues.length > 0 ? 'text-orange-500' : 'text-white'}`}>{result.criticalIssues.length + result.missingKeywords.length}</span>
                 </div>
               </div>
             </div>
