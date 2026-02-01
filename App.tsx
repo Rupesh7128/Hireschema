@@ -6,25 +6,25 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FileData, AnalysisResult, HistoryItem, ContactProfile } from './types';
-import { analyzeResume, extractTextFromPdf } from './services/geminiService.ts';
-import { db } from './services/db.ts';
-import { logEvent, logPageView } from './services/analytics.ts';
-import { verifyDodoPayment, savePaymentState, isIdPaid } from './services/paymentService.ts';
-import { restoreStateAfterPayment, clearPersistedState } from './services/stateService.ts';
-import { AnimatedLogo } from './components/AnimatedLogo.tsx';
-import { Header } from './components/Header.tsx';
-import { Footer } from './components/Footer.tsx';
+import { analyzeResume, extractTextFromPdf } from './services/geminiService';
+import { db } from './services/db';
+import { logEvent, logPageView } from './services/analytics';
+import { verifyDodoPayment, savePaymentState, isIdPaid } from './services/paymentService';
+import { restoreStateAfterPayment, clearPersistedState } from './services/stateService';
+import { AnimatedLogo } from './components/AnimatedLogo';
+import { Header } from './components/Header';
+import { Footer } from './components/Footer';
 
 // Lazy load heavy components for better initial load performance
-const ResumeUploader = lazy(() => import('./components/ResumeUploader.tsx'));
-const AnalysisDashboard = lazy(() => import('./components/AnalysisDashboard.tsx'));
-const ContentGenerator = lazy(() => import('./components/ContentGenerator.tsx'));
-const LandingPage = lazy(() => import('./components/LandingPage.tsx'));
-const LegalPages = lazy(() => import('./components/LegalPages.tsx'));
-const RoastPage = lazy(() => import('./components/RoastPage.tsx'));
-const BlogPage = lazy(() => import('./components/BlogPage.tsx'));
-const FeaturePage = lazy(() => import('./components/FeaturePage.tsx'));
-const PricingPage = lazy(() => import('./components/PricingPage.tsx'));
+const ResumeUploader = lazy(() => import('./components/ResumeUploader'));
+const AnalysisDashboard = lazy(() => import('./components/AnalysisDashboard'));
+const ContentGenerator = lazy(() => import('./components/ContentGenerator'));
+const LandingPage = lazy(() => import('./components/LandingPage'));
+const LegalPages = lazy(() => import('./components/LegalPages'));
+const RoastPage = lazy(() => import('./components/RoastPage'));
+const BlogPage = lazy(() => import('./components/BlogPage'));
+const FeaturePage = lazy(() => import('./components/FeaturePage'));
+const PricingPage = lazy(() => import('./components/PricingPage'));
 
 // --- CONSTANTS ---
 const FEATURES_DATA = {
@@ -204,11 +204,51 @@ export default function App() {
   );
 
   // --- VIEWS ---
-  const [view, setView] = useState<'landing' | 'dashboard' | 'legal' | 'roast' | 'blog' | 'feature' | 'pricing' | 'changelog' | 'success-stories'>(hasPaymentCallback ? 'dashboard' : 'landing');
-  const [legalPage, setLegalPage] = useState<'privacy' | 'terms' | 'cookies' | null>(null);
+  const [view, setView] = useState<'landing' | 'dashboard' | 'legal' | 'roast' | 'blog' | 'feature' | 'pricing' | 'changelog' | 'success-stories'>(() => {
+    const path = window.location.pathname;
+    const searchParams = new URLSearchParams(window.location.search);
+    const hasPayment = !!(
+      searchParams.get('paymentId') || 
+      searchParams.get('payment_id') || 
+      searchParams.get('session_id') ||
+      searchParams.get('session') ||
+      searchParams.get('checkout_session') ||
+      searchParams.get('id')
+    );
+
+    if (hasPayment) return 'dashboard';
+    if (path === '/app') return 'dashboard';
+    if (['/privacy', '/terms', '/cookies'].includes(path)) return 'legal';
+    if (path === '/roast' || path === '/roast-my-resume') return 'roast';
+    if (path === '/pricing') return 'pricing';
+    if (path.startsWith('/feature/')) return 'feature';
+    if (path.startsWith('/blog')) return 'blog';
+    if (path === '/changelog') return 'changelog';
+    if (path === '/success-stories') return 'success-stories';
+    return 'landing';
+  });
+
+  const [legalPage, setLegalPage] = useState<'privacy' | 'terms' | 'cookies' | null>(() => {
+    const path = window.location.pathname;
+    if (['/privacy', '/terms', '/cookies'].includes(path)) return path.substring(1) as any;
+    return null;
+  });
+
   const [dashboardView, setDashboardView] = useState<'scan' | 'result'>('scan');
-  const [blogSlug, setBlogSlug] = useState<string | null>(null);
-  const [featureId, setFeatureId] = useState<string | null>(null);
+  const [blogSlug, setBlogSlug] = useState<string | null>(() => {
+    const path = window.location.pathname;
+    if (path.startsWith('/blog')) {
+      const slug = path.replace(/^\/blog\/?/, '');
+      return slug || null;
+    }
+    return null;
+  });
+
+  const [featureId, setFeatureId] = useState<string | null>(() => {
+    const path = window.location.pathname;
+    if (path.startsWith('/feature/')) return path.replace('/feature/', '');
+    return null;
+  });
 
   // --- DATA ---
   const [history, setHistory] = useState<HistoryItem[]>([]);
@@ -244,14 +284,18 @@ export default function App() {
   // --- INIT ---
   useEffect(() => {
     const initData = async () => {
-        const [h, p] = await Promise.all([
-            db.history.getAll(),
-            db.user.get()
-        ]);
-        setHistory(h);
-        setProfile(p);
-        
-        return h; // Return history for chaining
+        try {
+            const [h, p] = await Promise.all([
+                db.history.getAll(),
+                db.user.get()
+            ]);
+            setHistory(h);
+            setProfile(p);
+            return h;
+        } catch (e) {
+            console.error('Failed to load initial data:', e);
+            return [];
+        }
     };
     
     // Handle URL Routing & Payment Verification
@@ -280,7 +324,6 @@ export default function App() {
         // Check for Payment Callback
         if (paymentId) {
             console.log('Payment Callback detected:', { paymentId, redirectStatus });
-            setView('dashboard');
             setIsVerifyingPayment(true);
             
             try {
@@ -381,34 +424,15 @@ export default function App() {
                 setIsVerifyingPayment(false);
             }
         }
-
-        if (['/privacy', '/terms', '/cookies'].includes(path)) {
-           setView('legal');
-           setLegalPage(path.substring(1) as any);
-        } else if (path === '/roast' || path === '/roast-my-resume') {
-           setView('roast');
-           if (path === '/roast') window.history.replaceState({}, '', '/roast-my-resume');
-        } else if (path === '/pricing') {
-           setView('pricing');
-        } else if (path.startsWith('/feature/')) {
-           setView('feature');
-           setFeatureId(path.replace('/feature/', ''));
-        } else if (path.startsWith('/blog')) {
-           setView('blog');
-           const slug = path.replace(/^\/blog\/?/, '');
-           if (slug) setBlogSlug(slug);
-        } else if (path === '/app') {
-           setView('dashboard');
-        } else if (path === '/changelog') {
-           setView('changelog');
-        } else if (path === '/success-stories') {
-           setView('success-stories');
-        }
     };
     
     initRoute();
-    logPageView(view);
   }, []); // Run once on mount
+
+  // Separate effect for page views
+  useEffect(() => {
+    logPageView(view);
+  }, [view]);
 
   // --- ACTIONS ---
 
