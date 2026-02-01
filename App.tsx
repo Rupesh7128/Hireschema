@@ -868,44 +868,120 @@ export default function App() {
                                       <p className="text-zinc-500 font-mono text-[10px]">{Math.round(analysisProgress)}% COMPLETE</p>
                                   </div>
                                ) : (
-                                   <div className="w-full space-y-4 sm:space-y-6">
-                                      <div className="text-center"><h1 className="text-xl sm:text-2xl font-bold text-white mb-1">New Analysis</h1><p className="text-zinc-400 text-xs">Step {inputWizardStep + 1} of 2</p></div>
-                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 min-h-[300px] sm:h-[350px]">
-                                          <div className={`flex flex-col h-full ${inputWizardStep === 1 ? 'hidden md:flex' : ''}`}>
-                                              <h3 className="text-[10px] font-bold text-zinc-500 uppercase mb-2">1. Select Resume</h3>
-                                              <div className="flex-1 overflow-hidden h-full min-h-[200px]">
+                                   <div className="w-full space-y-8 sm:space-y-10 py-4">
+                                      <div className="text-center space-y-2">
+                                          <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight uppercase">Scan Your Resume</h1>
+                                          <p className="text-zinc-500 text-[10px] sm:text-xs font-medium uppercase tracking-[0.2em]">
+                                              Ready to beat the ATS? Follow these <span className="text-orange-500">2 quick steps</span>.
+                                          </p>
+                                      </div>
+                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-stretch">
+                                          {/* Step 1: Resume */}
+                                          <div className={`flex flex-col gap-4 group ${inputWizardStep === 1 ? 'hidden md:flex' : ''}`}>
+                                              <div className="flex items-center gap-3">
+                                                  <div className="w-6 h-6 rounded-full bg-orange-600 flex items-center justify-center text-[10px] font-black text-white shadow-[0_0_15px_rgba(234,88,12,0.4)]">1</div>
+                                                  <h3 className="text-[11px] font-black text-white uppercase tracking-widest">Upload Resume</h3>
+                                              </div>
+                                              
+                                              <div className="flex-1 min-h-[220px] bg-zinc-900/40 border border-white/5 rounded-2xl p-1 group-hover:border-orange-500/20 transition-all shadow-2xl">
                                                   <Suspense fallback={<div className="h-full flex items-center justify-center"><Loader2 className="w-5 h-5 text-orange-500 animate-spin" /></div>}>
                                                     <ResumeUploader onFileUpload={handleFileUpload} currentFile={resumeFile} />
                                                   </Suspense>
                                               </div>
-                                              <div className="md:hidden mt-4">
+
+                                              <div className="md:hidden">
                                                   <button 
                                                       onClick={() => setInputWizardStep(1)} 
                                                       disabled={!resumeFile} 
-                                                      className="w-full py-3 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-xs uppercase tracking-wide transition-all rounded-sm cursor-pointer border-none disabled:opacity-50 touch-target"
+                                                      className="w-full py-4 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-xl transition-all disabled:opacity-30 disabled:grayscale touch-target shadow-lg shadow-orange-900/20"
                                                   >
-                                                      Next Step
+                                                      Next: Target Job
                                                   </button>
                                               </div>
                                           </div>
-                                          <div className={`flex flex-col h-full ${inputWizardStep === 0 ? 'hidden md:flex' : ''}`}>
-                                               <div className="md:hidden mb-1"><button onClick={() => setInputWizardStep(0)} className="text-zinc-500 py-1.5 text-xs touch-target">Back</button></div>
-                                               <h3 className="text-[10px] font-bold text-zinc-500 uppercase mb-2">2. Job Details</h3>
-                                               <div className="flex gap-1.5 mb-2 bg-zinc-900 p-1 rounded-lg border border-zinc-800 self-start">
-                                                  <button onClick={() => setJobInputMode('link')} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded text-[10px] font-bold transition-colors touch-target ${jobInputMode === 'link' ? 'bg-orange-600 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>Link</button>
-                                                  <button onClick={() => setJobInputMode('text')} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded text-[10px] font-bold transition-colors touch-target ${jobInputMode === 'text' ? 'bg-zinc-700 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>Text</button>
+                                          {/* Step 2: Job Details */}
+                                          <div className={`flex flex-col gap-4 group ${inputWizardStep === 0 ? 'hidden md:flex' : ''}`}>
+                                               <div className="md:hidden">
+                                                   <button onClick={() => setInputWizardStep(0)} className="text-zinc-500 py-1.5 text-[10px] font-black uppercase tracking-widest flex items-center gap-2 touch-target">
+                                                       <X className="w-3 h-3" /> Back
+                                                   </button>
                                                </div>
-                                               <div className="flex-1 min-h-[180px]">{jobInputMode === 'link' ? (<div className="h-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 sm:p-5 flex flex-col justify-center gap-3"><div className="text-center"><h4 className="text-white font-bold text-[10px] uppercase tracking-widest">Paste Job URL</h4><p className="text-zinc-500 text-[9px]">LinkedIn, Indeed, etc.</p></div><input type="url" inputMode="url" value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} placeholder="https://..." className="w-full bg-zinc-950 border border-zinc-700 rounded-lg p-2.5 text-xs text-white focus:border-orange-500 outline-none" /></div>) : (<textarea value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} placeholder="Paste job description..." className="w-full h-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 sm:p-4 text-xs text-zinc-300 focus:outline-none focus:border-zinc-600 resize-none font-mono min-h-[180px]" />)}</div>
+                                               
+                                               <div className="flex items-center justify-between">
+                                                   <div className="flex items-center gap-3">
+                                                       <div className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-[10px] font-black text-zinc-400 group-hover:bg-orange-600 group-hover:text-white transition-all">2</div>
+                                                       <h3 className="text-[11px] font-black text-white uppercase tracking-widest">Target Job</h3>
+                                                   </div>
+                                                   
+                                                   <div className="flex bg-zinc-900/80 p-1 rounded-lg border border-white/5">
+                                                      <button 
+                                                          onClick={() => setJobInputMode('link')} 
+                                                          className={`px-3 py-1 rounded-md text-[9px] font-black uppercase tracking-widest transition-all ${jobInputMode === 'link' ? 'bg-zinc-700 text-white shadow-lg' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                                      >
+                                                          Link
+                                                      </button>
+                                                      <button 
+                                                          onClick={() => setJobInputMode('text')} 
+                                                          className={`px-3 py-1 rounded-md text-[9px] font-black uppercase tracking-widest transition-all ${jobInputMode === 'text' ? 'bg-zinc-700 text-white shadow-lg' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                                      >
+                                                          Text
+                                                      </button>
+                                                   </div>
+                                               </div>
+
+                                               <div className="flex-1 min-h-[220px] bg-zinc-900/40 border border-white/5 rounded-2xl overflow-hidden group-hover:border-orange-500/20 transition-all shadow-2xl">
+                                                   {jobInputMode === 'link' ? (
+                                                       <div className="h-full p-6 flex flex-col justify-center items-center gap-4 text-center">
+                                                           <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center">
+                                                               <LinkIcon className="w-4 h-4 text-orange-500" />
+                                                           </div>
+                                                           <div>
+                                                               <h4 className="text-white font-black text-[10px] uppercase tracking-[0.2em] mb-1">Paste Job Link</h4>
+                                                               <p className="text-zinc-500 text-[9px] font-medium leading-relaxed max-w-[180px]">LinkedIn, Indeed, or any company career page.</p>
+                                                           </div>
+                                                           <input 
+                                                               type="url" 
+                                                               inputMode="url" 
+                                                               value={jobDescription} 
+                                                               onChange={(e) => setJobDescription(e.target.value)} 
+                                                               placeholder="https://..." 
+                                                               className="w-full bg-zinc-950 border border-white/10 rounded-xl p-3.5 text-xs text-white placeholder:text-zinc-700 focus:border-orange-500/50 outline-none transition-all font-mono" 
+                                                           />
+                                                       </div>
+                                                   ) : (
+                                                       <textarea 
+                                                           value={jobDescription} 
+                                                           onChange={(e) => setJobDescription(e.target.value)} 
+                                                           placeholder="Paste the full job description here..." 
+                                                           className="w-full h-full bg-transparent p-5 text-xs text-zinc-300 placeholder:text-zinc-700 focus:outline-none resize-none font-mono leading-relaxed" 
+                                                       />
+                                                   )}
+                                               </div>
                                           </div>
                                       </div>
-                                      {error && <div className="p-2.5 bg-orange-950/20 border border-orange-900/30 rounded-lg flex items-start gap-2.5 text-orange-400 text-xs"><AlertCircle className="w-4 h-4 shrink-0 mt-0.5" /> <span>{error}</span></div>}
-                                      <div className="flex justify-end pb-2">
+
+                                      {error && (
+                                          <motion.div 
+                                              initial={{ opacity: 0, y: 5 }}
+                                              animate={{ opacity: 1, y: 0 }}
+                                              className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-3 text-red-400 text-[10px] font-black uppercase tracking-widest"
+                                          >
+                                              <AlertCircle className="w-4 h-4 shrink-0" />
+                                              <span>{error}</span>
+                                          </motion.div>
+                                      )}
+
+                                      <div className="flex justify-center pt-2">
                                           <button 
                                               onClick={handleAnalysis} 
-                                              disabled={!resumeFile || isAnalyzing} 
-                                              className="w-full sm:w-auto px-6 py-2.5 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-xs uppercase tracking-wide transition-all rounded-sm cursor-pointer border-none disabled:opacity-50 disabled:cursor-not-allowed touch-target"
+                                              disabled={!resumeFile || isAnalyzing || !jobDescription.trim()} 
+                                              className="group relative w-full sm:w-auto overflow-hidden px-12 py-4 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-black text-[11px] uppercase tracking-[0.2em] rounded-xl transition-all disabled:opacity-30 disabled:grayscale touch-target shadow-xl shadow-orange-900/20"
                                           >
-                                              Start Analysis
+                                              <div className="relative z-10 flex items-center justify-center gap-2">
+                                                  <span>Scan & Optimize</span>
+                                                  <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                                              </div>
+                                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                                           </button>
                                       </div>
                                    </div>
