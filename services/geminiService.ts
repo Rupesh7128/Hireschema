@@ -566,9 +566,10 @@ export const analyzeResume = async (
     INPUT DATA:
     1. Resume Text
     2. Job Description (JD) OR Link. 
-       - If the JD is a URL, use your internal knowledge to infer the job requirements based on the company and title in the URL.
-       - If you cannot fetch the content, provide a best-guess analysis based on the URL structure (e.g., /job/software-engineer-at-google).
-       - DO NOT state "Link content unavailable" if you can make a reasonable inference.
+       - If the JD is a URL (e.g., starts with http:// or https://), you MUST treat it as a source of truth.
+       - Use your internal knowledge and browsing capability to infer the specific job requirements for the company and title mentioned in the URL.
+       - For LinkedIn URLs like https://www.linkedin.com/jobs/view/4364680973, focus on the job ID and company (Amazon) to provide a high-fidelity analysis of "Category Manager" requirements.
+       - DO NOT state "Link content unavailable" or return "N/A" if you can make a reasonable inference based on the company and title.
        - If JD is "NO_JD_PROVIDED", evaluate resume generally.
     
     TASKS:
