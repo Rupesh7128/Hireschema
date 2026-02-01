@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Dog } from 'lucide-react';
 
 interface LoadingIndicatorProps {
     message?: string;
@@ -29,29 +30,36 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
         <div className="flex flex-col items-center justify-center gap-4">
             <motion.div
                 animate={{ 
-                    y: [0, -20, 0],
-                    rotate: [0, 5, -5, 0]
+                    y: [0, -15, 0],
+                    rotate: [0, 10, -10, 0],
+                    scale: [1, 1.1, 1]
                 }}
                 transition={{ 
-                    duration: 1.5, 
+                    duration: 2, 
                     repeat: Infinity, 
                     ease: "easeInOut" 
                 }}
-                className={`${sizeClasses[size]} relative`}
+                className={`${sizeClasses[size]} relative flex items-center justify-center`}
             >
                 {hasError ? (
-                    <div className="w-full h-full bg-orange-500 rounded-full animate-pulse" />
+                    <div className="relative w-full h-full flex items-center justify-center">
+                        <div className="absolute inset-0 bg-orange-500/20 rounded-full animate-pulse blur-xl" />
+                        <Dog className="w-2/3 h-2/3 text-orange-500 relative z-10" />
+                    </div>
                 ) : (
                     <img 
                         src={dogImage} 
                         alt="Loading..." 
                         className="w-full h-full object-contain"
-                        onError={() => setHasError(true)}
+                        onError={() => {
+                            console.warn(`[LoadingIndicator] Failed to load image: ${dogImage}`);
+                            setHasError(true);
+                        }}
                     />
                 )}
             </motion.div>
             {message && (
-                <p className="text-zinc-500 text-sm font-mono animate-pulse uppercase tracking-widest">
+                <p className="text-zinc-500 text-xs font-black animate-pulse uppercase tracking-[0.3em] text-center max-w-[200px]">
                     {message}
                 </p>
             )}
