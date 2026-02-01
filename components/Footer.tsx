@@ -22,7 +22,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
     <footer className="relative bg-zinc-950 border-t border-white/5 pt-24 pb-12 overflow-hidden">
         {/* Decorative Background Elements */}
         <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-orange-600/5 rounded-full blur-[120px] pointer-events-none translate-x-1/2 translate-y-1/2"></div>
-        <div className="absolute top-0 left-0 w-[300px] h-[300px] bg-blue-600/5 rounded-full blur-[100px] pointer-events-none -translate-x-1/2 -translate-y-1/2"></div>
+        <div className="absolute top-0 left-0 w-[300px] h-[300px] bg-orange-600/5 rounded-full blur-[100px] pointer-events-none -translate-x-1/2 -translate-y-1/2"></div>
 
         <div className="max-w-7xl mx-auto px-6 sm:px-10 relative z-10">
             <div className="grid grid-cols-2 md:grid-cols-12 gap-y-16 gap-x-8 mb-24">

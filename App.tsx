@@ -179,8 +179,8 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
     if (this.state.hasError) {
       return (
         <div className="flex items-center justify-center h-screen bg-zinc-950">
-          <div className="max-w-lg p-6 rounded-xl border border-red-900/40 bg-red-950/20 text-red-300">
-            <h2 className="text-xl font-bold mb-2 text-red-400">Something went wrong</h2>
+          <div className="max-w-lg p-6 rounded-xl border border-orange-900/40 bg-orange-950/20 text-orange-300">
+            <h2 className="text-xl font-bold mb-2 text-orange-400">Something went wrong</h2>
             <p className="text-sm">{this.state.message}</p>
             <button onClick={() => this.setState({ hasError: false, message: '' })} className="mt-4 px-4 py-2 bg-zinc-800 text-white rounded">Try again</button>
           </div>
@@ -335,7 +335,7 @@ export default function App() {
                     const persistedState = restoreStateAfterPayment();
                     
                     if (persistedState) {
-                        console.log('✅ Restoring from persisted state, navigating to editor...');
+                        console.log('Restoring from persisted state, navigating to editor...');
                         
                         // Set all state in sequence to ensure proper updates
                         setResumeFile(persistedState.resumeFile);
@@ -688,7 +688,7 @@ export default function App() {
                   { name: "Elena K.", role: "UX Designer", company: "Airbnb", quote: "The interview prep feature gave me the confidence I needed. The STAR method breakdown was a game changer." }
                 ].map((story, i) => (
                   <div key={i} className="bg-zinc-900/50 border border-white/5 p-8 rounded-2xl hover:border-orange-500/30 transition-all">
-                    <div className="text-orange-500 mb-6">★★★★★</div>
+                    <div className="text-orange-500 mb-6 font-bold">5/5 Rating</div>
                     <p className="text-zinc-300 italic mb-8 italic">"{story.quote}"</p>
                     <div>
                       <div className="font-bold text-white">{story.name}</div>
@@ -747,7 +747,7 @@ export default function App() {
                               <div className="flex justify-between items-start mb-1">
                                 <span className="text-[10px] font-mono text-zinc-500">{item.date}</span>
                                 {paid && (
-                                  <div className="flex items-center gap-1 px-1.5 py-0.5 bg-green-500/10 border border-green-500/20 rounded text-[8px] font-bold text-green-500 uppercase">
+                                  <div className="flex items-center gap-1 px-1.5 py-0.5 bg-orange-500/10 border border-orange-500/20 rounded text-[8px] font-bold text-orange-500 uppercase">
                                     <CheckCircle className="w-2 h-2" /> Paid
                                   </div>
                                 )}
@@ -787,7 +787,7 @@ export default function App() {
             
             {/* Payment Success Toast */}
             {showPaymentSuccess && (
-                <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-2 px-4 py-3 bg-green-600 text-white text-sm font-bold rounded-lg shadow-lg animate-in fade-in slide-in-from-top-2">
+                <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-2 px-4 py-3 bg-orange-600 text-white text-sm font-bold rounded-lg shadow-lg animate-in fade-in slide-in-from-top-2">
                     <CheckCircle className="w-5 h-5" />
                     <span>Payment successful! Premium features unlocked.</span>
                 </div>
@@ -816,9 +816,9 @@ export default function App() {
                        <div className="h-6 w-[1px] bg-white/5 mx-1"></div>
 
                        {isPaid && (
-                           <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full">
-                               <CheckCircle className="w-3.5 h-3.5 text-green-500" />
-                               <span className="text-xs font-bold text-green-500 uppercase tracking-wider">Premium</span>
+                           <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-orange-500/10 border border-orange-500/20 rounded-full">
+                               <CheckCircle className="w-3.5 h-3.5 text-orange-500" />
+                               <span className="text-xs font-bold text-orange-500 uppercase tracking-wider">Premium</span>
                            </div>
                        )}
                        <a 
@@ -884,7 +884,7 @@ export default function App() {
                                               </div>
                                           </div>
                                           <div className={`flex flex-col h-full ${inputWizardStep === 0 ? 'hidden md:flex' : ''}`}>
-                                               <div className="md:hidden mb-2"><button onClick={() => setInputWizardStep(0)} className="text-zinc-500 py-2 touch-target">← Back</button></div>
+                                               <div className="md:hidden mb-2"><button onClick={() => setInputWizardStep(0)} className="text-zinc-500 py-2 touch-target">Back</button></div>
                                                <h3 className="text-xs font-bold text-zinc-500 uppercase mb-3">2. Job Details</h3>
                                                <div className="flex gap-2 mb-3 bg-zinc-900 p-1 rounded-lg border border-zinc-800 self-start">
                                                   <button onClick={() => setJobInputMode('link')} className={`flex items-center gap-2 px-3 py-2 rounded text-xs font-bold transition-colors touch-target ${jobInputMode === 'link' ? 'bg-orange-600 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}><LinkIcon className="w-3 h-3" /> Link</button>
@@ -893,7 +893,7 @@ export default function App() {
                                                <div className="flex-1 min-h-[200px]">{jobInputMode === 'link' ? (<div className="h-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 sm:p-6 flex flex-col justify-center gap-4"><div className="text-center"><div className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-3"><LinkIcon className="w-6 h-6 text-orange-500" /></div><h4 className="text-white font-bold text-sm">Paste Job URL</h4><p className="text-zinc-500 text-xs">LinkedIn, Indeed, etc.</p></div><input type="url" inputMode="url" value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} placeholder="https://..." className="w-full bg-zinc-950 border border-zinc-700 rounded-lg p-3 text-sm text-white focus:border-orange-500 outline-none" /></div>) : (<textarea value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} placeholder="Paste job description..." className="w-full h-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 sm:p-5 text-sm text-zinc-300 focus:outline-none focus:border-zinc-600 resize-none font-mono min-h-[200px]" />)}</div>
                                           </div>
                                       </div>
-                                      {error && <div className="p-3 sm:p-4 bg-red-950/20 border border-red-900/30 rounded-lg flex items-start gap-3 text-red-400 text-sm"><AlertCircle className="w-5 h-5 shrink-0 mt-0.5" /> <span>{error}</span></div>}
+                                      {error && <div className="p-3 sm:p-4 bg-orange-950/20 border border-orange-900/30 rounded-lg flex items-start gap-3 text-orange-400 text-sm"><AlertCircle className="w-5 h-5 shrink-0 mt-0.5" /> <span>{error}</span></div>}
                                       <div className="flex justify-end pb-4">
                                           <button 
                                               onClick={handleAnalysis} 

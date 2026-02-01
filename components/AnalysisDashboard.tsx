@@ -113,6 +113,18 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
     setIsEditingProfile(false);
   };
 
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setEditProfileData({ ...editProfileData, photo: base64String });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   // --- HELPERS ---
   const handleDownloadCSV = () => {
     const headers = ["Category", "Details"];
@@ -198,8 +210,8 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
               <div className="text-center">
                 <span className="block text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1">Status</span>
                 <div className="flex items-center gap-1.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                  <span className="text-xs font-bold text-green-500 uppercase">Live Report</span>
+                  <div className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+                  <span className="text-xs font-bold text-orange-500 uppercase">Live Report</span>
                 </div>
               </div>
             </div>
@@ -215,7 +227,17 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/[0.02] to-transparent pointer-events-none" />
           
           <div className="relative z-10 flex items-center gap-6">
-            <div className="w-24 h-24 rounded-3xl bg-zinc-800 border-2 border-zinc-700/50 flex items-center justify-center shrink-0 overflow-hidden relative shadow-2xl group/photo">
+            <div 
+              className="w-24 h-24 rounded-3xl bg-zinc-800 border-2 border-zinc-700/50 flex items-center justify-center shrink-0 overflow-hidden relative shadow-2xl group/photo cursor-pointer"
+              onClick={() => document.getElementById('photo-upload')?.click()}
+            >
+              <input 
+                type="file" 
+                id="photo-upload" 
+                className="hidden" 
+                accept="image/*"
+                onChange={handlePhotoUpload}
+              />
               {editProfileData.photo ? (
                 <img src={editProfileData.photo} alt="Profile" className="w-full h-full object-cover transition-transform group-hover/photo:scale-110" />
               ) : (
@@ -317,11 +339,11 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
           
           {/* Main Verdict: Job Seeker First */}
           <div className="p-8 bg-zinc-900/40 border border-white/5 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
-            <div className={`absolute top-0 right-0 w-48 h-48 blur-[80px] -mr-24 -mt-24 opacity-30 ${result.atsScore >= 70 ? 'bg-green-500' : 'bg-orange-500'}`} />
+            <div className={`absolute top-0 right-0 w-48 h-48 blur-[80px] -mr-24 -mt-24 opacity-30 bg-orange-500`} />
             
             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
               <div className="flex items-center gap-6">
-                <div className={`p-4 rounded-3xl ${result.atsScore >= 70 ? 'bg-green-500/10 text-green-500' : 'bg-orange-500/10 text-orange-500 shadow-2xl shadow-orange-500/10'}`}>
+                <div className={`p-4 rounded-3xl bg-orange-500/10 text-orange-500 shadow-2xl shadow-orange-500/10`}>
                   {result.atsScore >= 70 ? <Sparkles className="w-10 h-10" /> : <ShieldAlert className="w-10 h-10" />}
                 </div>
                 <div>
@@ -340,7 +362,7 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
               <div className="flex items-center gap-10 w-full md:w-auto px-8 py-4 bg-zinc-950/50 rounded-3xl border border-white/5 backdrop-blur-xl">
                 <div className="text-center">
                   <span className="block text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1.5">Likelihood</span>
-                  <span className={`text-xl font-black ${result.atsScore >= 80 ? 'text-green-500' : result.atsScore >= 60 ? 'text-orange-400' : 'text-orange-600'}`}>
+                  <span className={`text-xl font-black ${result.atsScore >= 80 ? 'text-white' : result.atsScore >= 60 ? 'text-orange-400' : 'text-orange-600'}`}>
                     {result.atsScore >= 80 ? 'HIGH' : result.atsScore >= 60 ? 'MEDIUM' : 'LOW'}
                   </span>
                 </div>
@@ -348,7 +370,7 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
                 <div className="text-center">
                   <span className="block text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1.5">Impact Issues</span>
                   <div className="flex items-center justify-center gap-2">
-                    <span className={`text-xl font-black ${result.criticalIssues.length > 0 ? 'text-orange-500' : 'text-green-500'}`}>{result.criticalIssues.length + result.missingKeywords.length}</span>
+                    <span className={`text-xl font-black ${result.criticalIssues.length > 0 ? 'text-orange-500' : 'text-white'}`}>{result.criticalIssues.length + result.missingKeywords.length}</span>
                     <AlertTriangle className={`w-4 h-4 ${result.criticalIssues.length > 0 ? 'text-orange-500' : 'text-zinc-800'}`} />
                   </div>
                 </div>
@@ -428,7 +450,7 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
                 onClick={copyKeywords}
                 className="px-3 py-1.5 bg-zinc-950 border border-white/10 rounded-xl text-[10px] font-black text-zinc-400 hover:text-white hover:border-orange-500/50 transition-all flex items-center gap-2"
               >
-                {copiedKeywords ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
+                {copiedKeywords ? <Check className="w-3 h-3 text-orange-500" /> : <Copy className="w-3 h-3" />}
                 {copiedKeywords ? "COPIED" : "COPY ALL"}
               </button>
             </div>
@@ -441,8 +463,8 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
                   </span>
                 ))
               ) : (
-                <div className="flex items-center gap-3 text-zinc-500 text-sm font-bold bg-zinc-950/50 p-4 rounded-2xl w-full border border-green-500/20">
-                  <CheckCircle className="w-5 h-5 text-green-500" /> 100% Keyword Match Found
+                <div className="flex items-center gap-3 text-zinc-500 text-sm font-bold bg-zinc-950/50 p-4 rounded-2xl w-full border border-orange-500/20">
+                  <CheckCircle className="w-5 h-5 text-orange-500" /> 100% Keyword Match Found
                 </div>
               )}
             </div>
@@ -466,16 +488,16 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
             <div className="space-y-4">
               {result.criticalIssues.length > 0 ? (
                 result.criticalIssues.map((issue, idx) => (
-                  <div key={idx} className="flex items-start gap-4 p-4 bg-red-500/5 border border-red-500/10 rounded-2xl group/risk hover:bg-red-500/10 transition-all">
-                    <div className="mt-1 p-1 bg-red-500/20 rounded-md">
+                  <div key={idx} className="flex items-start gap-4 p-4 bg-orange-500/5 border border-orange-500/10 rounded-2xl group/risk hover:bg-orange-500/10 transition-all">
+                    <div className="mt-1 p-1 bg-orange-500/20 rounded-md">
                       <AlertTriangle className="w-3 h-3 text-orange-500" />
                     </div>
                     <span className="text-sm text-zinc-300 leading-snug font-bold">{issue}</span>
                   </div>
                 ))
               ) : (
-                <div className="flex items-center gap-3 text-zinc-500 text-sm font-bold bg-zinc-950/50 p-4 rounded-2xl border border-green-500/20">
-                  <CheckCircle className="w-5 h-5 text-green-500" /> Clean Formatting - ATS Optimized
+                <div className="flex items-center gap-3 text-zinc-500 text-sm font-bold bg-zinc-950/50 p-4 rounded-2xl border border-orange-500/20">
+                  <CheckCircle className="w-5 h-5 text-orange-500" /> Clean Formatting - ATS Optimized
                 </div>
               )}
             </div>

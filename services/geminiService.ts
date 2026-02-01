@@ -71,17 +71,7 @@ const getGenAI = (): GoogleGenerativeAI => {
     
     const apiKey = getApiKey();
 
-    // DEBUG: Log masked key to verify it's being read correctly
-    if (apiKey) {
-        console.log(`[Gemini Service] API Key loaded: ${apiKey.substring(0, 4)}...${apiKey.substring(apiKey.length - 4)}`);
-    } else {
-        console.error("[Gemini Service] API Key is MISSING! Please check your environment variables.");
-        console.error("[Gemini Service] Available env vars:", {
-            vite_gemini: !!(import.meta as any).env?.VITE_GEMINI_API_KEY,
-            gemini: !!(import.meta as any).env?.GEMINI_API_KEY,
-            process_gemini: !!(process as any).env?.GEMINI_API_KEY,
-            process_api: !!(process as any).env?.API_KEY
-        });
+    if (!apiKey) {
         throw new Error('Gemini API key not found. Please check your environment variables.');
     }
 
@@ -576,7 +566,9 @@ export const analyzeResume = async (
     INPUT DATA:
     1. Resume Text
     2. Job Description (JD) OR Link. 
-       - If the JD is a URL, try to infer context or state "Link content unavailable" (Search tool disabled for stability).
+       - If the JD is a URL, use your internal knowledge to infer the job requirements based on the company and title in the URL.
+       - If you cannot fetch the content, provide a best-guess analysis based on the URL structure (e.g., /job/software-engineer-at-google).
+       - DO NOT state "Link content unavailable" if you can make a reasonable inference.
        - If JD is "NO_JD_PROVIDED", evaluate resume generally.
     
     TASKS:
@@ -666,13 +658,13 @@ export const generateContent = async (
       userPrompt = `
       You are an expert Resume Writer and ATS Optimization Specialist.
       
-      ════════════════════════════════════════════════════════════════════════════════
-      ⛔ CRITICAL: ZERO FABRICATION POLICY - READ THIS CAREFULLY ⛔
-      ════════════════════════════════════════════════════════════════════════════════
+      --------------------------------------------------------------------------------
+      CRITICAL: ZERO FABRICATION POLICY - READ THIS CAREFULLY
+      --------------------------------------------------------------------------------
       
       Your task is to REFORMAT and OPTIMIZE the resume above, NOT to create a new one.
       
-      🚫 ABSOLUTELY FORBIDDEN - DO NOT:
+      ABSOLUTELY FORBIDDEN - DO NOT:
       • Invent ANY company names (use ONLY companies from the original resume)
       • Invent ANY job titles (use ONLY titles from the original resume)
       • Invent ANY school names (use ONLY schools from the original resume)
@@ -682,7 +674,7 @@ export const generateContent = async (
       • Add ANY metrics/numbers not in the original resume
       • Add ANY certifications not in the original resume
       
-      ✅ YOU MUST:
+      YOU MUST:
       • Copy the candidate's NAME exactly as shown
       • Copy ALL company names exactly as shown
       • Copy ALL job titles exactly as shown  
@@ -690,7 +682,7 @@ export const generateContent = async (
       • Copy ALL dates exactly as shown
       • Copy the candidate's contact info exactly
       
-      ✅ YOU MAY IMPROVE:
+      YOU MAY IMPROVE:
       • Reword bullet points to sound more impactful (same facts, better phrasing)
       • Add relevant keywords from the job description INTO existing bullet points
       • Write a professional summary based on their ACTUAL experience
@@ -718,7 +710,7 @@ export const generateContent = async (
       userPrompt = `
       Write a persuasive Cover Letter for the candidate.
       
-      ⛔ CRITICAL - ZERO FABRICATION POLICY:
+      CRITICAL - ZERO FABRICATION POLICY:
       • Use ONLY companies, job titles, and achievements from the ORIGINAL RESUME above
       • Do NOT invent any experience, projects, or accomplishments
       • Reference their REAL work history exactly as shown in the resume
@@ -741,7 +733,7 @@ export const generateContent = async (
       userPrompt = `
       Create an Interview Prep Kit for this candidate.
       
-      ⛔ CRITICAL - ZERO FABRICATION POLICY:
+      CRITICAL - ZERO FABRICATION POLICY:
       • ALL STAR examples MUST use companies, projects, and achievements from the ORIGINAL RESUME above
       • Do NOT invent fictional scenarios or fake accomplishments
       • Reference ONLY their real work history as shown in the resume
@@ -853,35 +845,35 @@ export const generateContent = async (
   
   const resumeContext = originalResumeText && originalResumeText.length > 100
     ? `
-════════════════════════════════════════════════════════════════════════════════
-█ ORIGINAL RESUME CONTENT - THIS IS YOUR ONLY SOURCE OF TRUTH █
-════════════════════════════════════════════════════════════════════════════════
-⚠️ EVERY company name, job title, school name, date, and skill below is REAL.
-⚠️ You MUST use ONLY the information below. DO NOT invent anything.
-════════════════════════════════════════════════════════════════════════════════
+--------------------------------------------------------------------------------
+ORIGINAL RESUME CONTENT - THIS IS YOUR ONLY SOURCE OF TRUTH
+--------------------------------------------------------------------------------
+EVERY company name, job title, school name, date, and skill below is REAL.
+You MUST use ONLY the information below. DO NOT invent anything.
+--------------------------------------------------------------------------------
 
 ${originalResumeText}
 
-════════════════════════════════════════════════════════════════════════════════
-█ END OF ORIGINAL RESUME - USE ONLY THE INFORMATION ABOVE █
-════════════════════════════════════════════════════════════════════════════════
-⛔ If you output ANY company, school, or job title NOT shown above, you have FAILED.
-⛔ Double-check every fact against the original resume above before outputting.
-════════════════════════════════════════════════════════════════════════════════
+--------------------------------------------------------------------------------
+END OF ORIGINAL RESUME - USE ONLY THE INFORMATION ABOVE
+--------------------------------------------------------------------------------
+CRITICAL: If you output ANY company, school, or job title NOT shown above, you have FAILED.
+Double-check every fact against the original resume above before outputting.
+--------------------------------------------------------------------------------
 `
     : `
-════════════════════════════════════════════════════════════════════════════════
-⚠️ WARNING: Original resume text not available ⚠️
-════════════════════════════════════════════════════════════════════════════════
+--------------------------------------------------------------------------------
+WARNING: Original resume text not available
+--------------------------------------------------------------------------------
 Using limited profile data from analysis:
 - Name: ${analysis.contactProfile?.name || 'Unknown'}
 - Summary: ${analysis.summary || 'Not available'}
 - Key Strengths: ${analysis.keyStrengths?.join(", ") || 'Not available'}
 - Contact: ${JSON.stringify(analysis.contactProfile || {})}
 
-⚠️ Since original resume is unavailable, create a TEMPLATE with placeholders.
-⚠️ Use [Company Name], [Job Title], [School Name] as placeholders.
-════════════════════════════════════════════════════════════════════════════════
+Since original resume is unavailable, create a TEMPLATE with placeholders.
+Use [Company Name], [Job Title], [School Name] as placeholders.
+--------------------------------------------------------------------------------
 `;
 
   const fullPrompt = `

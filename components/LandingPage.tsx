@@ -567,11 +567,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.2 }}
-                        className="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl hover:border-green-500/20 transition-all duration-500 group"
+                        className="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl hover:border-orange-500/20 transition-all duration-500 group"
                     >
                         <div className="flex gap-5">
-                            <div className="w-12 h-12 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                                <CheckCircle2 className="w-6 h-6 text-green-500" />
+                            <div className="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                                <CheckCircle2 className="w-6 h-6 text-orange-500" />
                             </div>
                             <div>
                                 <h3 className="text-xl font-bold text-white mb-2">The HireSchema Fix</h3>
@@ -617,8 +617,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                     >
                         <div className="flex justify-between items-center mb-8 border-b border-white/5 pb-5">
                             <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                                <span className="text-[11px] font-bold text-green-500 uppercase tracking-widest">Optimized</span>
+                                <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+                                <span className="text-[11px] font-bold text-white uppercase tracking-widest">Optimized</span>
                             </div>
                             <div className="text-[11px] font-mono text-orange-400 font-bold uppercase tracking-tight">Score: 94/100</div>
                         </div>
@@ -629,8 +629,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                         
                         {/* Keyword highlight explanation */}
                         <div className="mt-8 flex flex-wrap gap-2">
-                            <span className="text-[9px] bg-green-500/10 text-green-400 px-2.5 py-1 rounded-full border border-green-500/20 font-mono uppercase tracking-wider">Quantified Impact</span>
-                            <span className="text-[9px] bg-green-500/10 text-green-400 px-2.5 py-1 rounded-full border border-green-500/20 font-mono uppercase tracking-wider">ATS Keywords Found</span>
+                            <span className="text-[9px] bg-orange-500/10 text-orange-400 px-2.5 py-1 rounded-full border border-orange-500/20 font-mono uppercase tracking-wider">Quantified Impact</span>
+                            <span className="text-[9px] bg-orange-500/10 text-orange-400 px-2.5 py-1 rounded-full border border-orange-500/20 font-mono uppercase tracking-wider">ATS Keywords Found</span>
                         </div>
 
                         {/* Floating Success Badge */}
@@ -639,7 +639,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                             whileInView={{ scale: 1, rotate: 12 }}
                             viewport={{ once: true }}
                             transition={{ type: "spring", delay: 1, damping: 10 }}
-                            className="absolute -right-4 -bottom-4 bg-green-500 text-black font-black px-6 py-3 rounded-xl shadow-2xl z-40 border-4 border-zinc-950 text-base"
+                            className="absolute -right-4 -bottom-4 bg-orange-500 text-white font-black px-6 py-3 rounded-xl shadow-2xl z-40 border-4 border-zinc-950 text-base"
                         >
                             ATS PASS
                         </motion.div>
