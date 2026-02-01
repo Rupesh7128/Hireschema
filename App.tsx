@@ -18,7 +18,7 @@ import { Footer } from './components/Footer';
 // Lazy load heavy components for better initial load performance
 const ResumeUploader = lazy(() => import('./components/ResumeUploader'));
 const AnalysisDashboard = lazy(() => import('./components/AnalysisDashboard'));
-const ContentGenerator = lazy(() => import('./components/ContentGenerator'));
+const Editor = lazy(() => import('./components/Editor'));
 const LandingPage = lazy(() => import('./components/LandingPage'));
 const LegalPages = lazy(() => import('./components/LegalPages'));
 const RoastPage = lazy(() => import('./components/RoastPage'));
@@ -926,7 +926,7 @@ export default function App() {
                                          ) : (
                                            <ErrorBoundary>
                                              <Suspense fallback={<div className="flex items-center justify-center h-64"><Loader2 className="w-8 h-8 text-orange-500 animate-spin" /></div>}>
-                                               <ContentGenerator 
+                                               <Editor 
                                                  analysisId={selectedHistoryId}
                                                  resumeFile={resumeFile}
                                                  resumeText={resumeText}
