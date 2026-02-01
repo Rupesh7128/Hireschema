@@ -14,6 +14,8 @@ import {
 interface AnalysisDashboardProps {
   result: AnalysisResult;
   onUpdateProfile?: (profile: ContactProfile) => void;
+  onNavigateTab?: (tab: 'analysis' | 'generator') => void;
+  onReScan?: () => void;
 }
 
 const ScoreRing = ({ value, label, icon: Icon, color = "orange", subtext }: { value: number, label: string, icon: any, color?: string, subtext?: string }) => {
@@ -90,10 +92,16 @@ const BulletList = ({ title, items, icon: Icon, color = "zinc" }: { title: strin
   );
 };
 
-const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateProfile }) => {
+const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateProfile, onNavigateTab, onReScan }) => {
   // --- PROFILE EDIT STATE ---
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [editProfileData, setEditProfileData] = useState<ContactProfile>(result.contactProfile);
+
+  const risksRef = React.useRef<HTMLDivElement>(null);
+
+  const scrollToRisks = () => {
+    risksRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   useEffect(() => {
     setEditProfileData(result.contactProfile);
@@ -394,12 +402,16 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
           
           <div className="lg:w-[60%] grid grid-cols-1 sm:grid-cols-2 gap-5">
             {[
-              { title: "Skill Injection", desc: "Embed the top 3 missing keywords into your bullet points.", action: "Go to Editor" },
-              { title: "Format Cleanup", desc: "Remove identified risks to ensure 100% ATS readability.", action: "View Risks" },
-              { title: "Story Alignment", desc: "Sync your summary with the Role Fit analysis below.", action: "Update Bio" },
-              { title: "Final Validation", desc: "Re-run analysis to hit the 85% golden score.", action: "Re-Scan" },
+              { title: "Skill Injection", desc: "Embed the top 3 missing keywords into your bullet points.", action: "Go to Editor", onClick: () => onNavigateTab?.('generator') },
+              { title: "Format Cleanup", desc: "Remove identified risks to ensure 100% ATS readability.", action: "View Risks", onClick: scrollToRisks },
+              { title: "Story Alignment", desc: "Sync your summary with the Role Fit analysis below.", action: "Update Bio", onClick: () => onNavigateTab?.('generator') },
+              { title: "Final Validation", desc: "Re-run analysis to hit the 85% golden score.", action: "Re-Scan", onClick: onReScan },
             ].map((step, i) => (
-              <div key={i} className="flex flex-col gap-4 p-6 bg-zinc-900/60 border border-white/5 rounded-3xl hover:bg-zinc-900/80 transition-all cursor-default group/card relative">
+              <div 
+                key={i} 
+                onClick={step.onClick}
+                className="flex flex-col gap-4 p-6 bg-zinc-900/60 border border-white/5 rounded-3xl hover:bg-zinc-900/80 hover:border-orange-500/30 transition-all cursor-pointer group/card relative"
+              >
                 <div className="flex items-center gap-4">
                   <h4 className="text-base font-black text-white">{step.title}</h4>
                 </div>
@@ -456,7 +468,7 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
           </div>
 
           {/* Critical Risks / Issues */}
-          <div className="bg-zinc-900/40 border border-white/5 p-8 rounded-[3rem] shadow-xl">
+          <div ref={risksRef} className="bg-zinc-900/40 border border-white/5 p-8 rounded-[3rem] shadow-xl">
             <div className="flex items-center gap-3 mb-6">
               <h3 className="text-sm font-black text-white uppercase tracking-widest">Technical Risks</h3>
             </div>

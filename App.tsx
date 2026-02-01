@@ -919,7 +919,12 @@ export default function App() {
                                            <div className="h-full overflow-y-auto p-6">
                                              <ErrorBoundary>
                                                <Suspense fallback={<div className="flex items-center justify-center h-64"><Loader2 className="w-8 h-8 text-orange-500 animate-spin" /></div>}>
-                                                 <AnalysisDashboard result={analysisResult} onUpdateProfile={handleUpdateAnalysisProfile} />
+                                                 <AnalysisDashboard 
+                                                   result={analysisResult} 
+                                                   onUpdateProfile={handleUpdateAnalysisProfile} 
+                                                   onNavigateTab={setResultTab}
+                                                   onReScan={startNewScan}
+                                                 />
                                                </Suspense>
                                              </ErrorBoundary>
                                            </div>
