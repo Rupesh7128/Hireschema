@@ -8,7 +8,6 @@ export interface FeaturePageProps {
   title: string;
   subtitle: string;
   description: string;
-  icon: LucideIcon;
   benefits: string[];
   
   // New detailed sections
@@ -32,7 +31,6 @@ export const FeaturePage: React.FC<FeaturePageProps> = ({
   title,
   subtitle,
   description,
-  icon: Icon,
   benefits,
   problemTitle,
   problemDesc,
@@ -52,9 +50,9 @@ export const FeaturePage: React.FC<FeaturePageProps> = ({
         
         {/* HERO */}
         <div className="flex flex-col items-center text-center mb-32 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <div className="w-20 h-20 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center mb-10 shadow-2xl shadow-orange-900/20 relative">
+          <div className="px-6 py-2 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center mb-10 shadow-2xl shadow-orange-900/20 relative">
             <div className="absolute inset-0 bg-orange-500/10 rounded-xl blur-xl" />
-            <Icon className="w-10 h-10 text-orange-500 relative z-10" />
+            <span className="text-orange-500 font-black text-sm uppercase tracking-[0.3em] relative z-10">Feature Deep-Dive</span>
           </div>
           
           <h1 className="text-5xl sm:text-7xl font-black tracking-tighter text-white mb-8 leading-[1.1] max-w-4xl">

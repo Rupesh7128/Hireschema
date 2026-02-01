@@ -295,36 +295,31 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
       id: "missing-keywords",
       title: "See What's Missing",
       desc: "We compare your resume to the job posting and show exactly which keywords you're missing.",
-      micro: "Like spell-check, but for job applications.",
-      icon: Search
+      micro: "Like spell-check, but for job applications."
     },
     {
       id: "fix-automatically",
       title: "Fix It Automatically",
       desc: "We rewrite your bullet points to include the right keywords naturally.",
-      micro: "Your experience, better words.",
-      icon: Sparkles
+      micro: "Your experience, better words."
     },
     {
       id: "cover-letter",
       title: "Cover Letter Included",
       desc: "Get a personalized cover letter that matches the job you're applying for.",
-      micro: "No more blank page anxiety.",
-      icon: FileText
+      micro: "No more blank page anxiety."
     },
     {
       id: "interview-prep",
       title: "Interview Questions",
       desc: "See likely interview questions based on the job description, with sample answers.",
-      micro: "Be prepared, not surprised.",
-      icon: BrainCircuit
+      micro: "Be prepared, not surprised."
     },
     {
       id: "skill-gap",
       title: "Learn What You're Missing",
       desc: "If you're missing a skill, we show you free resources to learn it quickly.",
-      micro: "Turn weaknesses into strengths.",
-      icon: GraduationCap
+      micro: "Turn weaknesses into strengths."
     }
   ];
 

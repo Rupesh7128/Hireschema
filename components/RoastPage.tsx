@@ -216,8 +216,8 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                     animate={{ scale: 1, opacity: 1 }}
                     className="space-y-4"
                 >
-                    <div className="inline-flex items-center justify-center p-3 sm:p-4 bg-orange-500/10 rounded-full mb-4 border border-orange-500/20 shadow-[0_0_30px_rgba(249,115,22,0.3)]">
-                        <Flame className="w-8 sm:w-10 h-8 sm:h-10 text-orange-500" />
+                    <div className="inline-flex items-center justify-center px-6 py-2 bg-orange-500/10 rounded-full mb-4 border border-orange-500/20 shadow-[0_0_30px_rgba(249,115,22,0.3)]">
+                        <span className="text-orange-500 font-black text-sm uppercase tracking-[0.3em]">Roast Engine</span>
                     </div>
                     <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tighter uppercase">
                         Roast My <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-300">Resume</span>
@@ -241,8 +241,7 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                     <label className="group relative flex flex-col items-center justify-center w-full h-56 sm:h-64 rounded-2xl border-2 border-dashed border-zinc-800 hover:border-orange-500/50 active:border-orange-500/70 bg-zinc-900/30 hover:bg-zinc-900 transition-all cursor-pointer overflow-hidden touch-target">
                         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5"></div>
                         <div className="relative z-10 flex flex-col items-center justify-center pt-5 pb-6">
-                            <Upload className="w-10 sm:w-12 h-10 sm:h-12 text-zinc-600 group-hover:text-orange-500 mb-4 transition-colors transform group-hover:scale-110 duration-500" />
-                            <p className="mb-2 text-base sm:text-lg text-white font-bold">Drop your PDF here</p>
+                            <p className="mb-2 text-base sm:text-lg text-white font-bold uppercase tracking-widest">Drop PDF here</p>
                             <p className="text-xs text-zinc-500 font-mono">TAP TO UPLOAD</p>
                         </div>
                         <input type="file" className="hidden" accept=".pdf" onChange={handleFileUpload} />
@@ -265,7 +264,7 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                 >
                     <div className="absolute inset-0 bg-orange-500 blur-3xl opacity-30 animate-pulse"></div>
                     <div className="relative w-24 h-24 bg-zinc-900 border-2 border-orange-500/30 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(249,115,22,0.4)]">
-                        <Flame className="w-12 h-12 text-orange-500 animate-bounce" />
+                        <span className="text-2xl font-black text-orange-500 animate-pulse">AI</span>
                     </div>
                 </motion.div>
                 
@@ -323,9 +322,6 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                         {/* Main Score */}
                         <div className="lg:col-span-2 bg-gradient-to-br from-zinc-900 via-zinc-900 to-orange-950/20 border border-orange-900/30 p-6 sm:p-8 rounded-2xl flex flex-col items-center justify-center text-center shadow-2xl relative overflow-hidden">
                             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-600 via-orange-500 to-orange-600"></div>
-                            <div className="absolute top-4 right-4">
-                                <Skull className="w-8 h-8 text-orange-500/20" />
-                            </div>
                             
                             <div className="text-zinc-400 text-xs font-bold uppercase tracking-widest mb-3">Employability Score</div>
                             <div className="relative mb-4">
@@ -336,7 +332,6 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                             </div>
                             
                             <div className="flex items-center gap-2 text-orange-400 text-sm font-bold bg-orange-950/40 px-4 py-2 rounded-full border border-orange-500/20">
-                                <TrendingDown className="w-4 h-4" />
                                 {roastScore < 25 ? "Medically Unhireable" : 
                                  roastScore < 40 ? "Spiritually Unemployable" : 
                                  roastScore < 55 ? "Barely Breathing" : "Surprisingly Decent"}
@@ -415,10 +410,10 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                     {/* Quick Stats */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                         {[
-                            { icon: Target, label: 'Buzzword Density', value: `${Math.floor(Math.random() * 40) + 20}%`, color: 'text-orange-500' },
-                            { icon: Zap, label: 'Cringe Factor', value: `${Math.floor(Math.random() * 30) + 70}/100`, color: 'text-zinc-400' },
-                            { icon: Star, label: 'Originality', value: `${Math.floor(Math.random() * 15) + 5}%`, color: 'text-orange-400' },
-                            { icon: Award, label: 'Hire Probability', value: `${Math.floor(Math.random() * 20) + 10}%`, color: 'text-zinc-500' },
+                            { label: 'Buzzword Density', value: `${Math.floor(Math.random() * 40) + 20}%`, color: 'text-orange-500' },
+                            { label: 'Cringe Factor', value: `${Math.floor(Math.random() * 30) + 70}/100`, color: 'text-zinc-400' },
+                            { label: 'Originality', value: `${Math.floor(Math.random() * 15) + 5}%`, color: 'text-orange-400' },
+                            { label: 'Hire Probability', value: `${Math.floor(Math.random() * 20) + 10}%`, color: 'text-zinc-500' },
                         ].map((stat, index) => (
                             <motion.div
                                 key={index}
@@ -427,9 +422,8 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                                 transition={{ delay: index * 0.2, duration: 0.8 }}
                                 className="bg-zinc-900/60 border border-zinc-800 p-4 rounded-xl text-center"
                             >
-                                <stat.icon className={`w-6 h-6 ${stat.color} mx-auto mb-2`} />
-                                <div className="text-lg font-bold text-white">{stat.value}</div>
-                                <div className="text-xs text-zinc-500">{stat.label}</div>
+                                <div className="text-lg font-bold text-white mb-1">{stat.value}</div>
+                                <div className="text-[10px] text-zinc-500 uppercase tracking-widest">{stat.label}</div>
                             </motion.div>
                         ))}
                     </div>
@@ -442,17 +436,13 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                         className="bg-gradient-to-br from-zinc-900 via-zinc-900 to-orange-950/10 border border-zinc-800 rounded-2xl p-6 sm:p-8 md:p-12 shadow-2xl relative overflow-hidden"
                     >
                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-600 via-orange-600 to-orange-600"></div>
-                        <div className="absolute top-6 right-6">
-                            <Flame className="w-10 h-10 text-orange-500/20" />
-                        </div>
                         
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="p-3 bg-orange-500/10 rounded-xl border border-orange-500/20">
-                                <Skull className="w-6 h-6 text-orange-500" />
+                            <div className="px-4 py-1 bg-orange-500/10 rounded-lg border border-orange-500/20">
+                                <span className="text-orange-500 font-black text-xs uppercase tracking-widest">Master Verdict</span>
                             </div>
                             <div>
-                                <h2 className="text-3xl font-bold text-white">The Verdict</h2>
-                                <p className="text-zinc-400 text-sm">Brutally honest feedback incoming</p>
+                                <h2 className="text-3xl font-bold text-white uppercase tracking-tighter">The Verdict</h2>
                             </div>
                         </div>
                         
@@ -507,24 +497,11 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                         
                         <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
                             <div className="flex items-start gap-4">
-                                <div className="p-3 bg-orange-500/10 rounded-xl border border-orange-500/20 shrink-0">
-                                    <Trophy className="w-8 h-8 text-orange-500" />
-                                </div>
                                 <div>
-                                    <h3 className="text-3xl font-bold text-white mb-2">Ready to stop being a punchline?</h3>
-                                    <p className="text-zinc-400 text-sm sm:text-base max-w-md leading-relaxed">
+                                    <h3 className="text-3xl font-bold text-white mb-2 uppercase tracking-tighter">Ready to stop being a punchline?</h3>
+                                    <p className="text-zinc-400 text-sm sm:text-base max-w-md leading-relaxed font-medium">
                                         We've roasted thousands and hired hundreds. Your resume doesn't have to be a comedy show.
                                     </p>
-                                    <div className="flex items-center gap-4 mt-4 text-xs text-zinc-500">
-                                        <div className="flex items-center gap-1">
-                                            <Star className="w-3 h-3 text-yellow-500" />
-                                            <span>4.9/5 Success Rate</span>
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                            <Target className="w-3 h-3 text-green-500" />
-                                            <span>2x More Interviews</span>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                             
@@ -538,7 +515,6 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                                     }} 
                                     className="px-6 sm:px-10 py-3.5 sm:py-4 bg-zinc-900 hover:bg-zinc-800 active:bg-zinc-700 text-white font-mono font-bold text-sm uppercase tracking-wide shadow-[4px_4px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[2px] active:translate-y-[2px] transition-all rounded-sm cursor-pointer border border-zinc-800 flex items-center justify-center gap-2"
                                 >
-                                    <RotateCcw className="w-4 h-4" /> 
                                     <span>Roast Another</span>
                                 </a>
                                 <a 
@@ -550,7 +526,7 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                                     }}
                                     className="px-6 sm:px-10 py-3.5 sm:py-4 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-sm sm:text-base uppercase tracking-wide flex items-center justify-center gap-2 sm:gap-3 shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[2px] active:translate-y-[2px] transition-all rounded-sm cursor-pointer border-none touch-target"
                                 >
-                                    Fix It Fast <ArrowRight className="w-4 h-4" />
+                                    Fix It Fast
                                 </a>
                             </div>
                         </div>

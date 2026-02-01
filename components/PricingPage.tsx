@@ -49,7 +49,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStart }) => {
             {/* Row 1 */}
             <div className="grid grid-cols-4 p-6 border-b border-white/5 hover:bg-white/5 transition-colors items-center">
               <div className="col-span-1 font-bold text-white">ATS Keyword Optimization</div>
-              <div className="col-span-1 flex justify-center"><CheckCircle2 className="w-6 h-6 text-orange-500" /></div>
+              <div className="col-span-1 flex justify-center"><div className="w-2 h-2 rounded-full bg-orange-500" /></div>
               <div className="col-span-1 flex justify-center text-center text-sm text-zinc-500">Manual prompting required</div>
               <div className="col-span-1 flex justify-center text-center text-sm text-zinc-500">Basic matching</div>
             </div>
@@ -57,15 +57,15 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStart }) => {
             {/* Row 2 */}
             <div className="grid grid-cols-4 p-6 border-b border-white/5 hover:bg-white/5 transition-colors items-center">
               <div className="col-span-1 font-bold text-white">Resume Scoring (0-100)</div>
-              <div className="col-span-1 flex justify-center"><CheckCircle2 className="w-6 h-6 text-orange-500" /></div>
-              <div className="col-span-1 flex justify-center"><XCircle className="w-5 h-5 text-zinc-700" /></div>
-              <div className="col-span-1 flex justify-center"><Check className="w-5 h-5 text-zinc-500" /></div>
+              <div className="col-span-1 flex justify-center"><div className="w-2 h-2 rounded-full bg-orange-500" /></div>
+              <div className="col-span-1 flex justify-center text-zinc-700 font-bold">—</div>
+              <div className="col-span-1 flex justify-center text-zinc-500 font-bold">YES</div>
             </div>
 
             {/* Row 3 */}
             <div className="grid grid-cols-4 p-6 border-b border-white/5 hover:bg-white/5 transition-colors items-center">
               <div className="col-span-1 font-bold text-white">Missing Keyword Identification</div>
-              <div className="col-span-1 flex justify-center text-center text-sm text-orange-400 font-bold">Exact Match</div>
+              <div className="col-span-1 flex justify-center text-center text-sm text-orange-400 font-bold uppercase tracking-widest">Exact Match</div>
               <div className="col-span-1 flex justify-center text-center text-sm text-zinc-500">Hallucinates keywords</div>
               <div className="col-span-1 flex justify-center text-center text-sm text-zinc-500">Limited database</div>
             </div>
@@ -73,8 +73,8 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStart }) => {
             {/* Row 4 */}
             <div className="grid grid-cols-4 p-6 border-b border-white/5 hover:bg-white/5 transition-colors items-center">
               <div className="col-span-1 font-bold text-white">Auto-Rewrite Bullet Points</div>
-              <div className="col-span-1 flex justify-center"><CheckCircle2 className="w-6 h-6 text-orange-500" /></div>
-              <div className="col-span-1 flex justify-center"><Check className="w-5 h-5 text-zinc-500" /></div>
+              <div className="col-span-1 flex justify-center"><div className="w-2 h-2 rounded-full bg-orange-500" /></div>
+              <div className="col-span-1 flex justify-center text-zinc-500 font-bold">YES</div>
               <div className="col-span-1 flex justify-center text-center text-sm text-zinc-500">Templates only</div>
             </div>
 
@@ -125,19 +125,19 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStart }) => {
                     <div className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Everything Included</div>
                     <ul className="space-y-3">
                         <li className="flex items-start gap-3">
-                            <CheckCircle2 className="w-5 h-5 text-orange-500 shrink-0" />
+                            <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
                             <span className="text-zinc-300 text-sm"><strong>ATS-Optimized PDF Resume</strong> <span className="text-zinc-500 block text-xs">Formatted to pass the robots.</span></span>
                         </li>
                         <li className="flex items-start gap-3">
-                            <CheckCircle2 className="w-5 h-5 text-orange-500 shrink-0" />
+                            <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
                             <span className="text-zinc-300 text-sm"><strong>Tailored Cover Letter</strong> <span className="text-zinc-500 block text-xs">Generated based on the job description.</span></span>
                         </li>
                         <li className="flex items-start gap-3">
-                            <CheckCircle2 className="w-5 h-5 text-orange-500 shrink-0" />
+                            <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
                             <span className="text-zinc-300 text-sm"><strong>Interview Prep Kit</strong> <span className="text-zinc-500 block text-xs">Predicted questions & STAR answers.</span></span>
                         </li>
                         <li className="flex items-start gap-3">
-                            <CheckCircle2 className="w-5 h-5 text-orange-500 shrink-0" />
+                            <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
                             <span className="text-zinc-300 text-sm"><strong>Keyword Gap Analysis</strong> <span className="text-zinc-500 block text-xs">See exactly what you're missing.</span></span>
                         </li>
                     </ul>
@@ -150,29 +150,20 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStart }) => {
                     <h3 className="text-xl font-bold text-white mb-4">Why HireSchema?</h3>
                     <ul className="space-y-4">
                         <li className="flex gap-3">
-                            <div className="w-8 h-8 rounded bg-zinc-800 flex items-center justify-center shrink-0">
-                                <Zap className="w-4 h-4 text-yellow-500" />
-                            </div>
                             <div>
-                                <h4 className="font-bold text-white text-sm">Time Saver</h4>
+                                <h4 className="font-bold text-white text-sm uppercase tracking-widest">Time Saver</h4>
                                 <p className="text-xs text-zinc-500">Save 10+ hours per application. No more manual tailoring.</p>
                             </div>
                         </li>
                         <li className="flex gap-3">
-                            <div className="w-8 h-8 rounded bg-zinc-800 flex items-center justify-center shrink-0">
-                                <Check className="w-4 h-4 text-green-500" />
-                            </div>
                             <div>
-                                <h4 className="font-bold text-white text-sm">Organized Tracking</h4>
+                                <h4 className="font-bold text-white text-sm uppercase tracking-widest">Organized Tracking</h4>
                                 <p className="text-xs text-zinc-500">Keep all your tailored resumes and job links in one place.</p>
                             </div>
                         </li>
                          <li className="flex gap-3">
-                            <div className="w-8 h-8 rounded bg-zinc-800 flex items-center justify-center shrink-0">
-                                <div className="text-xs font-bold text-zinc-400">AI</div>
-                            </div>
                             <div>
-                                <h4 className="font-bold text-white text-sm">No "AI" Fluff</h4>
+                                <h4 className="font-bold text-white text-sm uppercase tracking-widest">No AI Fluff</h4>
                                 <p className="text-xs text-zinc-500">We remove robotic phrases that recruiters hate.</p>
                             </div>
                         </li>
@@ -183,16 +174,14 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStart }) => {
                     <h3 className="text-xl font-bold text-white mb-4">Premium Add-ons <span className="text-xs font-normal text-zinc-500 ml-2">(Included Free)</span></h3>
                     <div className="grid grid-cols-1 gap-4">
                         <div className="flex items-center gap-3 p-3 bg-zinc-950 border border-zinc-800 rounded-lg">
-                            <BookOpen className="w-5 h-5 text-blue-400" />
                             <div>
-                                <div className="text-sm font-bold text-white">Skill Upgrader</div>
+                                <div className="text-sm font-bold text-white uppercase tracking-widest">Skill Upgrader</div>
                                 <div className="text-xs text-zinc-500">Links to learn missing skills.</div>
                             </div>
                         </div>
                         <div className="flex items-center gap-3 p-3 bg-zinc-950 border border-zinc-800 rounded-lg">
-                            <CheckCircle2 className="w-5 h-5 text-purple-400" />
                             <div>
-                                <div className="text-sm font-bold text-white">LinkedIn Optimizer</div>
+                                <div className="text-sm font-bold text-white uppercase tracking-widest">LinkedIn Optimizer</div>
                                 <div className="text-xs text-zinc-500">Headline & About section generator.</div>
                             </div>
                         </div>
