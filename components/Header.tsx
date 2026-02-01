@@ -83,15 +83,15 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
                     onClick={(e) => handleNavClick(e, 'scan')}
                     className="px-5 py-2.5 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-[10px] uppercase tracking-widest shadow-[3px_3px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none active:shadow-none hover:translate-x-[1.5px] hover:translate-y-[1.5px] active:translate-x-[1.5px] active:translate-y-[1.5px] transition-all rounded-sm cursor-pointer border-none flex items-center gap-2"
                 >
-                    Start Analysis <ArrowRight className="w-3 h-3" />
+                    Start Analysis
                 </a>
 
                 {/* Mobile Menu Toggle */}
                 <button 
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                    className="md:hidden text-white p-2 hover:bg-white/5 rounded-full transition-colors"
+                    className="md:hidden text-white p-2 hover:bg-white/5 rounded-full transition-colors font-bold text-[10px] uppercase tracking-widest"
                 >
-                    {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                    {isMobileMenuOpen ? 'Close' : 'Menu'}
                 </button>
             </div>
         </div>
@@ -109,9 +109,9 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
             >
                 <button 
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="absolute top-8 right-8 text-white p-2"
+                    className="absolute top-8 right-8 text-white p-2 font-bold text-sm uppercase tracking-widest"
                 >
-                    <X className="w-8 h-8" />
+                    Close
                 </button>
 
                 <div className="flex flex-col gap-8">
@@ -132,7 +132,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
                         onClick={(e) => handleNavClick(e, 'scan')}
                         className="w-full py-5 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-lg uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[2px] active:translate-y-[2px] transition-all rounded-sm flex items-center justify-center gap-4"
                     >
-                        Start Analysis <ArrowRight className="w-6 h-6" />
+                        Start Analysis
                     </a>
                 </div>
             </motion.div>

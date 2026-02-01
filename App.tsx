@@ -32,7 +32,6 @@ const FEATURES_DATA = {
       title: "Find Missing Keywords",
       subtitle: "The secret reason your resume is getting rejected.",
       description: "Most resumes get rejected because they don't match the specific language of the job description. ATS software scans for exact keyword matches. If you say 'customer service' but the job wants 'client success', you might get filtered out. Our tool compares your resume against the job posting and highlights exactly which keywords you are missing, so you can add them instantly.",
-      icon: Search,
       benefits: [
           "Scan against any job description in seconds",
           "See a list of exact missing keywords (hard skills, soft skills, tools)",
@@ -53,7 +52,6 @@ const FEATURES_DATA = {
       title: "Fix It Automatically",
       subtitle: "Your experience, rewritten to win.",
       description: "Knowing what's missing is half the battle. Fixing it is the other half. We don't just list keywords; we rewrite your bullet points to include them naturally. Our AI analyzes your experience and suggests professional, impact-driven rewrites that seamlessly integrate the required skills, so you sound like the perfect candidate without lying.",
-      icon: Sparkles,
       benefits: [
           "One-click rewrites for bullet points",
           "Natural integration of missing keywords",
@@ -74,7 +72,6 @@ const FEATURES_DATA = {
       title: "Cover Letter Included",
       subtitle: "Stop writing cover letters from scratch.",
       description: "Stop writing generic cover letters that get ignored. We generate a tailored cover letter that connects your specific experience to the company's needs. It highlights why you're a good fit based on the job description and your resume's strongest points, giving you a compelling narrative in seconds.",
-      icon: FileText,
       benefits: [
           "Personalized to the specific company and role",
           "Highlights your most relevant achievements",
@@ -95,7 +92,6 @@ const FEATURES_DATA = {
       title: "Interview Questions",
       subtitle: "Know what they'll ask before you walk in.",
       description: "Walk into your interview with confidence. We analyze the job description to predict the most likely interview questions you' face. But we don't stop there — we also provide sample answers based on your actual resume experience, helping you frame your stories to prove you're the right hire.",
-      icon: BrainCircuit,
       benefits: [
           "Predict likely technical and behavioral questions",
           "Get personalized STAR-method answer suggestions",
@@ -116,7 +112,6 @@ const FEATURES_DATA = {
       title: "Learn What You're Missing",
       subtitle: "Don't let one missing skill cost you the job.",
       description: "Sometimes you are missing a key skill required for the job. Instead of just flagging it, we help you bridge the gap. We identify the critical skills you lack and point you toward resources to learn them quickly, so you can honestly add them to your resume or discuss them in an interview.",
-      icon: GraduationCap,
       benefits: [
           "Identify critical skill gaps preventing you from getting hired",
           "Get curated learning resources for missing tools",
@@ -137,7 +132,6 @@ const FEATURES_DATA = {
       title: "Works in 8 Languages",
       subtitle: "Go global without the headache.",
       description: "The job market is global, and so are you. Whether you're applying for a role in Berlin, Tokyo, or Sao Paulo, we've got you covered. Instantly translate your resume and cover letter into 8 major languages while maintaining professional formatting and ATS optimization.",
-      icon: Globe,
       benefits: [
           "Instant translation to Spanish, French, German, Hindi, Portuguese, Japanese, Korean",
           "Maintain ATS-friendly formatting across languages",
@@ -747,16 +741,16 @@ export default function App() {
                               <div className="flex justify-between items-start mb-1">
                                 <span className="text-[10px] font-mono text-zinc-500">{item.date}</span>
                                 {paid && (
-                                  <div className="flex items-center gap-1 px-1.5 py-0.5 bg-orange-500/10 border border-orange-500/20 rounded text-[8px] font-bold text-orange-500 uppercase">
-                                    <CheckCircle className="w-2 h-2" /> Paid
+                                  <div className="flex items-center gap-1 px-1.5 py-0.5 bg-orange-500/10 border border-orange-500/20 rounded text-[8px] font-black text-orange-500 uppercase">
+                                    PAID
                                   </div>
                                 )}
                               </div>
-                              <h4 className={`text-sm font-bold truncate ${isSelected ? 'text-orange-500' : 'text-white'}`}>{item.jobTitle}</h4>
+                              <h4 className={`text-sm font-black truncate ${isSelected ? 'text-orange-500' : 'text-white'}`}>{item.jobTitle}</h4>
                               <p className="text-xs text-zinc-500 truncate">{item.company}</p>
                               <div className="mt-3 flex items-center justify-between">
-                                 <div className="text-[10px] font-bold text-zinc-600 uppercase tracking-tighter">ATS Score: <span className="text-white">{item.atsScore}%</span></div>
-                                 <ArrowRight className={`w-3 h-3 transition-transform group-hover:translate-x-1 ${isSelected ? 'text-orange-500' : 'text-zinc-700'}`} />
+                                 <div className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">ATS Score: <span className="text-white">{item.atsScore}%</span></div>
+                                 <span className={`text-xs transition-transform group-hover:translate-x-1 ${isSelected ? 'text-orange-500' : 'text-zinc-700'}`}>→</span>
                               </div>
                             </button>
                           );
@@ -809,16 +803,14 @@ export default function App() {
                           className="p-2 text-zinc-500 hover:text-white hover:bg-white/5 rounded-lg transition-all flex items-center gap-2"
                           title="View History"
                        >
-                          <History className="w-5 h-5" />
-                          <span className="hidden md:inline text-xs font-bold uppercase tracking-wider">History</span>
+                          <span className="text-xs font-black uppercase tracking-[0.2em]">History</span>
                        </button>
                        
                        <div className="h-6 w-[1px] bg-white/5 mx-1"></div>
 
                        {isPaid && (
                            <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-orange-500/10 border border-orange-500/20 rounded-full">
-                               <CheckCircle className="w-3.5 h-3.5 text-orange-500" />
-                               <span className="text-xs font-bold text-orange-500 uppercase tracking-wider">Premium</span>
+                               <span className="text-xs font-black text-orange-500 uppercase tracking-widest">Premium</span>
                            </div>
                        )}
                        <a 
@@ -830,7 +822,7 @@ export default function App() {
                           }} 
                           className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-xs uppercase tracking-wide shadow-[3px_3px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none active:shadow-none hover:translate-x-[1.5px] hover:translate-y-[1.5px] active:translate-x-[1.5px] active:translate-y-[1.5px] transition-all rounded-sm cursor-pointer border-none touch-target"
                        >
-                           <Plus className="w-3.5 h-3.5" /> <span className="hidden xs:inline">New Scan</span>
+                           <span className="hidden xs:inline">New Scan</span>
                        </a>
                    </div>
                </header>
@@ -851,7 +843,7 @@ export default function App() {
                                       <div className="relative w-24 sm:w-32 h-24 sm:h-32 mx-auto mb-6 sm:mb-8">
                                           <div className="absolute inset-0 bg-orange-500 rounded-full animate-ping opacity-20"></div>
                                           <div className="relative w-full h-full bg-zinc-900 border border-zinc-700 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(249,115,22,0.3)]">
-                                              <Radar className="w-12 sm:w-16 h-12 sm:h-16 text-orange-500 animate-[spin_3s_linear_infinite]" />
+                                              <span className="text-2xl font-black text-orange-500 animate-pulse uppercase">AI</span>
                                           </div>
                                       </div>
                                       <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
@@ -887,10 +879,10 @@ export default function App() {
                                                <div className="md:hidden mb-2"><button onClick={() => setInputWizardStep(0)} className="text-zinc-500 py-2 touch-target">Back</button></div>
                                                <h3 className="text-xs font-bold text-zinc-500 uppercase mb-3">2. Job Details</h3>
                                                <div className="flex gap-2 mb-3 bg-zinc-900 p-1 rounded-lg border border-zinc-800 self-start">
-                                                  <button onClick={() => setJobInputMode('link')} className={`flex items-center gap-2 px-3 py-2 rounded text-xs font-bold transition-colors touch-target ${jobInputMode === 'link' ? 'bg-orange-600 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}><LinkIcon className="w-3 h-3" /> Link</button>
-                                                  <button onClick={() => setJobInputMode('text')} className={`flex items-center gap-2 px-3 py-2 rounded text-xs font-bold transition-colors touch-target ${jobInputMode === 'text' ? 'bg-zinc-700 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}><FileText className="w-3 h-3" /> Text</button>
+                                                  <button onClick={() => setJobInputMode('link')} className={`flex items-center gap-2 px-3 py-2 rounded text-xs font-bold transition-colors touch-target ${jobInputMode === 'link' ? 'bg-orange-600 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>Link</button>
+                                                  <button onClick={() => setJobInputMode('text')} className={`flex items-center gap-2 px-3 py-2 rounded text-xs font-bold transition-colors touch-target ${jobInputMode === 'text' ? 'bg-zinc-700 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>Text</button>
                                                </div>
-                                               <div className="flex-1 min-h-[200px]">{jobInputMode === 'link' ? (<div className="h-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 sm:p-6 flex flex-col justify-center gap-4"><div className="text-center"><div className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-3"><LinkIcon className="w-6 h-6 text-orange-500" /></div><h4 className="text-white font-bold text-sm">Paste Job URL</h4><p className="text-zinc-500 text-xs">LinkedIn, Indeed, etc.</p></div><input type="url" inputMode="url" value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} placeholder="https://..." className="w-full bg-zinc-950 border border-zinc-700 rounded-lg p-3 text-sm text-white focus:border-orange-500 outline-none" /></div>) : (<textarea value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} placeholder="Paste job description..." className="w-full h-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 sm:p-5 text-sm text-zinc-300 focus:outline-none focus:border-zinc-600 resize-none font-mono min-h-[200px]" />)}</div>
+                                               <div className="flex-1 min-h-[200px]">{jobInputMode === 'link' ? (<div className="h-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 sm:p-6 flex flex-col justify-center gap-4"><div className="text-center"><h4 className="text-white font-bold text-sm uppercase tracking-widest">Paste Job URL</h4><p className="text-zinc-500 text-xs">LinkedIn, Indeed, etc.</p></div><input type="url" inputMode="url" value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} placeholder="https://..." className="w-full bg-zinc-950 border border-zinc-700 rounded-lg p-3 text-sm text-white focus:border-orange-500 outline-none" /></div>) : (<textarea value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} placeholder="Paste job description..." className="w-full h-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 sm:p-5 text-sm text-zinc-300 focus:outline-none focus:border-zinc-600 resize-none font-mono min-h-[200px]" />)}</div>
                                           </div>
                                       </div>
                                       {error && <div className="p-3 sm:p-4 bg-orange-950/20 border border-orange-900/30 rounded-lg flex items-start gap-3 text-orange-400 text-sm"><AlertCircle className="w-5 h-5 shrink-0 mt-0.5" /> <span>{error}</span></div>}

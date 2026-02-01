@@ -53,7 +53,6 @@ const ScoreRing = ({ value, label, icon: Icon, color = "orange", subtext }: { va
       </div>
       <div>
         <div className="flex items-center gap-1.5 mb-1">
-          <Icon className={`w-4 h-4 text-${color}-500`} />
           <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest">{label}</h3>
         </div>
         <p className="text-sm text-white font-bold mb-0.5">
@@ -71,9 +70,6 @@ const BulletList = ({ title, items, icon: Icon, color = "zinc" }: { title: strin
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
-        <div className={`p-2 rounded-lg bg-${color}-500/10 text-${color}-500`}>
-          <Icon className="w-4 h-4" />
-        </div>
         <h3 className="text-sm font-black text-white tracking-tight uppercase">{title}</h3>
       </div>
       <div className="grid gap-3">
@@ -184,16 +180,13 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
           <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/5 blur-[100px] -mr-32 -mt-32" />
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-1.5 bg-orange-500/10 rounded-lg">
-                <Briefcase className="w-4 h-4 text-orange-500" />
-              </div>
               <span className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.3em]">Target Opportunity</span>
             </div>
             <h1 className="text-3xl font-black text-white tracking-tight flex flex-wrap items-center gap-x-3">
               {result.jobTitle || "Target Role"}
               {result.company && (
                 <>
-                  <ChevronRight className="w-6 h-6 text-zinc-700" />
+                  <span className="text-zinc-700 mx-2">/</span>
                   <span className="text-orange-500">{result.company}</span>
                 </>
               )}
@@ -343,9 +336,6 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
             
             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
               <div className="flex items-center gap-6">
-                <div className={`p-4 rounded-3xl bg-orange-500/10 text-orange-500 shadow-2xl shadow-orange-500/10`}>
-                  {result.atsScore >= 70 ? <Sparkles className="w-10 h-10" /> : <ShieldAlert className="w-10 h-10" />}
-                </div>
                 <div>
                   <h4 className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.3em] mb-1.5">Master Verdict</h4>
                   <div className="flex flex-col">
@@ -371,7 +361,6 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
                   <span className="block text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1.5">Impact Issues</span>
                   <div className="flex items-center justify-center gap-2">
                     <span className={`text-xl font-black ${result.criticalIssues.length > 0 ? 'text-orange-500' : 'text-white'}`}>{result.criticalIssues.length + result.missingKeywords.length}</span>
-                    <AlertTriangle className={`w-4 h-4 ${result.criticalIssues.length > 0 ? 'text-orange-500' : 'text-zinc-800'}`} />
                   </div>
                 </div>
               </div>
@@ -386,9 +375,6 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
         <div className="flex flex-col lg:flex-row gap-12 items-center">
           <div className="lg:w-[40%]">
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-orange-500 rounded-xl shadow-lg shadow-orange-500/20">
-                <Rocket className="w-6 h-6 text-white" />
-              </div>
               <h2 className="text-2xl font-black text-white tracking-tight italic">Mission Critical: Next Steps</h2>
             </div>
             <p className="text-base text-zinc-400 leading-relaxed mb-8 font-medium">
@@ -408,21 +394,18 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
           
           <div className="lg:w-[60%] grid grid-cols-1 sm:grid-cols-2 gap-5">
             {[
-              { title: "Skill Injection", desc: "Embed the top 3 missing keywords into your bullet points.", icon: Target, action: "Go to Editor" },
-              { title: "Format Cleanup", desc: "Remove identified risks to ensure 100% ATS readability.", icon: ShieldAlert, action: "View Risks" },
-              { title: "Story Alignment", desc: "Sync your summary with the Role Fit analysis below.", icon: User, action: "Update Bio" },
-              { title: "Final Validation", desc: "Re-run analysis to hit the 85% golden score.", icon: Download, action: "Re-Scan" },
+              { title: "Skill Injection", desc: "Embed the top 3 missing keywords into your bullet points.", action: "Go to Editor" },
+              { title: "Format Cleanup", desc: "Remove identified risks to ensure 100% ATS readability.", action: "View Risks" },
+              { title: "Story Alignment", desc: "Sync your summary with the Role Fit analysis below.", action: "Update Bio" },
+              { title: "Final Validation", desc: "Re-run analysis to hit the 85% golden score.", action: "Re-Scan" },
             ].map((step, i) => (
               <div key={i} className="flex flex-col gap-4 p-6 bg-zinc-900/60 border border-white/5 rounded-3xl hover:bg-zinc-900/80 transition-all cursor-default group/card relative">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-orange-500/10 flex items-center justify-center shrink-0 group-hover/card:bg-orange-500/20 transition-colors">
-                    <step.icon className="w-6 h-6 text-orange-500" />
-                  </div>
                   <h4 className="text-base font-black text-white">{step.title}</h4>
                 </div>
                 <p className="text-xs text-zinc-400 leading-relaxed font-medium">{step.desc}</p>
                 <div className="flex items-center gap-1.5 text-[10px] font-black text-orange-500 uppercase tracking-widest mt-2 group-hover/card:gap-2.5 transition-all">
-                  {step.action} <ChevronRight className="w-3 h-3" />
+                  {step.action} <span className="ml-1">→</span>
                 </div>
               </div>
             ))}
@@ -441,17 +424,13 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
             <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/5 blur-3xl -mr-16 -mt-16" />
             <div className="flex items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-orange-500/10 rounded-lg">
-                  <Zap className="w-5 h-5 text-orange-500" />
-                </div>
                 <h3 className="text-sm font-black text-white uppercase tracking-widest">The Skill Gap</h3>
               </div>
               <button 
                 onClick={copyKeywords}
                 className="px-3 py-1.5 bg-zinc-950 border border-white/10 rounded-xl text-[10px] font-black text-zinc-400 hover:text-white hover:border-orange-500/50 transition-all flex items-center gap-2"
               >
-                {copiedKeywords ? <Check className="w-3 h-3 text-orange-500" /> : <Copy className="w-3 h-3" />}
-                {copiedKeywords ? "COPIED" : "COPY ALL"}
+                {copiedKeywords ? <span className="text-orange-500 font-bold">DONE</span> : <span className="font-bold">COPY ALL</span>}
               </button>
             </div>
             
@@ -464,13 +443,12 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
                 ))
               ) : (
                 <div className="flex items-center gap-3 text-zinc-500 text-sm font-bold bg-zinc-950/50 p-4 rounded-2xl w-full border border-orange-500/20">
-                  <CheckCircle className="w-5 h-5 text-orange-500" /> 100% Keyword Match Found
+                  100% Keyword Match Found
                 </div>
               )}
             </div>
             
             <div className="p-4 bg-zinc-950/50 rounded-2xl border border-white/5 flex gap-4 items-start">
-              <Info className="w-5 h-5 text-zinc-700 shrink-0 mt-0.5" />
               <p className="text-xs text-zinc-500 leading-relaxed font-medium">
                 <span className="text-zinc-300 font-bold">Pro Tip:</span> Sprinkle these into your <span className="text-white">Summary</span> and <span className="text-white">Experience</span> sections. Don't just list them; show how you used them.
               </p>
@@ -480,24 +458,18 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
           {/* Critical Risks / Issues */}
           <div className="bg-zinc-900/40 border border-white/5 p-8 rounded-[3rem] shadow-xl">
             <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-orange-500/10 rounded-lg">
-                <ShieldAlert className="w-5 h-5 text-orange-500" />
-              </div>
               <h3 className="text-sm font-black text-white uppercase tracking-widest">Technical Risks</h3>
             </div>
             <div className="space-y-4">
               {result.criticalIssues.length > 0 ? (
                 result.criticalIssues.map((issue, idx) => (
                   <div key={idx} className="flex items-start gap-4 p-4 bg-orange-500/5 border border-orange-500/10 rounded-2xl group/risk hover:bg-orange-500/10 transition-all">
-                    <div className="mt-1 p-1 bg-orange-500/20 rounded-md">
-                      <AlertTriangle className="w-3 h-3 text-orange-500" />
-                    </div>
                     <span className="text-sm text-zinc-300 leading-snug font-bold">{issue}</span>
                   </div>
                 ))
               ) : (
                 <div className="flex items-center gap-3 text-zinc-500 text-sm font-bold bg-zinc-950/50 p-4 rounded-2xl border border-orange-500/20">
-                  <CheckCircle className="w-5 h-5 text-orange-500" /> Clean Formatting - ATS Optimized
+                  Clean Formatting - ATS Optimized
                 </div>
               )}
             </div>

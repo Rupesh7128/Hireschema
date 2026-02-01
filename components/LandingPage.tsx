@@ -91,7 +91,6 @@ const FeatureMarquee = () => {
              >
                 {[...items, ...items, ...items, ...items].map((item, i) => (
                     <div key={i} className="flex items-center gap-3 mx-6 opacity-60 hover:opacity-100 transition-opacity">
-                         <Sparkles className="w-3 h-3 text-orange-500" />
                          <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-300">{item}</span>
                     </div>
                 ))}
@@ -141,7 +140,7 @@ const StepGraphic = ({ step }: { step: 1 | 2 | 3 }) => {
          <>
             {/* Upload UI */}
             <div className="w-12 h-16 bg-zinc-800 rounded border border-zinc-700 flex flex-col items-center justify-center gap-1 z-10 shadow-lg group-hover:scale-110 transition-transform">
-                <Upload className="w-4 h-4 text-zinc-500 group-hover:text-orange-500 transition-colors" />
+                <div className="text-[10px] font-black text-zinc-500 group-hover:text-orange-500 transition-colors uppercase">PDF</div>
                 <div className="w-8 h-1 bg-zinc-700 rounded-full group-hover:bg-orange-500/50 transition-colors"></div>
             </div>
             {/* Floating particles */}
@@ -173,8 +172,8 @@ const StepGraphic = ({ step }: { step: 1 | 2 | 3 }) => {
                 <div className="w-6 h-1 bg-zinc-500 rounded-full"></div>
                 <div className="w-full h-1 bg-orange-500/80 rounded-full shadow-[0_0_5px_rgba(249,115,22,0.5)]"></div>
                 
-                <div className="absolute -bottom-2 -right-2 bg-orange-500 text-black p-1 rounded-full border-2 border-zinc-900">
-                    <Check className="w-2 h-2" />
+                <div className="absolute -bottom-2 -right-2 bg-orange-500 text-black px-2 py-0.5 rounded-full border-2 border-zinc-900 text-[8px] font-black">
+                    OK
                 </div>
             </div>
          </>
@@ -398,8 +397,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 transition={{ duration: 1.2 }}
                 className="mb-6 px-4 py-2 bg-orange-500/10 border border-orange-500/20 rounded-full inline-flex items-center gap-2"
             >
-                <XCircle className="w-4 h-4 text-orange-500" />
-                <span className="text-orange-400 text-xs sm:text-sm font-medium">75% of resumes are rejected by robots before a human sees them</span>
+                <span className="text-orange-400 text-xs sm:text-sm font-black uppercase tracking-widest">Warning: 75% of resumes are rejected by robots before a human sees them</span>
             </motion.div>
 
             <motion.h1 
@@ -430,15 +428,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 className="flex flex-wrap justify-center gap-3 mb-10 text-sm"
             >
                 <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-full">
-                    <CheckCircle2 className="w-4 h-4 text-orange-500" />
                     <span className="text-zinc-300">See your ATS score</span>
                 </div>
                 <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-full">
-                    <CheckCircle2 className="w-4 h-4 text-orange-500" />
                     <span className="text-zinc-300">Find missing keywords</span>
                 </div>
                 <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-full">
-                    <CheckCircle2 className="w-4 h-4 text-orange-500" />
                     <span className="text-zinc-300">Fix & download optimized resume</span>
                 </div>
             </motion.div>
@@ -455,7 +450,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 {isDragging && (
                     <div className="absolute inset-0 -m-4 bg-orange-500/20 border-2 border-dashed border-orange-500 rounded-xl z-50 backdrop-blur-sm flex items-center justify-center">
                         <div className="bg-zinc-950 px-6 py-3 rounded-full border border-orange-500/50 text-orange-500 font-bold flex items-center gap-2 shadow-xl">
-                            <Upload className="w-5 h-5 animate-bounce" />
                             Drop PDF to Scan
                         </div>
                     </div>
@@ -467,9 +461,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                       // Trigger file input click
                       document.getElementById('hero-upload')?.click();
                   }}
-                  className={ORANGE_BUTTON_STYLE + " w-full sm:w-auto relative overflow-hidden group"}
+                  className={ORANGE_BUTTON_STYLE + " w-full sm:w-auto relative overflow-hidden group uppercase"}
                 >
-                    <Upload className="w-4 h-4 mr-2" />
                     Scan My Resume — Free
                     <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                 </button>
@@ -493,11 +486,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 transition={{ delay: 1.2 }}
                 className="flex flex-wrap justify-center gap-4 sm:gap-6 text-[10px] sm:text-xs text-zinc-500 font-mono items-center px-4"
             >
-                <span className="flex items-center gap-2 whitespace-nowrap"><ShieldCheck className="w-3.5 h-3.5 text-orange-500" /> 50,000+ resumes scanned</span>
+                <span className="flex items-center gap-2 whitespace-nowrap">50,000+ resumes scanned</span>
                 <span className="w-1 h-1 rounded-full bg-zinc-800 hidden sm:block"></span>
-                <span className="flex items-center gap-2 whitespace-nowrap"><CreditCard className="w-3.5 h-3.5 text-zinc-400" /> Free scan • $1 to download fix</span>
+                <span className="flex items-center gap-2 whitespace-nowrap">Free scan • $1 to download fix</span>
                 <span className="w-1 h-1 rounded-full bg-zinc-800 hidden sm:block"></span>
-                <span className="flex items-center gap-2 whitespace-nowrap"><Lock className="w-3.5 h-3.5 text-zinc-400" /> Your data stays yours</span>
+                <span className="flex items-center gap-2 whitespace-nowrap">Your data stays yours</span>
             </motion.div>
         </motion.div>
       </section>
@@ -525,14 +518,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                         initial={{ opacity: 0, x: -20 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
-                        className="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl hover:border-red-500/20 transition-all duration-500 group"
+                        className="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl transition-all duration-500 group"
                     >
                         <div className="flex gap-5">
-                            <div className="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                                <XCircle className="w-6 h-6 text-red-500" />
-                            </div>
                             <div>
-                                <h3 className="text-xl font-bold text-white mb-2">Missing Keywords</h3>
+                                <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-tighter">Missing Keywords</h3>
                                 <p className="text-zinc-400 text-sm leading-relaxed">
                                     If you don't have the exact keywords from the job description (e.g., "Agile", "SaaS"), the ATS scores you zero.
                                 </p>
@@ -546,14 +536,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.1 }}
-                        className="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl hover:border-orange-500/20 transition-all duration-500 group"
+                        className="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl transition-all duration-500 group"
                     >
                         <div className="flex gap-5">
-                            <div className="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                                <FileText className="w-6 h-6 text-orange-500" />
-                            </div>
                             <div>
-                                <h3 className="text-xl font-bold text-white mb-2">Bad Formatting</h3>
+                                <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-tighter">Bad Formatting</h3>
                                 <p className="text-zinc-400 text-sm leading-relaxed">
                                     Columns, graphics, and tables confuse the parser. Your resume ends up looking like gibberish to the robot.
                                 </p>
@@ -567,14 +554,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.2 }}
-                        className="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl hover:border-orange-500/20 transition-all duration-500 group"
+                        className="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl transition-all duration-500 group"
                     >
                         <div className="flex gap-5">
-                            <div className="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                                <CheckCircle2 className="w-6 h-6 text-orange-500" />
-                            </div>
                             <div>
-                                <h3 className="text-xl font-bold text-white mb-2">The HireSchema Fix</h3>
+                                <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-tighter">The HireSchema Fix</h3>
                                 <p className="text-zinc-400 text-sm leading-relaxed">
                                     We rewrite your bullets to include high-value keywords naturally, boosting your match score to 90%+.
                                 </p>
@@ -597,7 +581,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                     >
                         <div className="flex justify-between items-center mb-4 border-b border-white/5 pb-4">
                             <div className="flex items-center gap-2">
-                                <XCircle className="w-4 h-4 text-red-500/50" />
                                 <span className="text-[10px] font-bold text-red-500/50 uppercase tracking-widest">Before</span>
                             </div>
                             <div className="text-[10px] font-mono text-zinc-600 uppercase">Score: 42/100</div>
@@ -715,12 +698,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                         className="bg-zinc-900 border border-white/5 p-8 rounded-lg hover:border-orange-500/30 transition-all group cursor-pointer"
                         onClick={() => onStart('feature', undefined, f.id)}
                     >
-                        <div className="w-10 h-10 rounded bg-zinc-950 border border-zinc-800 flex items-center justify-center mb-4 group-hover:text-orange-500 transition-colors">
-                            <f.icon className="w-5 h-5 text-zinc-400 group-hover:text-orange-500" />
-                        </div>
                         <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
                             {f.title}
-                            <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-orange-500" />
+                            <span className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-orange-500 ml-1">→</span>
                         </h3>
                         <p className="text-zinc-400 text-sm leading-relaxed mb-4">
                             {f.desc}
@@ -748,9 +728,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                       <span className="text-zinc-500 font-bold uppercase tracking-wider text-xs mb-4">Analysis</span>
                       <div className="text-4xl font-black text-white mb-6">Free</div>
                       <ul className="space-y-4 text-left w-full mb-8 flex-1">
-                          <li className="flex items-center gap-3 text-sm text-zinc-300"><Check className="w-4 h-4 text-zinc-600" /> ATS score</li>
-                          <li className="flex items-center gap-3 text-sm text-zinc-300"><Check className="w-4 h-4 text-zinc-600" /> Keyword gaps</li>
-                          <li className="flex items-center gap-3 text-sm text-zinc-300"><Check className="w-4 h-4 text-zinc-600" /> Preview of rewritten bullets</li>
+                          <li className="flex items-center gap-3 text-sm text-zinc-300">ATS score</li>
+                          <li className="flex items-center gap-3 text-sm text-zinc-300">Keyword gaps</li>
+                          <li className="flex items-center gap-3 text-sm text-zinc-300">Preview of rewritten bullets</li>
                       </ul>
                     <a 
                         href="/app"
@@ -774,11 +754,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                     <span className="text-orange-500 font-bold uppercase tracking-wider text-xs mb-4">Results</span>
                     <div className="text-4xl font-black text-white mb-6">$1 <span className="text-base font-normal text-zinc-500">/ download</span></div>
                     <ul className="space-y-4 text-left w-full mb-8 flex-1">
-                        <li className="flex items-center gap-3 text-sm text-white"><Check className="w-4 h-4 text-orange-500" /> <strong>Optimized Resume PDF</strong></li>
-                        <li className="flex items-center gap-3 text-sm text-white"><Check className="w-4 h-4 text-orange-500" /> Tailored Cover Letter PDF</li>
-                        <li className="flex items-center gap-3 text-sm text-white"><Check className="w-4 h-4 text-orange-500" /> Interview Prep Kit access</li>
-                        <li className="flex items-center gap-3 text-sm text-white"><Check className="w-4 h-4 text-orange-500" /> Skill Assessment quizzes</li>
-                        <li className="flex items-center gap-3 text-xs text-zinc-500 mt-4 border-t border-white/5 pt-4"><Lock className="w-3 h-3" /> Secure payment via Dodo Payments</li>
+                        <li className="flex items-center gap-3 text-sm text-white"><strong>Optimized Resume PDF</strong></li>
+                        <li className="flex items-center gap-3 text-sm text-white">Tailored Cover Letter PDF</li>
+                        <li className="flex items-center gap-3 text-sm text-white">Interview Prep Kit access</li>
+                        <li className="flex items-center gap-3 text-sm text-white">Skill Assessment quizzes</li>
+                        <li className="flex items-center gap-3 text-xs text-zinc-500 mt-4 border-t border-white/5 pt-4">Secure payment via Dodo Payments</li>
                     </ul>
                     <a 
                         href="/app"
@@ -805,23 +785,18 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                        <h2 className="text-3xl font-bold text-white mb-6">Your data, protected.</h2>
                        <ul className="space-y-4">
                            <li className="flex items-start gap-3">
-                               <Database className="w-5 h-5 text-zinc-500 mt-0.5" />
                                <span className="text-zinc-300 text-sm"><strong>Zero Data Retention.</strong> We do not store your resumes or personal data on our servers.</span>
                            </li>
                            <li className="flex items-start gap-3">
-                               <Activity className="w-5 h-5 text-zinc-500 mt-0.5" />
                                <span className="text-zinc-300 text-sm">Processing occurs in ephemeral memory and is wiped after your session.</span>
                            </li>
                            <li className="flex items-start gap-3">
-                               <ShieldCheck className="w-5 h-5 text-zinc-500 mt-0.5" />
                                <span className="text-zinc-300 text-sm">Security: TLS encryption in transit.</span>
                            </li>
                            <li className="flex items-start gap-3">
-                               <XCircle className="w-5 h-5 text-zinc-500 mt-0.5" />
                                <span className="text-zinc-300 text-sm">We don’t share or sell your data.</span>
                            </li>
                            <li className="flex items-start gap-3">
-                               <CreditCard className="w-5 h-5 text-zinc-500 mt-0.5" />
                                <span className="text-zinc-300 text-sm">Payments handled securely by Dodo Payments.</span>
                            </li>
                        </ul>
@@ -834,7 +809,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                   <div className="flex-1 w-full flex justify-center">
                       <div className="w-64 h-64 bg-zinc-950 border border-zinc-800 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden">
                            <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.05)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] animate-[shimmer_3s_linear_infinite]"></div>
-                           <ShieldCheck className="w-20 h-20 text-orange-500 mb-4" />
                            <div className="px-4 py-1 bg-orange-500/10 rounded-full text-orange-500 text-xs font-bold">Zero storage</div>
                            <p className="text-[10px] text-zinc-500 mt-2">Ephemeral processing</p>
                       </div>
@@ -867,7 +841,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                             <div className="overflow-hidden">
                                 <h4 className="text-white font-bold text-sm truncate">{c.name}</h4>
                                 <div className="text-zinc-500 text-xs flex items-center gap-1 flex-wrap">
-                                    {c.role} <ArrowRight className="w-3 h-3 text-zinc-600" /> <span className="text-zinc-300">{c.target}</span>
+                                    {c.role} <span className="text-zinc-600">/</span> <span className="text-zinc-300">{c.target}</span>
                                 </div>
                             </div>
                         </div>
@@ -877,7 +851,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                                 <div className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">Before</div>
                                 <div className="text-xl font-mono text-zinc-400">{c.before}</div>
                             </div>
-                            <ArrowRight className="w-4 h-4 text-zinc-600" />
+                            <span className="text-zinc-600">→</span>
                             <div className="text-center">
                                 <div className="text-[10px] text-orange-500 uppercase font-bold tracking-wider">After</div>
                                 <div className="text-xl font-mono text-orange-400 font-bold">{c.after}</div>
@@ -885,8 +859,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                         </div>
 
                         <div className="flex items-start gap-2">
-                            <Award className="w-4 h-4 text-orange-500 mt-0.5 shrink-0" />
-                            <p className="text-sm text-zinc-300 font-medium">{c.outcome}</p>
+                            <p className="text-sm text-zinc-300 font-medium tracking-tight uppercase"><span className="text-orange-500 font-black mr-2">RESULT</span> {c.outcome}</p>
                         </div>
                     </motion.div>
                 ))}

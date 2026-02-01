@@ -47,17 +47,17 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                     <ul className="space-y-4">
                         <li>
                             <a href="/app" className={footerLinkClasses} onClick={(e) => handleNavClick(e, 'scan')}>
-                                Resume Scanner <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                                Resume Scanner
                             </a>
                         </li>
                         <li>
                             <a href="/roast-my-resume" className={footerLinkClasses} onClick={(e) => handleNavClick(e, 'roast')}>
-                                Resume Roast <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                                Resume Roast
                             </a>
                         </li>
                         <li>
                             <a href="/pricing" className={footerLinkClasses} onClick={(e) => handleNavClick(e, 'pricing')}>
-                                Pricing <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                                Pricing
                             </a>
                         </li>
                     </ul>
@@ -101,12 +101,12 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                     <ul className="space-y-4">
                         <li>
                             <a href="mailto:support@hireschema.com" className={footerLinkClasses}>
-                                <Mail className="w-3.5 h-3.5" /> Support
+                                Support
                             </a>
                         </li>
                         <li>
                             <a href="/roadmap" className={footerLinkClasses} onClick={(e) => e.preventDefault()}>
-                                <Zap className="w-3.5 h-3.5" /> Roadmap
+                                Roadmap
                             </a>
                         </li>
                     </ul>
