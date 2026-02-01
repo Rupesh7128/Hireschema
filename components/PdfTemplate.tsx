@@ -9,7 +9,7 @@ interface PdfTemplateProps {
 
 export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ content, themeColor = '#ea580c' }, ref) => {
   return (
-    <div style={{ position: 'absolute', top: '0', left: '0', width: '1px', height: '1px', overflow: 'hidden', opacity: 0, pointerEvents: 'none' }}>
+    <div style={{ position: 'absolute', top: '0', left: '0', opacity: 0, pointerEvents: 'none', zIndex: -100 }}>
       <div 
         ref={ref} 
         className="pdf-export-container" 
@@ -21,7 +21,8 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
           minHeight: '297mm',
           fontFamily: "'Inter', 'Helvetica', 'Arial', sans-serif",
           fontSize: '10.5pt',
-          lineHeight: '1.4'
+          lineHeight: '1.4',
+          boxSizing: 'border-box'
         }}
       >
         <style>{`
@@ -71,8 +72,13 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
             color: #000; 
           }
           /* Fix for html2pdf page breaking */
-          .pdf-export-container section {
+          h1, h2, h3 { 
+            page-break-after: avoid;
+            break-after: avoid;
+          }
+          ul, p {
             page-break-inside: avoid;
+            break-inside: avoid;
           }
         `}</style>
         <ReactMarkdown>{content}</ReactMarkdown>

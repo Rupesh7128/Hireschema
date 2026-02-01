@@ -176,9 +176,10 @@ export const Editor: React.FC<EditorProps> = ({
                     useCORS: true, 
                     letterRendering: true,
                     scrollY: 0,
-                    windowWidth: 794 // Exact A4 width in pixels at 96dpi
+                    windowWidth: 794,
+                    logging: false
                 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
                 pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
             };
             // @ts-ignore
