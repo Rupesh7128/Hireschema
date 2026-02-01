@@ -139,9 +139,9 @@ const StepGraphic = ({ step }: { step: 1 | 2 | 3 }) => {
        {step === 1 && (
          <>
             {/* Upload UI */}
-            <div className="w-12 h-16 bg-zinc-800 rounded border border-zinc-700 flex flex-col items-center justify-center gap-1 z-10 shadow-lg group-hover:scale-110 transition-transform">
-                <div className="text-xs font-black text-zinc-500 group-hover:text-orange-500 transition-colors uppercase">PDF</div>
-                <div className="w-8 h-1 bg-zinc-700 rounded-full group-hover:bg-orange-500/50 transition-colors"></div>
+            <div className="w-12 h-16 bg-white rounded border border-zinc-200 flex flex-col items-center justify-center gap-1 z-10 shadow-lg group-hover:scale-110 transition-transform">
+                <div className="text-[10px] font-black text-black group-hover:text-orange-500 transition-colors uppercase">PDF</div>
+                <div className="w-8 h-0.5 bg-orange-500 group-hover:bg-orange-600 transition-colors"></div>
             </div>
             {/* Floating particles */}
             <div className="absolute top-4 right-4 w-1.5 h-1.5 bg-orange-500 rounded-full animate-bounce"></div>
@@ -151,12 +151,12 @@ const StepGraphic = ({ step }: { step: 1 | 2 | 3 }) => {
        {step === 2 && (
          <>
             {/* Analysis UI */}
-             <div className="w-12 h-16 bg-zinc-800 rounded border border-zinc-700 flex flex-col p-1.5 gap-1.5 z-10 shadow-lg relative overflow-hidden group-hover:scale-110 transition-transform">
-                <div className="w-8 h-1 bg-zinc-600 rounded-full"></div>
-                <div className="w-6 h-1 bg-zinc-600 rounded-full"></div>
-                <div className="w-full h-1 bg-orange-500/50 rounded-full"></div>
-                <div className="w-5 h-1 bg-zinc-600 rounded-full"></div>
-                <div className="w-full h-1 bg-orange-500/50 rounded-full"></div>
+             <div className="w-12 h-16 bg-white rounded border border-zinc-200 flex flex-col p-1.5 gap-1.5 z-10 shadow-lg relative overflow-hidden group-hover:scale-110 transition-transform">
+                <div className="w-8 h-1 bg-zinc-200 rounded-full"></div>
+                <div className="w-6 h-1 bg-zinc-200 rounded-full"></div>
+                <div className="w-full h-1 bg-orange-500/30 rounded-full"></div>
+                <div className="w-5 h-1 bg-zinc-200 rounded-full"></div>
+                <div className="w-full h-1 bg-orange-500/30 rounded-full"></div>
                 {/* Scanner Line */}
                 <div className="absolute top-0 left-0 w-full h-1 bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,1)] animate-[scan_1.5s_ease-in-out_infinite]"></div>
             </div>
@@ -166,13 +166,13 @@ const StepGraphic = ({ step }: { step: 1 | 2 | 3 }) => {
        {step === 3 && (
          <>
             {/* Optimized UI */}
-             <div className="w-12 h-16 bg-zinc-800 rounded border border-orange-900/50 flex flex-col p-1.5 gap-1.5 z-10 shadow-lg group-hover:scale-110 transition-transform">
-                <div className="w-8 h-1 bg-zinc-500 rounded-full"></div>
-                <div className="w-full h-1 bg-orange-500/80 rounded-full shadow-[0_0_5px_rgba(249,115,22,0.5)]"></div>
-                <div className="w-6 h-1 bg-zinc-500 rounded-full"></div>
-                <div className="w-full h-1 bg-orange-500/80 rounded-full shadow-[0_0_5px_rgba(249,115,22,0.5)]"></div>
+             <div className="w-12 h-16 bg-white rounded border border-orange-500/30 flex flex-col p-1.5 gap-1.5 z-10 shadow-lg group-hover:scale-110 transition-transform">
+                <div className="w-8 h-1 bg-black rounded-full"></div>
+                <div className="w-full h-1 bg-orange-500 shadow-[0_0_5px_rgba(249,115,22,0.5)]"></div>
+                <div className="w-6 h-1 bg-black rounded-full"></div>
+                <div className="w-full h-1 bg-orange-500 shadow-[0_0_5px_rgba(249,115,22,0.5)]"></div>
                 
-                <div className="absolute -bottom-2 -right-2 bg-orange-500 text-black px-2 py-0.5 rounded-full border-2 border-zinc-900 text-xs font-black">
+                <div className="absolute -bottom-2 -right-2 bg-orange-500 text-white px-2 py-0.5 rounded-full border-2 border-white text-[10px] font-black">
                     OK
                 </div>
             </div>

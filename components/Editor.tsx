@@ -170,13 +170,13 @@ export const Editor: React.FC<EditorProps> = ({
             const opt = {
                 margin: [0, 0, 0, 0],
                 filename: `HireSchema_Optimized_${activeTab.replace(/\s+/g, '_')}.pdf`,
-                image: { type: 'jpeg', quality: 1.0 },
+                image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { 
-                    scale: 3, 
+                    scale: 2, 
                     useCORS: true, 
                     letterRendering: true,
                     scrollY: 0,
-                    windowWidth: 794 // 210mm at 96dpi
+                    windowWidth: 794 // Exact A4 width in pixels at 96dpi
                 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
                 pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
@@ -194,18 +194,18 @@ export const Editor: React.FC<EditorProps> = ({
     const renderMarkdown = (content: string) => (
         <ReactMarkdown
             components={{
-                h1: ({...props}) => <h1 className="text-3xl font-black uppercase tracking-tight mb-8 border-b-2 pb-4 text-zinc-900" style={{ borderColor: accentColor.value }} {...props} />,
-                h2: ({...props}) => <h2 className="text-lg font-black uppercase tracking-widest mt-10 mb-4 flex items-center gap-3" style={{ color: accentColor.value }} {...props} />,
-                h3: ({...props}) => <h3 className="text-base font-bold mt-6 mb-2 text-zinc-800" {...props} />,
-                p: ({...props}) => <p className="text-sm sm:text-base leading-relaxed text-zinc-700 mb-4" {...props} />,
+                h1: ({...props}) => <h1 className="text-4xl font-black uppercase tracking-tight mb-6 border-b-2 pb-2 text-black" style={{ borderColor: accentColor.value }} {...props} />,
+                h2: ({...props}) => <h2 className="text-lg font-black uppercase tracking-widest mt-12 mb-4" style={{ color: accentColor.value }} {...props} />,
+                h3: ({...props}) => <h3 className="text-base font-bold mt-6 mb-2 text-zinc-900" {...props} />,
+                p: ({...props}) => <p className="text-sm sm:text-base leading-relaxed text-zinc-800 mb-4" {...props} />,
                 ul: ({...props}) => <ul className="space-y-3 my-6" {...props} />,
                 li: ({...props}) => (
-                    <li className="flex items-start gap-3 text-sm sm:text-base text-zinc-700">
+                    <li className="flex items-start gap-3 text-sm sm:text-base text-zinc-800">
                         <span className="mt-2 w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: accentColor.value }} />
                         <span>{props.children}</span>
                     </li>
                 ),
-                strong: ({...props}) => <strong className="font-bold text-zinc-900" {...props} />,
+                strong: ({...props}) => <strong className="font-bold text-black" {...props} />,
             }}
         >
             {content}
@@ -267,7 +267,7 @@ export const Editor: React.FC<EditorProps> = ({
 
             <div className="flex-1 flex overflow-hidden">
                 {/* --- MAIN PREVIEW AREA --- */}
-                <div className="flex-1 overflow-y-auto custom-scrollbar p-4 bg-zinc-100 relative">
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-4 bg-black relative">
                     <div className="max-w-[700px] mx-auto">
                         <AnimatePresence mode="wait">
                             <motion.div
@@ -275,10 +275,8 @@ export const Editor: React.FC<EditorProps> = ({
                                 initial={{ opacity: 0, y: 15 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -15 }}
-                                className="bg-white border border-zinc-200 p-6 sm:p-10 rounded-2xl shadow-2xl relative overflow-hidden min-h-[900px]"
+                                className="bg-white border border-zinc-200 p-6 sm:p-12 rounded-sm shadow-2xl relative overflow-hidden min-h-[900px]"
                             >
-                                <div className="absolute top-0 right-0 w-48 h-48 bg-orange-500/5 blur-[80px] -mr-24 -mt-24" />
-                                
                                 {loadingStates[activeTab] ? (
                                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
                                         <LoadingIndicator message="AI Drafting..." size="md" />
