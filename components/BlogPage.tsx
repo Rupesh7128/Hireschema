@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { getBlogPosts, getBlogPost, getInternalLinks, BlogPost } from '../services/blogService';
-import { Loader2, ArrowLeft, ArrowRight } from 'lucide-react';
+import { LoadingIndicator } from './LoadingIndicator';
+import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { FileData } from '../types';
@@ -255,7 +256,7 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onBack, initialSlug, onNavig
       <div className="min-h-screen bg-black text-white font-sans selection:bg-orange-500/30">
         <Header onNavigate={onNavigate as any} />
         <div className="flex items-center justify-center h-screen">
-          <Loader2 className="w-6 h-6 text-zinc-600 animate-spin" />
+          <LoadingIndicator message="Fetching Stories..." size="lg" />
         </div>
       </div>
     );

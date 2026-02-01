@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { Upload, AlertCircle, Loader2, ArrowRight, Flame, Skull, TrendingDown, Trophy, RotateCcw, Star, Zap, Target, Award } from 'lucide-react';
+import { LoadingIndicator } from './LoadingIndicator';
+import { Upload, AlertCircle, ArrowRight, Flame, Skull, TrendingDown, Trophy, RotateCcw, Star, Zap, Target, Award, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -252,27 +253,9 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
 
         {isRoasting && (
             <div className="flex-1 flex flex-col items-center justify-center text-center space-y-6">
-                <motion.div 
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    className="relative"
-                >
-                    <div className="absolute inset-0 bg-orange-500 blur-2xl opacity-20 animate-pulse"></div>
-                    <div className="relative w-20 h-20 bg-zinc-900 border-2 border-orange-500/30 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(249,115,22,0.3)]">
-                        <span className="text-xl font-black text-orange-500 animate-pulse uppercase tracking-widest">AI</span>
-                    </div>
-                </motion.div>
+                <LoadingIndicator message={currentRoastPhase} size="lg" />
                 
-                <div className="space-y-3">
-                    <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white uppercase">
-                        Roasting...
-                    </h2>
-                    <p className="text-orange-400 font-mono text-[10px] animate-pulse uppercase tracking-widest">
-                        {currentRoastPhase}
-                    </p>
-                </div>
-
-                <div className="w-full max-w-sm space-y-2.5">
+                <div className="w-full max-w-sm space-y-2.5 mt-6">
                     <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
                         <motion.div 
                             className="h-full bg-gradient-to-r from-orange-600 via-orange-500 to-orange-600"
@@ -281,7 +264,7 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                             transition={{ duration: 0.8 }}
                         />
                     </div>
-                    <div className="text-zinc-500 text-[9px] font-mono uppercase tracking-widest">
+                    <div className="text-zinc-500 text-xs font-mono uppercase tracking-widest mt-2">
                         {Math.round(roastingProgress)}% • DESTROYING CAREER
                     </div>
                 </div>

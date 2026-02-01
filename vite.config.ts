@@ -14,6 +14,16 @@ export default defineConfig(({ mode }) => {
             changeOrigin: true,
             rewrite: (p) => p.replace(/^\/api\/massblog/, '/api'),
           },
+          // Proxy for other Vercel functions (requires a backend or vercel dev)
+          '/api': {
+            target: 'http://localhost:3002', 
+            changeOrigin: true,
+            bypass: (req, res) => {
+              if (req.url?.startsWith('/api/massblog')) return false;
+              console.warn(`[Vite Proxy] API route ${req.url} called but no backend is running. Use 'vercel dev' if available.`);
+              return true; // Bypass proxy and let it fail normally (404) instead of returning index.html
+            }
+          }
         },
       },
       plugins: [react()],

@@ -15,6 +15,7 @@ import { generateContent, calculateImprovedScore, refineContent, regenerateSecti
 import { saveStateBeforePayment } from '../services/stateService';
 import PaymentLock from './PaymentLock';
 import { PdfTemplate } from './PdfTemplate';
+import { LoadingIndicator } from './LoadingIndicator';
 
 interface EditorProps {
     analysisId?: string | null;
@@ -280,8 +281,7 @@ export const Editor: React.FC<EditorProps> = ({
                                 
                                 {loadingStates[activeTab] ? (
                                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-                                        <div className="w-12 h-12 border-3 border-orange-500/20 border-t-orange-500 rounded-full animate-spin" />
-                                        <p className="text-xs font-black text-zinc-500 uppercase tracking-[0.3em]">AI Drafting...</p>
+                                        <LoadingIndicator message="AI Drafting..." size="md" />
                                     </div>
                                 ) : (
                                     <>

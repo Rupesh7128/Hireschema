@@ -360,9 +360,11 @@ const getActionableError = (error: any): string => {
     const msg = error.message || '';
     console.error("Gemini API Error Details:", error); // Log full error for debugging
     
-    if (msg.includes('401') || msg.includes('API key')) return "Invalid API Key. Please verify your configuration in Vercel.";
+    if (msg.includes('401') || msg.includes('API key') || msg.includes('INVALID_ARGUMENT')) {
+        return "Invalid API Key detected. Please ensure your GEMINI_API_KEY in .env.local is valid and active.";
+    }
     if (msg.includes('429')) return "High traffic limit reached. Please try again in a minute.";
-    if (msg.includes('503')) return "AI Service temporarily unavailable. Please try again later.";
+    if (msg.includes('503')) return "AI Service (Gemini) is temporarily unavailable. This usually means the service is overloaded. Please try again in a few minutes.";
     if (msg.includes('PasswordException')) return "This PDF is password protected. Please unlock it and try again.";
     
     // Show the actual network error to help debug

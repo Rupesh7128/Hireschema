@@ -1,10 +1,11 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { 
     Plus, Link as LinkIcon, FileText, AlertCircle, Radar, 
-    CheckCircle, Loader2, Search, Sparkles, BrainCircuit, GraduationCap, Globe,
+    CheckCircle, Search, Sparkles, BrainCircuit, GraduationCap, Globe,
     History, X, ArrowRight, Zap, Target
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { LoadingIndicator } from './components/LoadingIndicator';
 import { FileData, AnalysisResult, HistoryItem, ContactProfile } from './types';
 import { analyzeResume, extractTextFromPdf, fetchJobDescriptionContent } from './services/geminiService';
 import { db } from './services/db';
@@ -153,10 +154,7 @@ const FEATURES_DATA = {
 // Loading fallback component
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-screen bg-zinc-950">
-    <div className="flex flex-col items-center gap-4">
-      <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
-      <p className="text-zinc-500 text-sm font-mono">Loading...</p>
-    </div>
+    <LoadingIndicator message="Loading Experience..." size="lg" />
   </div>
 );
 
@@ -786,9 +784,7 @@ export default function App() {
             {/* GLOBAL OVERLAY: Payment Verification */}
             {isVerifyingPayment && (
                 <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex flex-col items-center justify-center">
-                    <Loader2 className="w-12 h-12 text-orange-500 animate-spin mb-4" />
-                    <h2 className="text-xl font-bold text-white">Verifying Payment...</h2>
-                    <p className="text-zinc-500 text-sm mt-2">Please wait while we confirm your transaction.</p>
+                    <LoadingIndicator message="Verifying Payment..." size="lg" />
                 </div>
             )}
             
@@ -853,19 +849,14 @@ export default function App() {
                            >
                                {isAnalyzing ? (
                                   <div className="text-center px-4">
-                                      <div className="relative w-20 sm:w-24 h-20 sm:h-24 mx-auto mb-6 sm:mb-8">
-                                          <div className="absolute inset-0 bg-orange-500 rounded-full animate-ping opacity-20"></div>
-                                          <div className="relative w-full h-full bg-zinc-900 border border-zinc-700 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(249,115,22,0.3)]">
-                                              <span className="text-xl font-black text-orange-500 animate-pulse uppercase">AI</span>
-                                          </div>
-                                      </div>
-                                      <h2 className="text-lg sm:text-xl font-bold text-white mb-2">
-                                          {analysisProgress < 30 ? "Analyzing Resume..." : 
-                                           analysisProgress < 60 ? "Extracting Skills..." :
-                                           analysisProgress < 85 ? "Comparing with Job..." : 
-                                           "Finalizing Insights..."}
-                                      </h2>
-                                      <p className="text-zinc-500 font-mono text-xs">{Math.round(analysisProgress)}% COMPLETE</p>
+                                      <LoadingIndicator 
+                                          message={analysisProgress < 30 ? "Analyzing Resume..." : 
+                                                   analysisProgress < 60 ? "Extracting Skills..." :
+                                                   analysisProgress < 85 ? "Comparing with Job..." : 
+                                                   "Finalizing Insights..."}
+                                          size="lg"
+                                      />
+                                      <p className="text-zinc-500 font-mono text-xs mt-4">{Math.round(analysisProgress)}% COMPLETE</p>
                                   </div>
                                ) : (
                                    <div className="w-full space-y-8 sm:space-y-10 py-4">
@@ -884,7 +875,7 @@ export default function App() {
                                               </div>
                                               
                                               <div className="flex-1 min-h-[220px] bg-zinc-900/40 border border-white/5 rounded-2xl p-1 group-hover:border-orange-500/20 transition-all shadow-2xl">
-                                                  <Suspense fallback={<div className="h-full flex items-center justify-center"><Loader2 className="w-5 h-5 text-orange-500 animate-spin" /></div>}>
+                                                  <Suspense fallback={<div className="h-full flex items-center justify-center"><LoadingIndicator size="sm" message="" /></div>}>
                                                     <ResumeUploader onFileUpload={handleFileUpload} currentFile={resumeFile} />
                                                   </Suspense>
                                               </div>
@@ -1040,7 +1031,7 @@ export default function App() {
                                          {resultTab === 'analysis' ? (
                                            <div className="h-full overflow-y-auto p-4 sm:p-6">
                                              <ErrorBoundary>
-                                               <Suspense fallback={<div className="flex items-center justify-center h-64"><Loader2 className="w-8 h-8 text-orange-500 animate-spin" /></div>}>
+                                               <Suspense fallback={<div className="flex items-center justify-center h-64"><LoadingIndicator size="md" message="Loading Analysis..." /></div>}>
                                                  <AnalysisDashboard 
                                                    result={analysisResult} 
                                                    onUpdateProfile={handleUpdateAnalysisProfile} 
@@ -1052,7 +1043,7 @@ export default function App() {
                                            </div>
                                          ) : (
                                            <ErrorBoundary>
-                                             <Suspense fallback={<div className="flex items-center justify-center h-64"><Loader2 className="w-8 h-8 text-orange-500 animate-spin" /></div>}>
+                                             <Suspense fallback={<div className="flex items-center justify-center h-64"><LoadingIndicator size="md" message="Loading Editor..." /></div>}>
                                                <Editor 
                                                  analysisId={selectedHistoryId}
                                                  resumeFile={resumeFile}
