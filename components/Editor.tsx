@@ -101,11 +101,20 @@ export const Editor: React.FC<EditorProps> = ({
     // --- ACTIONS ---
     const handleRefine = async (customPrompt?: string) => {
         const prompt = customPrompt || chatInput;
-        if (!prompt.trim() || !generatedData[activeTab]) return;
+        console.log('[Editor] handleRefine called with prompt:', prompt);
+        console.log('[Editor] Current activeTab:', activeTab);
+        console.log('[Editor] Has generatedData for activeTab:', !!generatedData[activeTab]);
+
+        if (!prompt.trim() || !generatedData[activeTab]) {
+            console.warn('[Editor] handleRefine aborted: prompt empty or no content to refine');
+            return;
+        }
 
         setIsRefining(true);
         try {
+            console.log('[Editor] Calling refineContent...');
             const newContent = await refineContent(generatedData[activeTab], prompt, jobDescription);
+            console.log('[Editor] refineContent success, updating state');
             setGeneratedData(prev => ({ ...prev, [activeTab]: newContent }));
             setChatInput("");
             if (activeTab === GeneratorType.ATS_RESUME) {
@@ -113,7 +122,7 @@ export const Editor: React.FC<EditorProps> = ({
                 setOptimizedScore(score);
             }
         } catch (err) {
-            console.error(err);
+            console.error('[Editor] handleRefine failed:', err);
         } finally {
             setIsRefining(false);
         }
@@ -174,18 +183,18 @@ export const Editor: React.FC<EditorProps> = ({
     const renderMarkdown = (content: string) => (
         <ReactMarkdown
             components={{
-                h1: ({...props}) => <h1 className="text-3xl font-black uppercase tracking-tight mb-8 border-b-2 pb-4 text-white" style={{ borderColor: accentColor.value }} {...props} />,
+                h1: ({...props}) => <h1 className="text-3xl font-black uppercase tracking-tight mb-8 border-b-2 pb-4 text-zinc-900" style={{ borderColor: accentColor.value }} {...props} />,
                 h2: ({...props}) => <h2 className="text-lg font-black uppercase tracking-widest mt-10 mb-4 flex items-center gap-3" style={{ color: accentColor.value }} {...props} />,
-                h3: ({...props}) => <h3 className="text-base font-bold mt-6 mb-2 text-zinc-100" {...props} />,
-                p: ({...props}) => <p className="text-sm sm:text-base leading-relaxed text-zinc-400 mb-4" {...props} />,
+                h3: ({...props}) => <h3 className="text-base font-bold mt-6 mb-2 text-zinc-800" {...props} />,
+                p: ({...props}) => <p className="text-sm sm:text-base leading-relaxed text-zinc-700 mb-4" {...props} />,
                 ul: ({...props}) => <ul className="space-y-3 my-6" {...props} />,
                 li: ({...props}) => (
-                    <li className="flex items-start gap-3 text-sm sm:text-base text-zinc-400">
+                    <li className="flex items-start gap-3 text-sm sm:text-base text-zinc-700">
                         <span className="mt-2 w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: accentColor.value }} />
                         <span>{props.children}</span>
                     </li>
                 ),
-                strong: ({...props}) => <strong className="font-bold text-zinc-200" {...props} />,
+                strong: ({...props}) => <strong className="font-bold text-zinc-900" {...props} />,
             }}
         >
             {content}
@@ -247,7 +256,7 @@ export const Editor: React.FC<EditorProps> = ({
 
             <div className="flex-1 flex overflow-hidden">
                 {/* --- MAIN PREVIEW AREA --- */}
-                <div className="flex-1 overflow-y-auto custom-scrollbar p-4 bg-zinc-950 relative">
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-4 bg-zinc-100 relative">
                     <div className="max-w-[700px] mx-auto">
                         <AnimatePresence mode="wait">
                             <motion.div
@@ -255,7 +264,7 @@ export const Editor: React.FC<EditorProps> = ({
                                 initial={{ opacity: 0, y: 15 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -15 }}
-                                className="bg-zinc-900/30 border border-white/5 p-6 sm:p-10 rounded-2xl shadow-2xl relative overflow-hidden min-h-[900px]"
+                                className="bg-white border border-zinc-200 p-6 sm:p-10 rounded-2xl shadow-2xl relative overflow-hidden min-h-[900px]"
                             >
                                 <div className="absolute top-0 right-0 w-48 h-48 bg-orange-500/5 blur-[80px] -mr-24 -mt-24" />
                                 
@@ -270,7 +279,7 @@ export const Editor: React.FC<EditorProps> = ({
                                             <textarea
                                                 value={generatedData[activeTab] || ''}
                                                 onChange={(e) => setGeneratedData(prev => ({ ...prev, [activeTab]: e.target.value }))}
-                                                className="w-full h-[700px] bg-transparent text-zinc-300 font-mono text-xs resize-none focus:outline-none"
+                                                className="w-full h-[700px] bg-transparent text-zinc-800 font-mono text-xs resize-none focus:outline-none"
                                             />
                                         ) : (
                                             renderMarkdown(generatedData[activeTab] || '')
@@ -299,8 +308,8 @@ export const Editor: React.FC<EditorProps> = ({
                                 <button
                                     key={action.id}
                                     onClick={() => handleRefine(action.prompt)}
-                                    disabled={isRefining}
-                                    className="w-full group flex items-center gap-2.5 p-2.5 bg-zinc-900/50 border border-white/5 rounded-lg hover:border-orange-500/50 transition-all text-left"
+                                    disabled={isRefining || loadingStates[activeTab] || !generatedData[activeTab]}
+                                    className="w-full group flex items-center gap-2.5 p-2.5 bg-zinc-900/50 border border-white/5 rounded-lg hover:border-orange-500/50 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <div className="w-7 h-7 rounded-md bg-orange-500/10 flex items-center justify-center shrink-0 group-hover:bg-orange-500 transition-colors">
                                         <action.icon className="w-3 h-3 text-orange-500 group-hover:text-white" />
@@ -321,10 +330,18 @@ export const Editor: React.FC<EditorProps> = ({
 
                         <div className="space-y-2 mb-5">
                             <div className="p-2.5 bg-orange-500/5 border border-orange-500/10 rounded-lg">
-                                <div className="text-[8px] font-black text-orange-500 uppercase tracking-widest mb-0.5">ATS Strategy</div>
-                                <p className="text-[9px] text-zinc-500 leading-tight">
-                                    Injected <span className="text-white font-bold">{analysis.missingKeywords.length} missing keywords</span>.
-                                </p>
+                                <div className="text-[8px] font-black text-orange-500 uppercase tracking-widest mb-1.5">ATS Keywords Injected</div>
+                                <div className="flex flex-wrap gap-1.5">
+                                    {analysis.missingKeywords.length > 0 ? (
+                                        analysis.missingKeywords.map((keyword, idx) => (
+                                            <span key={idx} className="px-1.5 py-0.5 bg-orange-500/10 text-orange-500 border border-orange-500/20 rounded text-[7px] font-bold">
+                                                {keyword}
+                                            </span>
+                                        ))
+                                    ) : (
+                                        <p className="text-[9px] text-zinc-500 leading-tight">No missing keywords detected.</p>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
