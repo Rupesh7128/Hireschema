@@ -17,7 +17,7 @@ interface LandingPageProps {
 }
 
 // Consistent Global Button Styles - Mobile optimized with active states
-const ORANGE_BUTTON_STYLE = "px-6 sm:px-10 py-3.5 sm:py-4 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 sm:gap-3 shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[2px] active:translate-y-[2px] transition-all rounded-sm cursor-pointer border-none touch-target";
+const ORANGE_BUTTON_STYLE = "px-6 sm:px-8 py-3 sm:py-3.5 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-xs sm:text-sm tracking-wide flex items-center justify-center gap-2 sm:gap-2.5 shadow-[3px_3px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none active:shadow-none hover:translate-x-[1.5px] hover:translate-y-[1.5px] active:translate-x-[1.5px] active:translate-y-[1.5px] transition-all rounded-sm cursor-pointer border-none touch-target";
 
 // --- MOUSE TRAIL COMPONENT ---
 const ArrowDownIcon = () => (
@@ -365,41 +365,41 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
       }} />
 
       {/* --- HERO SECTION --- */}
-      <section className="relative min-h-[100vh] sm:min-h-[100vh] min-h-[100dvh] sm:min-h-[100dvh] flex flex-col items-center justify-center pt-20 sm:pt-24 px-4 sm:px-6 border-b border-white/10 overflow-hidden bg-zinc-950 pb-20">
+      <section className="relative min-h-[90vh] sm:min-h-[90vh] flex flex-col items-center justify-center pt-16 sm:pt-20 px-4 sm:px-6 border-b border-white/10 overflow-hidden bg-zinc-950 pb-16">
         
         {/* Live Animated Gradient Background - Reduced on mobile for performance */}
         <div className="absolute inset-0 bg-zinc-950 overflow-hidden pointer-events-none">
             {/* Dynamic Moving Orbs/Mesh - Simplified on mobile */}
-            <div className="absolute top-[-50%] left-[-20%] w-[80%] h-[80%] rounded-full bg-orange-600/20 blur-[100px] sm:blur-[150px] sm:animate-[spin_40s_linear_infinite]" />
-            <div className="absolute bottom-[-30%] right-[-10%] w-[60%] h-[60%] rounded-full bg-zinc-800/20 blur-[150px] animate-[spin_50s_linear_infinite_reverse]" />
-            <div className="absolute top-[30%] right-[20%] w-[50%] h-[50%] rounded-full bg-orange-900/10 blur-[100px] animate-pulse" />
+            <div className="absolute top-[-50%] left-[-20%] w-[80%] h-[80%] rounded-full bg-orange-600/20 blur-[80px] sm:blur-[120px] sm:animate-[spin_40s_linear_infinite]" />
+            <div className="absolute bottom-[-30%] right-[-10%] w-[60%] h-[60%] rounded-full bg-zinc-800/20 blur-[120px] animate-[spin_50s_linear_infinite_reverse]" />
+            <div className="absolute top-[30%] right-[20%] w-[50%] h-[50%] rounded-full bg-orange-900/10 blur-[80px] animate-pulse" />
             
-            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-soft-light"></div>
+            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-15 mix-blend-soft-light"></div>
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-zinc-950/50 to-zinc-950"></div>
         </div>
         
         {/* Grid overlay */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px] opacity-20"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px] opacity-20"></div>
         
         <motion.div 
             style={{ y: yHero }}
-            className="relative z-10 max-w-5xl mx-auto text-center flex flex-col items-center"
+            className="relative z-10 max-w-4xl mx-auto text-center flex flex-col items-center"
         >
             {/* Problem Statement - What ATS is */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1.2 }}
-                className="mb-6 px-4 py-2 bg-orange-500/10 border border-orange-500/20 rounded-full inline-flex items-center gap-2"
+                className="mb-5 px-3 py-1.5 bg-orange-500/10 border border-orange-500/20 rounded-full inline-flex items-center gap-2"
             >
-                <span className="text-orange-400 text-xs sm:text-sm font-black uppercase tracking-widest">Warning: 75% of resumes are rejected by robots before a human sees them</span>
+                <span className="text-orange-400 text-[10px] sm:text-xs font-black uppercase tracking-widest">75% of resumes are auto-rejected by robots</span>
             </motion.div>
 
             <motion.h1 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1.4 }}
-                className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tighter text-white mb-6 leading-[1.1] sm:leading-[1]"
+                className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tighter text-white mb-5 leading-[1.1] sm:leading-[1]"
             >
                 Your resume gets filtered out<br/>
                 <span className="text-transparent bg-clip-text bg-gradient-to-br from-orange-400 to-orange-700">before recruiters see it.</span>
@@ -409,10 +409,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1.4, delay: 0.4 }}
-                className="max-w-3xl text-lg sm:text-xl text-zinc-400 mb-6 leading-relaxed font-light"
+                className="max-w-2xl text-base sm:text-lg text-zinc-400 mb-5 leading-relaxed font-light"
             >
-               Companies use <span className="text-white font-semibold">ATS (Applicant Tracking Systems)</span> to auto-reject resumes missing specific keywords. 
-               We scan your resume against the job description and show you exactly what's missing.
+               Companies use <span className="text-white font-semibold">ATS</span> to auto-reject resumes missing keywords. 
+               We scan your resume and show you exactly what's missing to get hired.
             </motion.p>
 
             {/* Clear Value Prop */}
@@ -420,16 +420,16 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1.4, delay: 0.6 }}
-                className="flex flex-wrap justify-center gap-3 mb-10 text-sm"
+                className="flex flex-wrap justify-center gap-2 mb-8 text-[11px]"
             >
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-full">
-                    <span className="text-zinc-300">See your ATS score</span>
+                <div className="flex items-center gap-2 px-2.5 py-1 bg-zinc-900 border border-zinc-800 rounded-full">
+                    <span className="text-zinc-400">See ATS score</span>
                 </div>
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-full">
-                    <span className="text-zinc-300">Find missing keywords</span>
+                <div className="flex items-center gap-2 px-2.5 py-1 bg-zinc-900 border border-zinc-800 rounded-full">
+                    <span className="text-zinc-400">Find gaps</span>
                 </div>
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-full">
-                    <span className="text-zinc-300">Fix & download optimized resume</span>
+                <div className="flex items-center gap-2 px-2.5 py-1 bg-zinc-900 border border-zinc-800 rounded-full">
+                    <span className="text-zinc-400">Fix & download</span>
                 </div>
             </motion.div>
 
@@ -437,14 +437,14 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1.4, delay: 0.8 }}
-                className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto mb-10 relative"
+                className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto mb-8 relative"
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
             >
                 {isDragging && (
-                    <div className="absolute inset-0 -m-4 bg-orange-500/20 border-2 border-dashed border-orange-500 rounded-xl z-50 backdrop-blur-sm flex items-center justify-center">
-                        <div className="bg-zinc-950 px-6 py-3 rounded-full border border-orange-500/50 text-orange-500 font-bold flex items-center gap-2 shadow-xl">
+                    <div className="absolute inset-0 -m-3 bg-orange-500/20 border-2 border-dashed border-orange-500 rounded-xl z-50 backdrop-blur-sm flex items-center justify-center">
+                        <div className="bg-zinc-950 px-4 py-2 rounded-full border border-orange-500/50 text-orange-500 font-bold flex items-center gap-2 shadow-xl text-xs">
                             Drop PDF to Scan
                         </div>
                     </div>
@@ -469,8 +469,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                     onChange={(e) => handleHeroUpload(e)}
                 />
                 
-                <p className="sm:hidden text-zinc-500 text-xs mt-2">Tap to upload PDF</p>
-                <p className="hidden sm:block text-zinc-500 text-xs mt-2 absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap opacity-60">
+                <p className="sm:hidden text-zinc-600 text-[10px] mt-1">Tap to upload PDF</p>
+                <p className="hidden sm:block text-zinc-600 text-[10px] mt-1 absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap opacity-60">
                     or drag and drop PDF here
                 </p>
             </motion.div>
@@ -479,13 +479,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.2 }}
-                className="flex flex-wrap justify-center gap-4 sm:gap-6 text-[10px] sm:text-xs text-zinc-500 font-mono items-center px-4"
+                className="flex flex-wrap justify-center gap-3 sm:gap-4 text-[9px] sm:text-[10px] text-zinc-600 font-mono items-center px-4"
             >
-                <span className="flex items-center gap-2 whitespace-nowrap">50,000+ resumes scanned</span>
+                <span className="flex items-center gap-2 whitespace-nowrap">50,000+ scanned</span>
                 <span className="w-1 h-1 rounded-full bg-zinc-800 hidden sm:block"></span>
-                <span className="flex items-center gap-2 whitespace-nowrap">Free scan • $1 to download fix</span>
+                <span className="flex items-center gap-2 whitespace-nowrap">Free scan • $1 fix</span>
                 <span className="w-1 h-1 rounded-full bg-zinc-800 hidden sm:block"></span>
-                <span className="flex items-center gap-2 whitespace-nowrap">Your data stays yours</span>
+                <span className="flex items-center gap-2 whitespace-nowrap">No data retention</span>
             </motion.div>
         </motion.div>
       </section>
@@ -494,32 +494,32 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
       <FeatureMarquee />
 
       {/* --- VALUE + PROOF BLOCK --- */}
-      <section className="py-24 px-6 bg-zinc-950 border-b border-white/5 relative overflow-hidden">
+      <section className="py-12 px-6 bg-zinc-950 border-b border-white/5 relative overflow-hidden">
         {/* Decorative background elements */}
-        <div className="absolute top-1/4 -left-20 w-96 h-96 bg-orange-500/5 rounded-full blur-[120px] pointer-events-none"></div>
-        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-orange-600/5 rounded-full blur-[120px] pointer-events-none"></div>
+        <div className="absolute top-1/4 -left-20 w-80 h-80 bg-orange-500/5 rounded-full blur-[100px] pointer-events-none"></div>
+        <div className="absolute bottom-1/4 -right-20 w-80 h-80 bg-orange-600/5 rounded-full blur-[100px] pointer-events-none"></div>
 
-        <div className="max-w-7xl mx-auto relative z-10">
-            <div className="text-center mb-20">
-                <h2 className="text-4xl sm:text-5xl font-black text-white mb-6 tracking-tight">How we get you past the <span className="text-orange-500">ATS robots</span></h2>
-                <p className="text-zinc-400 max-w-2xl mx-auto text-lg font-light">We don't just "check" your resume. We re-engineer it to match exactly what recruiters are looking for.</p>
+        <div className="max-w-6xl mx-auto relative z-10">
+            <div className="text-center mb-10">
+                <h2 className="text-2xl sm:text-3xl font-black text-white mb-3 tracking-tight">How we get you past the <span className="text-orange-500">ATS robots</span></h2>
+                <p className="text-zinc-500 max-w-xl mx-auto text-sm font-light">We re-engineer your resume to match exactly what recruiters are looking for.</p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
                 {/* Problem/Solution Cards */}
-                <div className="lg:col-span-5 space-y-5">
+                <div className="lg:col-span-5 space-y-3">
                     {/* Missing Keywords */}
                     <motion.div 
                         initial={{ opacity: 0, x: -20 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
-                        className="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl transition-all duration-500 group"
+                        className="bg-zinc-900/40 border border-white/5 p-4 rounded-xl transition-all duration-500 group"
                     >
-                        <div className="flex gap-5">
+                        <div className="flex gap-3">
                             <div>
-                                <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-tighter">Missing Keywords</h3>
-                                <p className="text-zinc-400 text-sm leading-relaxed">
-                                    If you don't have the exact keywords from the job description (e.g., "Agile", "SaaS"), the ATS scores you zero.
+                                <h3 className="text-base font-bold text-white mb-0.5 uppercase tracking-tighter">Missing Keywords</h3>
+                                <p className="text-zinc-500 text-[11px] leading-relaxed">
+                                    If you don't have the exact keywords from the job description, the ATS scores you zero.
                                 </p>
                             </div>
                         </div>
@@ -531,13 +531,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.1 }}
-                        className="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl transition-all duration-500 group"
+                        className="bg-zinc-900/40 border border-white/5 p-4 rounded-xl transition-all duration-500 group"
                     >
-                        <div className="flex gap-5">
+                        <div className="flex gap-3">
                             <div>
-                                <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-tighter">Bad Formatting</h3>
-                                <p className="text-zinc-400 text-sm leading-relaxed">
-                                    Columns, graphics, and tables confuse the parser. Your resume ends up looking like gibberish to the robot.
+                                <h3 className="text-base font-bold text-white mb-0.5 uppercase tracking-tighter">Bad Formatting</h3>
+                                <p className="text-zinc-500 text-[11px] leading-relaxed">
+                                    Columns and graphics confuse the parser. Your resume ends up looking like gibberish to the robot.
                                 </p>
                             </div>
                         </div>
@@ -549,12 +549,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.2 }}
-                        className="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl transition-all duration-500 group"
+                        className="bg-zinc-900/40 border border-white/5 p-4 rounded-xl transition-all duration-500 group"
                     >
-                        <div className="flex gap-5">
+                        <div className="flex gap-3">
                             <div>
-                                <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-tighter">The HireSchema Fix</h3>
-                                <p className="text-zinc-400 text-sm leading-relaxed">
+                                <h3 className="text-base font-bold text-white mb-0.5 uppercase tracking-tighter">The HireSchema Fix</h3>
+                                <p className="text-zinc-500 text-[11px] leading-relaxed">
                                     We rewrite your bullets to include high-value keywords naturally, boosting your match score to 90%+.
                                 </p>
                             </div>
@@ -562,62 +562,58 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                     </motion.div>
                 </div>
 
-                {/* Visual Proof - Layered Mockup */}
-                <div className="lg:col-span-7 relative h-[450px] sm:h-[500px] flex items-center justify-center lg:justify-end">
+                {/* Visual Proof */}
+                <div className="lg:col-span-7 relative h-[350px] flex items-center justify-center lg:justify-end">
                     {/* Background Glow */}
-                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-orange-500/10 blur-[120px] rounded-full"></div>
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[350px] h-[200px] bg-orange-500/5 blur-[80px] rounded-full"></div>
 
-                    {/* Before Card (Behind) */}
+                    {/* Before Card */}
                     <motion.div 
                         initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                        whileInView={{ opacity: 0.4, y: -60, scale: 0.95 }}
+                        whileInView={{ opacity: 0.4, y: -30, scale: 0.95 }}
                         viewport={{ once: true }}
-                        className="absolute w-full max-w-[480px] bg-zinc-900/80 border border-white/5 rounded-2xl p-6 shadow-2xl z-10 backdrop-blur-md"
+                        className="absolute w-full max-w-[350px] bg-zinc-900/80 border border-white/5 rounded-xl p-4 shadow-2xl z-10 backdrop-blur-md"
                     >
-                        <div className="flex justify-between items-center mb-4 border-b border-white/5 pb-4">
-                            <div className="flex items-center gap-2">
-                                <span className="text-[10px] font-bold text-red-500/50 uppercase tracking-widest">Before</span>
-                            </div>
-                            <div className="text-[10px] font-mono text-zinc-600 uppercase">Score: 42/100</div>
+                        <div className="flex justify-between items-center mb-2 border-b border-white/5 pb-2">
+                            <span className="text-[8px] font-black text-red-500/50 uppercase tracking-widest">Before</span>
+                            <div className="text-[8px] font-mono text-zinc-600 uppercase tracking-tight">Score: 42/100</div>
                         </div>
-                        <p className="text-zinc-500 text-sm italic font-serif leading-relaxed line-through decoration-red-500/30">
+                        <p className="text-zinc-600 text-[11px] italic font-serif leading-relaxed line-through decoration-red-500/20">
                             Responsible for sales and managing the team during the quarter.
                         </p>
                     </motion.div>
 
-                    {/* Optimized Card (Front) */}
+                    {/* Optimized Card */}
                     <motion.div 
-                        initial={{ opacity: 0, y: 40, scale: 1 }}
-                        whileInView={{ opacity: 1, y: 30, scale: 1 }}
+                        initial={{ opacity: 0, y: 30, scale: 1 }}
+                        whileInView={{ opacity: 1, y: 15, scale: 1 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.3, type: "spring", stiffness: 50 }}
-                        className="absolute w-full max-w-[520px] bg-zinc-900 border border-orange-500/40 rounded-3xl p-8 sm:p-10 shadow-[0_0_80px_rgba(234,88,12,0.2)] z-20 backdrop-blur-xl"
+                        className="absolute w-full max-w-[400px] bg-zinc-900 border border-orange-500/30 rounded-2xl p-5 sm:p-6 shadow-[0_0_50px_rgba(234,88,12,0.15)] z-20 backdrop-blur-xl"
                     >
-                        <div className="flex justify-between items-center mb-8 border-b border-white/5 pb-5">
-                            <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-orange-500"></div>
-                                <span className="text-[11px] font-bold text-white uppercase tracking-widest">Optimized</span>
+                        <div className="flex justify-between items-center mb-4 border-b border-white/5 pb-3">
+                            <div className="flex items-center gap-1.5">
+                                <div className="w-1.5 h-1.5 rounded-full bg-orange-500"></div>
+                                <span className="text-[9px] font-black text-white uppercase tracking-widest">Optimized</span>
                             </div>
-                            <div className="text-[11px] font-mono text-orange-400 font-bold uppercase tracking-tight">Score: 94/100</div>
+                            <div className="text-[9px] font-mono text-orange-400 font-bold uppercase tracking-tight">Score: 94/100</div>
                         </div>
                         
-                        <p className="text-white text-lg sm:text-xl leading-relaxed font-medium">
+                        <p className="text-white text-sm sm:text-base leading-relaxed font-medium">
                             Led a <span className="text-orange-200 border-b-2 border-orange-500/50 pb-0.5 px-0.5 font-bold">sales team of 10</span>, achieving <span className="text-orange-200 border-b-2 border-orange-500/50 pb-0.5 px-0.5 font-bold">150% of quota</span> ($2M ARR) through strategic <span className="text-orange-200 border-b-2 border-orange-500/50 pb-0.5 px-0.5 font-bold">CRM implementation</span>.
                         </p>
                         
-                        {/* Keyword highlight explanation */}
-                        <div className="mt-8 flex flex-wrap gap-2">
-                            <span className="text-[9px] bg-orange-500/10 text-orange-400 px-2.5 py-1 rounded-full border border-orange-500/20 font-mono uppercase tracking-wider">Quantified Impact</span>
-                            <span className="text-[9px] bg-orange-500/10 text-orange-400 px-2.5 py-1 rounded-full border border-orange-500/20 font-mono uppercase tracking-wider">ATS Keywords Found</span>
+                        <div className="mt-4 flex flex-wrap gap-2">
+                            <span className="text-[7px] bg-orange-500/10 text-orange-400 px-1.5 py-0.5 rounded-full border border-orange-500/20 font-mono uppercase tracking-widest">Quantified Impact</span>
                         </div>
 
-                        {/* Floating Success Badge */}
+                        {/* Success Badge */}
                         <motion.div 
                             initial={{ scale: 0, rotate: -5 }}
                             whileInView={{ scale: 1, rotate: 12 }}
                             viewport={{ once: true }}
                             transition={{ type: "spring", delay: 1, damping: 10 }}
-                            className="absolute -right-4 -bottom-4 bg-orange-500 text-white font-black px-6 py-3 rounded-xl shadow-2xl z-40 border-4 border-zinc-950 text-base"
+                            className="absolute -right-2 -bottom-2 bg-orange-500 text-white font-black px-3 py-1.5 rounded-lg shadow-2xl z-40 border-2 border-zinc-950 text-[10px] uppercase"
                         >
                             ATS PASS
                         </motion.div>
@@ -627,47 +623,42 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         </div>
       </section>
 
-      {/* --- HOW IT WORKS (VISUAL FLOW) --- */}
-      <section className="py-24 px-6 bg-zinc-950 border-b border-white/5 relative overflow-hidden">
-          <div className="max-w-7xl mx-auto relative z-10">
-               <div className="text-center mb-20">
-                  <h2 className="text-3xl font-bold text-white mb-4">How it works</h2>
-                  <p className="text-zinc-500">Get a better resume in under 2 minutes.</p>
+      {/* --- HOW IT WORKS --- */}
+      <section className="py-12 px-6 bg-zinc-950 border-b border-white/5 relative overflow-hidden">
+          <div className="max-w-6xl mx-auto relative z-10">
+               <div className="text-center mb-12">
+                  <h2 className="text-xl font-black text-white mb-1 uppercase tracking-tight">How it works</h2>
+                  <p className="text-zinc-500 text-xs">Get a better resume in under 2 minutes.</p>
               </div>
 
-              <div className="relative grid grid-cols-1 md:grid-cols-3 gap-12">
-                  {/* Visual Connection Line (Desktop) */}
-                  <div className="hidden md:block absolute top-[48px] left-[15%] right-[15%] h-[2px] bg-zinc-800 z-0">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-orange-500/50 to-transparent w-1/2 animate-[shimmer_3s_infinite_linear]" style={{ backgroundSize: '200% 100%' }}></div>
-                  </div>
-                  
+              <div className="relative grid grid-cols-1 md:grid-cols-3 gap-8">
                   {/* Step 1 */}
                   <div 
                       className="flex flex-col items-center text-center relative group cursor-pointer"
                       onClick={() => onStart('scan')}
                   >
                       <StepGraphic step={1} />
-                      <h4 className="text-lg font-bold text-white mb-3 group-hover:text-orange-500 transition-colors">Upload & Scan</h4>
-                      <p className="text-zinc-400 text-sm leading-relaxed max-w-[280px]">
-                          Drop your resume (PDF) and copy-paste the job posting you want to apply for. Takes 10 seconds.
+                      <h4 className="text-sm font-black text-white mb-1.5 group-hover:text-orange-500 transition-colors uppercase tracking-widest">1. Upload</h4>
+                      <p className="text-zinc-500 text-[11px] leading-relaxed max-w-[200px]">
+                          Drop your resume and paste the job posting. Takes 10 seconds.
                       </p>
                   </div>
 
                   {/* Step 2 */}
                   <div className="flex flex-col items-center text-center relative group">
                       <StepGraphic step={2} />
-                      <h4 className="text-lg font-bold text-white mb-3">See What's Wrong</h4>
-                      <p className="text-zinc-400 text-sm leading-relaxed max-w-[280px]">
-                          We show you your score (0-100) and list the exact keywords the job wants that your resume is missing.
+                      <h4 className="text-sm font-black text-white mb-1.5 uppercase tracking-widest">2. Analyze</h4>
+                      <p className="text-zinc-500 text-[11px] leading-relaxed max-w-[200px]">
+                          See your score and the exact keywords the job wants that you lack.
                       </p>
                   </div>
 
                   {/* Step 3 */}
                   <div className="flex flex-col items-center text-center relative group">
                       <StepGraphic step={3} />
-                      <h4 className="text-lg font-bold text-white mb-3">Fix & Download</h4>
-                      <p className="text-zinc-400 text-sm leading-relaxed max-w-[280px]">
-                          We rewrite your resume with the right keywords. Download the fixed version as a PDF. Done.
+                      <h4 className="text-sm font-black text-white mb-1.5 uppercase tracking-widest">3. Optimize</h4>
+                      <p className="text-zinc-500 text-[11px] leading-relaxed max-w-[200px]">
+                          Rewrite your resume with the right keywords and download the PDF.
                       </p>
                   </div>
               </div>
@@ -675,33 +666,33 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
       </section>
 
       {/* --- FEATURES GRID --- */}
-      <section id="features" className="py-24 px-6 bg-zinc-900/50 relative scroll-mt-20">
-        <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-16">
-                <h2 className="text-3xl font-bold text-white mb-4">Everything You Need to Get Hired</h2>
-                <p className="text-zinc-500">Not just a resume checker — a complete job application toolkit.</p>
+      <section id="features" className="py-12 px-6 bg-zinc-900/50 relative scroll-mt-20">
+        <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-10">
+                <h2 className="text-xl font-black text-white mb-1 uppercase tracking-tight">Everything You Need</h2>
+                <p className="text-zinc-500 text-xs">Not just a resume checker — a complete toolkit.</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {features.map((f, i) => (
                     <motion.div 
                         key={i} 
                         initial={{ opacity: 0, y: 10 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ delay: i * 0.2, duration: 0.8 }}
-                        className="bg-zinc-900 border border-white/5 p-8 rounded-lg hover:border-orange-500/30 transition-all group cursor-pointer"
+                        transition={{ delay: i * 0.1, duration: 0.8 }}
+                        className="bg-zinc-900 border border-white/5 p-5 rounded-xl hover:border-orange-500/30 transition-all group cursor-pointer"
                         onClick={() => onStart('feature', undefined, f.id)}
                     >
-                        <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                        <h3 className="text-sm font-black text-white mb-1 flex items-center gap-2">
                             {f.title}
-                            <span className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-orange-500 ml-1">→</span>
+                            <span className="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-orange-500 ml-1">→</span>
                         </h3>
-                        <p className="text-zinc-400 text-sm leading-relaxed mb-4">
+                        <p className="text-zinc-500 text-[11px] leading-relaxed mb-2.5">
                             {f.desc}
                         </p>
-                        <div className="border-t border-white/5 pt-4">
-                            <p className="text-xs text-zinc-600 font-mono mb-2">
+                        <div className="border-t border-white/5 pt-2.5">
+                            <p className="text-[9px] text-zinc-600 font-mono italic">
                                 {f.micro}
                             </p>
                         </div>
@@ -712,20 +703,20 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
       </section>
 
       {/* --- PRICING SECTION --- */}
-      <section id="pricing" className="py-24 px-6 bg-zinc-950 border-t border-white/10 scroll-mt-20">
+      <section id="pricing" className="py-16 px-6 bg-zinc-950 border-t border-white/10 scroll-mt-20">
           <div className="max-w-4xl mx-auto text-center">
-              <h2 className="text-3xl font-bold text-white mb-4">Simple Pricing</h2>
-              <p className="text-zinc-500 mb-12">Free analysis. Pay only when you download.</p>
+              <h2 className="text-2xl font-black text-white mb-2 uppercase tracking-tight">Simple Pricing</h2>
+              <p className="text-zinc-500 text-sm mb-10">Free analysis. Pay only when you download.</p>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
                   {/* Free Tier */}
-                  <div className="bg-zinc-900/30 border border-zinc-800 p-8 rounded-2xl flex flex-col items-center">
-                      <span className="text-zinc-500 font-bold uppercase tracking-wider text-xs mb-4">Analysis</span>
-                      <div className="text-4xl font-black text-white mb-6">Free</div>
-                      <ul className="space-y-4 text-left w-full mb-8 flex-1">
-                          <li className="flex items-center gap-3 text-sm text-zinc-300">ATS score</li>
-                          <li className="flex items-center gap-3 text-sm text-zinc-300">Keyword gaps</li>
-                          <li className="flex items-center gap-3 text-sm text-zinc-300">Preview of rewritten bullets</li>
+                  <div className="bg-zinc-900/30 border border-zinc-800 p-6 rounded-2xl flex flex-col items-center">
+                      <span className="text-zinc-600 font-black uppercase tracking-[0.2em] text-[10px] mb-4">Analysis</span>
+                      <div className="text-3xl font-black text-white mb-6 uppercase tracking-tighter">Free</div>
+                      <ul className="space-y-3 text-left w-full mb-8 flex-1">
+                          <li className="flex items-center gap-2 text-xs text-zinc-400 font-bold uppercase tracking-tight">ATS score</li>
+                          <li className="flex items-center gap-2 text-xs text-zinc-400 font-bold uppercase tracking-tight">Keyword gaps</li>
+                          <li className="flex items-center gap-2 text-xs text-zinc-400 font-bold uppercase tracking-tight">AI Preview</li>
                       </ul>
                     <a 
                         href="/app"
@@ -735,25 +726,24 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                             logEvent('cta_click', { tier: 'free' }); 
                             onStart('scan'); 
                         }} 
-                        className={ORANGE_BUTTON_STYLE + " w-full"}
+                        className={ORANGE_BUTTON_STYLE + " w-full py-3.5 text-xs"}
                     >
                         Start now
                     </a>
                 </div>
 
                 {/* Paid Tier */}
-                <div className="bg-gradient-to-b from-zinc-900 to-zinc-950 border border-orange-500/30 p-8 rounded-2xl flex flex-col items-center relative shadow-2xl">
-                     <div className="absolute top-0 right-0 bg-orange-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg uppercase">
-                         Pay as you go
+                <div className="bg-gradient-to-b from-zinc-900 to-zinc-950 border border-orange-500/30 p-6 rounded-2xl flex flex-col items-center relative shadow-2xl">
+                     <div className="absolute top-0 right-0 bg-orange-600 text-white text-[9px] font-black px-3 py-1 rounded-bl-lg rounded-tr-lg uppercase tracking-widest">
+                         Unlock
                      </div>
-                    <span className="text-orange-500 font-bold uppercase tracking-wider text-xs mb-4">Results</span>
-                    <div className="text-4xl font-black text-white mb-6">$1 <span className="text-base font-normal text-zinc-500">/ download</span></div>
-                    <ul className="space-y-4 text-left w-full mb-8 flex-1">
-                        <li className="flex items-center gap-3 text-sm text-white"><strong>Optimized Resume PDF</strong></li>
-                        <li className="flex items-center gap-3 text-sm text-white">Tailored Cover Letter PDF</li>
-                        <li className="flex items-center gap-3 text-sm text-white">Interview Prep Kit access</li>
-                        <li className="flex items-center gap-3 text-sm text-white">Skill Assessment quizzes</li>
-                        <li className="flex items-center gap-3 text-xs text-zinc-500 mt-4 border-t border-white/5 pt-4">Secure payment via Dodo Payments</li>
+                    <span className="text-orange-500 font-black uppercase tracking-[0.2em] text-[10px] mb-4">Full Access</span>
+                    <div className="text-3xl font-black text-white mb-6 uppercase tracking-tighter">$1 <span className="text-sm font-normal text-zinc-600 tracking-normal">/ download</span></div>
+                    <ul className="space-y-3 text-left w-full mb-8 flex-1">
+                        <li className="flex items-center gap-2 text-xs text-zinc-200 font-bold uppercase tracking-tight">Optimized Resume PDF</li>
+                        <li className="flex items-center gap-2 text-xs text-zinc-200 font-bold uppercase tracking-tight">Tailored Cover Letter</li>
+                        <li className="flex items-center gap-2 text-xs text-zinc-200 font-bold uppercase tracking-tight">Interview Prep Kit</li>
+                        <li className="flex items-center gap-2 text-[10px] text-zinc-600 mt-3 border-t border-white/5 pt-3">Secure payment via Dodo</li>
                     </ul>
                     <a 
                         href="/app"
@@ -763,7 +753,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                             logEvent('cta_click', { tier: 'paid' }); 
                             onStart('optimize'); 
                         }} 
-                        className={ORANGE_BUTTON_STYLE + " w-full"}
+                        className={ORANGE_BUTTON_STYLE + " w-full py-3.5 text-xs"}
                     >
                         Start now
                     </a>

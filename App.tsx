@@ -703,18 +703,18 @@ export default function App() {
                 <div key="history-wrapper" className="fixed inset-0 z-[60]">
                   <motion.div 
                     key="history-sidebar"
-                    initial={{ x: -300 }}
+                    initial={{ x: -260 }}
                     animate={{ x: 0 }}
-                    exit={{ x: -300 }}
-                    className="absolute inset-y-0 left-0 w-[300px] bg-zinc-950 border-r border-white/5 flex flex-col shadow-2xl z-[61]"
+                    exit={{ x: -260 }}
+                    className="absolute inset-y-0 left-0 w-[260px] bg-zinc-950 border-r border-white/5 flex flex-col shadow-2xl z-[61]"
                   >
-                    <div className="p-6 border-b border-white/5 flex justify-between items-center">
-                      <h2 className="text-sm font-bold uppercase tracking-widest text-zinc-500">History</h2>
+                    <div className="p-4 border-b border-white/5 flex justify-between items-center">
+                      <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600">History</h2>
                       <button onClick={() => setShowHistory(false)} className="text-zinc-500 hover:text-white transition-colors">
-                        <X className="w-5 h-5" />
+                        <X className="w-4 h-4" />
                       </button>
                     </div>
-                    <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+                    <div className="flex-1 overflow-y-auto p-3 space-y-2 custom-scrollbar">
                       {history.length === 0 ? (
                         <div className="text-center py-10">
                           <p className="text-zinc-600 text-xs">No analysis history yet.</p>
@@ -790,8 +790,8 @@ export default function App() {
             {/* MAIN CONTENT */}
             <div className="flex-1 flex flex-col min-w-0 bg-zinc-950">
                {/* HEADER */}
-               <header className="h-14 sm:h-16 border-b border-white/5 bg-zinc-950 flex items-center justify-between px-3 sm:px-6 shrink-0 safe-area-inset">
-                   <div className="cursor-pointer touch-target flex items-center" onClick={() => { 
+               <header className="h-12 sm:h-14 border-b border-white/5 bg-zinc-950 flex items-center justify-between px-3 sm:px-6 shrink-0 safe-area-inset">
+                   <div className="cursor-pointer touch-target flex items-center scale-90 origin-left" onClick={() => { 
                        setView('landing'); 
                        window.history.pushState({}, '', '/');
                        window.scrollTo(0, 0);
@@ -800,17 +800,17 @@ export default function App() {
                    <div className="flex items-center gap-2 sm:gap-4">
                        <button 
                           onClick={() => setShowHistory(true)}
-                          className="p-2 text-zinc-500 hover:text-white hover:bg-white/5 rounded-lg transition-all flex items-center gap-2"
+                          className="p-1.5 text-zinc-500 hover:text-white hover:bg-white/5 rounded-lg transition-all flex items-center gap-2"
                           title="View History"
                        >
-                          <span className="text-xs font-black uppercase tracking-[0.2em]">History</span>
+                          <span className="text-[9px] font-black uppercase tracking-[0.2em]">History</span>
                        </button>
                        
-                       <div className="h-6 w-[1px] bg-white/5 mx-1"></div>
+                       <div className="h-5 w-[1px] bg-white/5 mx-1"></div>
 
                        {isPaid && (
-                           <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-orange-500/10 border border-orange-500/20 rounded-full">
-                               <span className="text-xs font-black text-orange-500 uppercase tracking-widest">Premium</span>
+                           <div className="hidden sm:flex items-center gap-2 px-2.5 py-0.5 bg-orange-500/10 border border-orange-500/20 rounded-full">
+                               <span className="text-[9px] font-black text-orange-500 uppercase tracking-widest">Premium</span>
                            </div>
                        )}
                        <a 
@@ -820,7 +820,7 @@ export default function App() {
                               e.preventDefault();
                               startNewScan();
                           }} 
-                          className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-xs uppercase tracking-wide shadow-[3px_3px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none active:shadow-none hover:translate-x-[1.5px] hover:translate-y-[1.5px] active:translate-x-[1.5px] active:translate-y-[1.5px] transition-all rounded-sm cursor-pointer border-none touch-target"
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-[10px] uppercase tracking-wide transition-all rounded-sm cursor-pointer border-none touch-target"
                        >
                            <span className="hidden xs:inline">New Scan</span>
                        </a>
@@ -828,7 +828,7 @@ export default function App() {
                </header>
 
                {/* CONTENT */}
-               <main className="flex-1 overflow-y-auto custom-scrollbar p-6 relative">
+               <main className="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 relative">
                    <AnimatePresence mode="wait">
                        {dashboardView === 'scan' ? (
                            <motion.div 
@@ -836,32 +836,32 @@ export default function App() {
                               initial={{ opacity: 0, y: 10 }}
                               animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, y: -10 }}
-                              className="max-w-4xl mx-auto h-full flex flex-col items-center justify-center px-2 sm:px-0"
+                              className="max-w-3xl mx-auto h-full flex flex-col items-center justify-center px-2 sm:px-0"
                            >
                                {isAnalyzing ? (
                                   <div className="text-center px-4">
-                                      <div className="relative w-24 sm:w-32 h-24 sm:h-32 mx-auto mb-6 sm:mb-8">
+                                      <div className="relative w-20 sm:w-24 h-20 sm:h-24 mx-auto mb-6 sm:mb-8">
                                           <div className="absolute inset-0 bg-orange-500 rounded-full animate-ping opacity-20"></div>
                                           <div className="relative w-full h-full bg-zinc-900 border border-zinc-700 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(249,115,22,0.3)]">
-                                              <span className="text-2xl font-black text-orange-500 animate-pulse uppercase">AI</span>
+                                              <span className="text-xl font-black text-orange-500 animate-pulse uppercase">AI</span>
                                           </div>
                                       </div>
-                                      <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
+                                      <h2 className="text-lg sm:text-xl font-bold text-white mb-2">
                                           {analysisProgress < 30 ? "Analyzing Resume..." : 
                                            analysisProgress < 60 ? "Extracting Skills..." :
                                            analysisProgress < 85 ? "Comparing with Job..." : 
                                            "Finalizing Insights..."}
                                       </h2>
-                                      <p className="text-zinc-500 font-mono text-xs">{Math.round(analysisProgress)}% COMPLETE</p>
+                                      <p className="text-zinc-500 font-mono text-[10px]">{Math.round(analysisProgress)}% COMPLETE</p>
                                   </div>
                                ) : (
-                                   <div className="w-full space-y-6 sm:space-y-8">
-                                      <div className="text-center"><h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">New Analysis</h1><p className="text-zinc-400 text-sm">Step {inputWizardStep + 1} of 2</p></div>
-                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 min-h-[350px] sm:h-[400px]">
+                                   <div className="w-full space-y-4 sm:space-y-6">
+                                      <div className="text-center"><h1 className="text-xl sm:text-2xl font-bold text-white mb-1">New Analysis</h1><p className="text-zinc-400 text-xs">Step {inputWizardStep + 1} of 2</p></div>
+                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 min-h-[300px] sm:h-[350px]">
                                           <div className={`flex flex-col h-full ${inputWizardStep === 1 ? 'hidden md:flex' : ''}`}>
-                                              <h3 className="text-xs font-bold text-zinc-500 uppercase mb-3">1. Select Resume</h3>
-                                              <div className="flex-1 overflow-hidden h-full min-h-[250px]">
-                                                  <Suspense fallback={<div className="h-full flex items-center justify-center"><Loader2 className="w-6 h-6 text-orange-500 animate-spin" /></div>}>
+                                              <h3 className="text-[10px] font-bold text-zinc-500 uppercase mb-2">1. Select Resume</h3>
+                                              <div className="flex-1 overflow-hidden h-full min-h-[200px]">
+                                                  <Suspense fallback={<div className="h-full flex items-center justify-center"><Loader2 className="w-5 h-5 text-orange-500 animate-spin" /></div>}>
                                                     <ResumeUploader onFileUpload={handleFileUpload} currentFile={resumeFile} />
                                                   </Suspense>
                                               </div>
@@ -869,28 +869,28 @@ export default function App() {
                                                   <button 
                                                       onClick={() => setInputWizardStep(1)} 
                                                       disabled={!resumeFile} 
-                                                      className="w-full py-4 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-sm uppercase tracking-wide shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[2px] active:translate-y-[2px] transition-all rounded-sm cursor-pointer border-none disabled:opacity-50 touch-target"
+                                                      className="w-full py-3 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-xs uppercase tracking-wide transition-all rounded-sm cursor-pointer border-none disabled:opacity-50 touch-target"
                                                   >
                                                       Next Step
                                                   </button>
                                               </div>
                                           </div>
                                           <div className={`flex flex-col h-full ${inputWizardStep === 0 ? 'hidden md:flex' : ''}`}>
-                                               <div className="md:hidden mb-2"><button onClick={() => setInputWizardStep(0)} className="text-zinc-500 py-2 touch-target">Back</button></div>
-                                               <h3 className="text-xs font-bold text-zinc-500 uppercase mb-3">2. Job Details</h3>
-                                               <div className="flex gap-2 mb-3 bg-zinc-900 p-1 rounded-lg border border-zinc-800 self-start">
-                                                  <button onClick={() => setJobInputMode('link')} className={`flex items-center gap-2 px-3 py-2 rounded text-xs font-bold transition-colors touch-target ${jobInputMode === 'link' ? 'bg-orange-600 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>Link</button>
-                                                  <button onClick={() => setJobInputMode('text')} className={`flex items-center gap-2 px-3 py-2 rounded text-xs font-bold transition-colors touch-target ${jobInputMode === 'text' ? 'bg-zinc-700 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>Text</button>
+                                               <div className="md:hidden mb-1"><button onClick={() => setInputWizardStep(0)} className="text-zinc-500 py-1.5 text-xs touch-target">Back</button></div>
+                                               <h3 className="text-[10px] font-bold text-zinc-500 uppercase mb-2">2. Job Details</h3>
+                                               <div className="flex gap-1.5 mb-2 bg-zinc-900 p-1 rounded-lg border border-zinc-800 self-start">
+                                                  <button onClick={() => setJobInputMode('link')} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded text-[10px] font-bold transition-colors touch-target ${jobInputMode === 'link' ? 'bg-orange-600 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>Link</button>
+                                                  <button onClick={() => setJobInputMode('text')} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded text-[10px] font-bold transition-colors touch-target ${jobInputMode === 'text' ? 'bg-zinc-700 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>Text</button>
                                                </div>
-                                               <div className="flex-1 min-h-[200px]">{jobInputMode === 'link' ? (<div className="h-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 sm:p-6 flex flex-col justify-center gap-4"><div className="text-center"><h4 className="text-white font-bold text-sm uppercase tracking-widest">Paste Job URL</h4><p className="text-zinc-500 text-xs">LinkedIn, Indeed, etc.</p></div><input type="url" inputMode="url" value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} placeholder="https://..." className="w-full bg-zinc-950 border border-zinc-700 rounded-lg p-3 text-sm text-white focus:border-orange-500 outline-none" /></div>) : (<textarea value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} placeholder="Paste job description..." className="w-full h-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 sm:p-5 text-sm text-zinc-300 focus:outline-none focus:border-zinc-600 resize-none font-mono min-h-[200px]" />)}</div>
+                                               <div className="flex-1 min-h-[180px]">{jobInputMode === 'link' ? (<div className="h-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 sm:p-5 flex flex-col justify-center gap-3"><div className="text-center"><h4 className="text-white font-bold text-[10px] uppercase tracking-widest">Paste Job URL</h4><p className="text-zinc-500 text-[9px]">LinkedIn, Indeed, etc.</p></div><input type="url" inputMode="url" value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} placeholder="https://..." className="w-full bg-zinc-950 border border-zinc-700 rounded-lg p-2.5 text-xs text-white focus:border-orange-500 outline-none" /></div>) : (<textarea value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} placeholder="Paste job description..." className="w-full h-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 sm:p-4 text-xs text-zinc-300 focus:outline-none focus:border-zinc-600 resize-none font-mono min-h-[180px]" />)}</div>
                                           </div>
                                       </div>
-                                      {error && <div className="p-3 sm:p-4 bg-orange-950/20 border border-orange-900/30 rounded-lg flex items-start gap-3 text-orange-400 text-sm"><AlertCircle className="w-5 h-5 shrink-0 mt-0.5" /> <span>{error}</span></div>}
-                                      <div className="flex justify-end pb-4">
+                                      {error && <div className="p-2.5 bg-orange-950/20 border border-orange-900/30 rounded-lg flex items-start gap-2.5 text-orange-400 text-xs"><AlertCircle className="w-4 h-4 shrink-0 mt-0.5" /> <span>{error}</span></div>}
+                                      <div className="flex justify-end pb-2">
                                           <button 
                                               onClick={handleAnalysis} 
                                               disabled={!resumeFile || isAnalyzing} 
-                                              className="w-full sm:w-auto px-8 py-3.5 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-sm uppercase tracking-wide shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[2px] active:translate-y-[2px] transition-all rounded-sm cursor-pointer border-none disabled:opacity-50 disabled:cursor-not-allowed touch-target"
+                                              className="w-full sm:w-auto px-6 py-2.5 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-xs uppercase tracking-wide transition-all rounded-sm cursor-pointer border-none disabled:opacity-50 disabled:cursor-not-allowed touch-target"
                                           >
                                               Start Analysis
                                           </button>
@@ -908,15 +908,15 @@ export default function App() {
                            >
                                {analysisResult && resumeFile && (
                                    <>
-                                      <div className="flex justify-center mb-6">
+                                      <div className="flex justify-center mb-4">
                                          <div className="bg-zinc-900 p-1 rounded-lg border border-zinc-800 flex gap-1">
-                                           <button onClick={() => setResultTab('analysis')} className={`px-4 py-2 rounded text-xs font-bold transition-all ${resultTab === 'analysis' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>Diagnostic</button>
-                                           <button onClick={() => setResultTab('generator')} className={`px-4 py-2 rounded text-xs font-bold transition-all ${resultTab === 'generator' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>Editor</button>
+                                           <button onClick={() => setResultTab('analysis')} className={`px-3 py-1.5 rounded text-[10px] font-bold transition-all ${resultTab === 'analysis' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>Diagnostic</button>
+                                           <button onClick={() => setResultTab('generator')} className={`px-3 py-1.5 rounded text-[10px] font-bold transition-all ${resultTab === 'generator' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>Editor</button>
                                          </div>
                                       </div>
                                       <div className="flex-1 bg-zinc-900/30 border border-white/5 rounded-xl overflow-hidden">
                                          {resultTab === 'analysis' ? (
-                                           <div className="h-full overflow-y-auto p-6">
+                                           <div className="h-full overflow-y-auto p-4 sm:p-6">
                                              <ErrorBoundary>
                                                <Suspense fallback={<div className="flex items-center justify-center h-64"><Loader2 className="w-8 h-8 text-orange-500 animate-spin" /></div>}>
                                                  <AnalysisDashboard 

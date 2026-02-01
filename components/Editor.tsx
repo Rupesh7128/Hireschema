@@ -196,50 +196,50 @@ export const Editor: React.FC<EditorProps> = ({
         <div className="flex flex-col h-full bg-black text-white font-sans overflow-hidden">
             
             {/* --- TOP BAR --- */}
-            <div className="h-16 border-b border-white/5 flex items-center justify-between px-6 bg-zinc-950/50 backdrop-blur-xl shrink-0">
-                <div className="flex items-center gap-8">
+            <div className="h-14 border-b border-white/5 flex items-center justify-between px-4 bg-zinc-950/50 backdrop-blur-xl shrink-0">
+                <div className="flex items-center gap-6">
                     <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Live Workspace</span>
+                        <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
+                        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500">Workspace</span>
                     </div>
                     
                     <div className="flex bg-zinc-900/50 p-1 rounded-lg border border-white/5">
                         {[
                             { id: GeneratorType.ATS_RESUME, label: 'Resume', icon: FileText },
-                            { id: GeneratorType.COVER_LETTER, label: 'Cover Letter', icon: Mail },
+                            { id: GeneratorType.COVER_LETTER, label: 'Cover', icon: Mail },
                             { id: GeneratorType.INTERVIEW_PREP, label: 'Interview', icon: MessageSquare },
                             { id: GeneratorType.LEARNING_PATH, label: 'Gaps', icon: GraduationCap },
                         ].map(tab => (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab.id ? 'bg-zinc-800 text-white shadow-lg' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-[9px] font-black uppercase tracking-widest transition-all ${activeTab === tab.id ? 'bg-zinc-800 text-white shadow-lg' : 'text-zinc-500 hover:text-zinc-300'}`}
                             >
-                                <tab.icon className={`w-3.5 h-3.5 ${activeTab === tab.id ? 'text-orange-500' : ''}`} />
+                                <tab.icon className={`w-3 h-3 ${activeTab === tab.id ? 'text-orange-500' : ''}`} />
                                 {tab.label}
                             </button>
                         ))}
                     </div>
                 </div>
 
-                <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2 px-4 py-2 bg-zinc-900/50 border border-white/5 rounded-full">
-                        <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Score</span>
-                        <span className="text-sm font-black text-orange-500">{optimizedScore || analysis.atsScore}%</span>
+                <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900/50 border border-white/5 rounded-full">
+                        <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Score</span>
+                        <span className="text-xs font-black text-orange-500">{optimizedScore || analysis.atsScore}%</span>
                     </div>
                     
-                    <div className="h-6 w-px bg-white/10" />
+                    <div className="h-5 w-px bg-white/10" />
                     
-                    <div className="flex gap-2">
-                        <button onClick={handlePrint} className="p-2 text-zinc-500 hover:text-white transition-colors" title="Print"><Printer className="w-4 h-4" /></button>
-                        <button onClick={handleCopy} className="p-2 text-zinc-500 hover:text-white transition-colors" title="Copy"><Copy className="w-4 h-4" /></button>
+                    <div className="flex gap-1.5">
+                        <button onClick={handlePrint} className="p-1.5 text-zinc-500 hover:text-white transition-colors" title="Print"><Printer className="w-3.5 h-3.5" /></button>
+                        <button onClick={handleCopy} className="p-1.5 text-zinc-500 hover:text-white transition-colors" title="Copy"><Copy className="w-3.5 h-3.5" /></button>
                         <button 
                             onClick={handleDownloadPDF} 
                             disabled={isDownloading}
-                            className="flex items-center gap-2 px-6 py-2 bg-orange-600 hover:bg-orange-500 text-white font-black text-[10px] uppercase tracking-widest rounded-sm transition-all disabled:opacity-50"
+                            className="flex items-center gap-1.5 px-4 py-1.5 bg-orange-600 hover:bg-orange-500 text-white font-black text-[9px] uppercase tracking-widest rounded-sm transition-all disabled:opacity-50"
                         >
-                            {isDownloading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
-                            Download PDF
+                            {isDownloading ? <Loader2 className="w-2.5 h-2.5 animate-spin" /> : <Download className="w-2.5 h-2.5" />}
+                            PDF
                         </button>
                     </div>
                 </div>
@@ -247,22 +247,22 @@ export const Editor: React.FC<EditorProps> = ({
 
             <div className="flex-1 flex overflow-hidden">
                 {/* --- MAIN PREVIEW AREA --- */}
-                <div className="flex-1 overflow-y-auto custom-scrollbar p-12 bg-zinc-950 relative">
-                    <div className="max-w-[800px] mx-auto">
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-4 bg-zinc-950 relative">
+                    <div className="max-w-[700px] mx-auto">
                         <AnimatePresence mode="wait">
                             <motion.div
                                 key={activeTab + (loadingStates[activeTab] ? 'loading' : 'content')}
-                                initial={{ opacity: 0, y: 20 }}
+                                initial={{ opacity: 0, y: 15 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -20 }}
-                                className="bg-zinc-900/30 border border-white/5 p-16 rounded-[2.5rem] shadow-2xl relative overflow-hidden min-h-[1000px]"
+                                exit={{ opacity: 0, y: -15 }}
+                                className="bg-zinc-900/30 border border-white/5 p-6 sm:p-10 rounded-2xl shadow-2xl relative overflow-hidden min-h-[900px]"
                             >
-                                <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/5 blur-[100px] -mr-32 -mt-32" />
+                                <div className="absolute top-0 right-0 w-48 h-48 bg-orange-500/5 blur-[80px] -mr-24 -mt-24" />
                                 
                                 {loadingStates[activeTab] ? (
-                                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
-                                        <div className="w-16 h-16 border-4 border-orange-500/20 border-t-orange-500 rounded-full animate-spin" />
-                                        <p className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.3em]">AI is Drafting...</p>
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                                        <div className="w-12 h-12 border-3 border-orange-500/20 border-t-orange-500 rounded-full animate-spin" />
+                                        <p className="text-[9px] font-black text-zinc-500 uppercase tracking-[0.3em]">AI Drafting...</p>
                                     </div>
                                 ) : (
                                     <>
@@ -270,7 +270,7 @@ export const Editor: React.FC<EditorProps> = ({
                                             <textarea
                                                 value={generatedData[activeTab] || ''}
                                                 onChange={(e) => setGeneratedData(prev => ({ ...prev, [activeTab]: e.target.value }))}
-                                                className="w-full h-[800px] bg-transparent text-zinc-300 font-mono text-sm resize-none focus:outline-none"
+                                                className="w-full h-[700px] bg-transparent text-zinc-300 font-mono text-xs resize-none focus:outline-none"
                                             />
                                         ) : (
                                             renderMarkdown(generatedData[activeTab] || '')
@@ -283,111 +283,89 @@ export const Editor: React.FC<EditorProps> = ({
 
                     {/* Hidden PDF Template */}
                     <div className="hidden">
-                        <div ref={pdfRef} className="p-10 bg-white text-black font-sans">
+                        <div ref={pdfRef} className="p-8 bg-white text-black font-sans">
                             {renderMarkdown(generatedData[activeTab] || '')}
                         </div>
                     </div>
                 </div>
 
                 {/* --- RIGHT CONTROL PANEL --- */}
-                <div className="w-[360px] border-l border-white/5 bg-zinc-950 flex flex-col shrink-0">
-                    <div className="p-6 border-b border-white/5">
-                        <h3 className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.3em] mb-6">Optimization Tools</h3>
+                <div className="w-[260px] border-l border-white/5 bg-zinc-950 flex flex-col shrink-0">
+                    <div className="p-3 border-b border-white/5">
+                        <h3 className="text-[8px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-3">Tools</h3>
                         
-                        <div className="space-y-4">
+                        <div className="space-y-2">
                             {QUICK_ACTIONS.map(action => (
                                 <button
                                     key={action.id}
                                     onClick={() => handleRefine(action.prompt)}
                                     disabled={isRefining}
-                                    className="w-full group flex items-center gap-4 p-4 bg-zinc-900/50 border border-white/5 rounded-2xl hover:border-orange-500/50 transition-all text-left"
+                                    className="w-full group flex items-center gap-2.5 p-2.5 bg-zinc-900/50 border border-white/5 rounded-lg hover:border-orange-500/50 transition-all text-left"
                                 >
-                                    <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center shrink-0 group-hover:bg-orange-500 transition-colors">
-                                        <action.icon className="w-4 h-4 text-orange-500 group-hover:text-white" />
+                                    <div className="w-7 h-7 rounded-md bg-orange-500/10 flex items-center justify-center shrink-0 group-hover:bg-orange-500 transition-colors">
+                                        <action.icon className="w-3 h-3 text-orange-500 group-hover:text-white" />
                                     </div>
                                     <div>
-                                        <div className="text-xs font-black text-white uppercase tracking-wider">{action.label}</div>
-                                        <div className="text-[10px] text-zinc-500 mt-1">One-click AI boost</div>
+                                        <div className="text-[9px] font-black text-white uppercase tracking-wider">{action.label}</div>
+                                        <div className="text-[8px] text-zinc-600 mt-0.5 tracking-tight">One-click boost</div>
                                     </div>
                                 </button>
                             ))}
                         </div>
                     </div>
 
-                    <div className="flex-1 p-6 overflow-y-auto custom-scrollbar">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.3em]">Job Seeker Insights</h3>
+                    <div className="flex-1 p-3 overflow-y-auto custom-scrollbar">
+                        <div className="flex items-center justify-between mb-2.5">
+                            <h3 className="text-[8px] font-black text-zinc-500 uppercase tracking-[0.2em]">Insights</h3>
                         </div>
 
-                        <div className="space-y-4 mb-8">
-                            <div className="p-4 bg-orange-500/5 border border-orange-500/10 rounded-2xl">
-                                <div className="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-1">ATS Strategy</div>
-                                <p className="text-[11px] text-zinc-400 leading-relaxed">
-                                    We've injected <span className="text-white font-bold">{analysis.missingKeywords.length} missing keywords</span> into your content. This directly improves your rank in recruiter searches.
-                                </p>
-                            </div>
-                            <div className="p-4 bg-zinc-900/50 border border-white/5 rounded-2xl">
-                                <div className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Recruiter Tip</div>
-                                <p className="text-[11px] text-zinc-500 leading-relaxed italic">
-                                    "Recruiters spend 6 seconds on a first pass. Your top 1/3 of the page must scream 'I am the solution'."
+                        <div className="space-y-2 mb-5">
+                            <div className="p-2.5 bg-orange-500/5 border border-orange-500/10 rounded-lg">
+                                <div className="text-[8px] font-black text-orange-500 uppercase tracking-widest mb-0.5">ATS Strategy</div>
+                                <p className="text-[9px] text-zinc-500 leading-tight">
+                                    Injected <span className="text-white font-bold">{analysis.missingKeywords.length} missing keywords</span>.
                                 </p>
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.3em]">AI Assistant</h3>
-                            <div className="flex gap-2">
-                                {ACCENT_COLORS.map(c => (
-                                    <button 
-                                        key={c.name}
-                                        onClick={() => setAccentColor(c)}
-                                        className={`w-3 h-3 rounded-full border ${accentColor.name === c.name ? 'border-white scale-125' : 'border-transparent opacity-50'}`}
-                                        style={{ backgroundColor: c.value }}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="bg-zinc-900/50 border border-white/5 rounded-2xl p-4 mb-6">
-                            <p className="text-xs text-zinc-500 leading-relaxed font-medium italic">
-                                "Try asking me to: 'Rewrite the summary for a more senior role' or 'Highlight my leadership in the experience section'."
-                            </p>
+                        <div className="flex items-center justify-between mb-2.5">
+                            <h3 className="text-[8px] font-black text-zinc-500 uppercase tracking-[0.2em]">Assistant</h3>
                         </div>
 
                         <div className="relative">
                             <textarea
                                 value={chatInput}
                                 onChange={(e) => setChatInput(e.target.value)}
-                                placeholder="Custom AI instruction..."
-                                className="w-full bg-zinc-900/50 border border-white/5 rounded-2xl p-4 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-orange-500/50 resize-none h-32 transition-all"
+                                placeholder="Instructions..."
+                                className="w-full bg-zinc-900/50 border border-white/5 rounded-lg p-2.5 text-[10px] text-white placeholder:text-zinc-700 focus:outline-none focus:border-orange-500/50 resize-none h-20 transition-all"
                             />
                             <button
                                 onClick={() => handleRefine()}
                                 disabled={isRefining || !chatInput.trim()}
-                                className="absolute bottom-4 right-4 p-2 bg-orange-600 rounded-xl text-white hover:bg-orange-500 disabled:opacity-50 transition-all"
+                                className="absolute bottom-2 right-2 p-1 bg-orange-600 rounded-md text-white hover:bg-orange-500 disabled:opacity-50 transition-all"
                             >
-                                {isRefining ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                                {isRefining ? <Loader2 className="w-2.5 h-2.5 animate-spin" /> : <Send className="w-2.5 h-2.5" />}
                             </button>
                         </div>
                     </div>
 
-                    <div className="p-6 border-t border-white/5 bg-zinc-950/80 backdrop-blur-md">
-                        <div className="flex items-center justify-between mb-4">
-                            <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Workspace Language</span>
+                    <div className="p-3 border-t border-white/5 bg-zinc-950/80 backdrop-blur-md">
+                        <div className="flex items-center justify-between mb-2.5">
+                            <span className="text-[8px] font-black text-zinc-500 uppercase tracking-widest">Language</span>
                             <button 
                                 onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-                                className="flex items-center gap-2 text-[10px] font-black text-orange-500 uppercase tracking-widest hover:text-orange-400 transition-colors"
+                                className="flex items-center gap-1 text-[8px] font-black text-orange-500 uppercase tracking-widest hover:text-orange-400 transition-colors"
                             >
-                                {appLanguage} <ChevronDown className="w-3 h-3" />
+                                {appLanguage} <ChevronDown className="w-2 h-2" />
                             </button>
                         </div>
                         
                         <div className="flex gap-2">
                             <button 
                                 onClick={() => setIsEditing(!isEditing)}
-                                className={`flex-1 py-3 rounded-sm border font-black text-[10px] uppercase tracking-widest transition-all ${isEditing ? 'bg-orange-600 border-orange-700 text-white' : 'bg-zinc-900 border-white/5 text-zinc-500 hover:text-white'}`}
+                                className={`flex-1 py-2 rounded-sm border font-black text-[8px] uppercase tracking-widest transition-all ${isEditing ? 'bg-orange-600 border-orange-700 text-white' : 'bg-zinc-900 border-white/5 text-zinc-500 hover:text-white'}`}
                             >
-                                {isEditing ? 'Save Changes' : 'Manual Edit'}
+                                {isEditing ? 'Save' : 'Manual Edit'}
                             </button>
                         </div>
                     </div>

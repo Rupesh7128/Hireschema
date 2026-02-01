@@ -192,7 +192,7 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
       {/* Header - Mobile optimized */}
       <Header onNavigate={onNavigate} />
 
-      <main className="pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 container mx-auto max-w-5xl min-h-screen min-h-[100dvh] flex flex-col">
+      <main className="pt-16 sm:pt-20 pb-6 sm:pb-10 px-4 container mx-auto max-w-4xl min-h-screen min-h-[100dvh] flex flex-col">
         
         {/* SEO Hidden Semantic Content */}
         <div className="sr-only">
@@ -210,75 +210,70 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
         </div>
 
         {!roastResult && !isRoasting && (
-            <div className="flex-1 flex flex-col items-center justify-center text-center space-y-6 sm:space-y-8 px-2">
+            <div className="flex-1 flex flex-col items-center justify-center text-center space-y-5 sm:space-y-6 px-2">
                 <motion.div 
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="space-y-4"
+                    className="space-y-3"
                 >
-                    <div className="inline-flex items-center justify-center px-6 py-2 bg-orange-500/10 rounded-full mb-4 border border-orange-500/20 shadow-[0_0_30px_rgba(249,115,22,0.3)]">
-                        <span className="text-orange-500 font-black text-sm uppercase tracking-[0.3em]">Roast Engine</span>
+                    <div className="inline-flex items-center justify-center px-4 py-1.5 bg-orange-500/10 rounded-full mb-2 border border-orange-500/20 shadow-[0_0_20px_rgba(249,115,22,0.2)]">
+                        <span className="text-orange-500 font-black text-[10px] uppercase tracking-[0.3em]">Roast Engine</span>
                     </div>
-                    <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tighter uppercase">
+                    <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tighter uppercase">
                         Roast My <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-300">Resume</span>
                     </h1>
-                    <p className="text-zinc-400 text-sm sm:text-lg max-w-md mx-auto leading-relaxed px-2">
-                        Get the internet's most <span className="text-white font-bold">brutally honest AI resume roast</span>. Our engine scans for cringe, red flags, and employment gaps to help you build a better career.
+                    <p className="text-zinc-400 text-xs sm:text-base max-w-sm mx-auto leading-relaxed px-2 font-medium">
+                        Get the internet's most <span className="text-white font-bold">brutally honest AI resume roast</span>. Our engine scans for cringe, red flags, and gaps to help you build a better career.
                     </p>
-                    {/* SEO Hidden Content for crawlers */}
-                    <div className="sr-only">
-                        <h2>Free Resume Roast Online</h2>
-                        <p>Upload your PDF resume to get instant AI feedback. We analyze your formatting, keyword density, and overall hireability. Perfect for software engineers, product managers, and designers looking to improve their ATS score.</p>
-                    </div>
                 </motion.div>
 
                 <motion.div 
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.4 }}
-                    className="w-full max-w-md px-2"
+                    className="w-full max-w-sm px-2"
                 >
-                    <label className="group relative flex flex-col items-center justify-center w-full h-56 sm:h-64 rounded-2xl border-2 border-dashed border-zinc-800 hover:border-orange-500/50 active:border-orange-500/70 bg-zinc-900/30 hover:bg-zinc-900 transition-all cursor-pointer overflow-hidden touch-target">
+                    <label className="group relative flex flex-col items-center justify-center w-full h-48 sm:h-56 rounded-xl border-2 border-dashed border-zinc-800 hover:border-orange-500/50 active:border-orange-500/70 bg-zinc-900/30 hover:bg-zinc-900 transition-all cursor-pointer overflow-hidden touch-target">
                         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5"></div>
-                        <div className="relative z-10 flex flex-col items-center justify-center pt-5 pb-6">
-                            <p className="mb-2 text-base sm:text-lg text-white font-bold uppercase tracking-widest">Drop PDF here</p>
-                            <p className="text-xs text-zinc-500 font-mono">TAP TO UPLOAD</p>
+                        <div className="relative z-10 flex flex-col items-center justify-center pt-4 pb-5">
+                            <p className="mb-1.5 text-sm sm:text-base text-white font-bold uppercase tracking-widest">Drop PDF here</p>
+                            <p className="text-[10px] text-zinc-500 font-mono uppercase">TAP TO UPLOAD</p>
                         </div>
                         <input type="file" className="hidden" accept=".pdf" onChange={handleFileUpload} />
                     </label>
                 </motion.div>
                 {error && (
-                    <div className="text-orange-500 text-sm font-bold flex items-center gap-2 bg-orange-950/30 px-4 py-2 rounded-lg border border-orange-900/50 mx-2">
-                        <AlertCircle className="w-4 h-4 shrink-0" /> {error}
+                    <div className="text-orange-500 text-[10px] font-bold flex items-center gap-2 bg-orange-950/30 px-3 py-1.5 rounded-lg border border-orange-900/50 mx-2">
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0" /> {error}
                     </div>
                 )}
             </div>
         )}
 
         {isRoasting && (
-            <div className="flex-1 flex flex-col items-center justify-center text-center space-y-8">
+            <div className="flex-1 flex flex-col items-center justify-center text-center space-y-6">
                 <motion.div 
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     className="relative"
                 >
-                    <div className="absolute inset-0 bg-orange-500 blur-3xl opacity-30 animate-pulse"></div>
-                    <div className="relative w-24 h-24 bg-zinc-900 border-2 border-orange-500/30 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(249,115,22,0.4)]">
-                        <span className="text-2xl font-black text-orange-500 animate-pulse">AI</span>
+                    <div className="absolute inset-0 bg-orange-500 blur-2xl opacity-20 animate-pulse"></div>
+                    <div className="relative w-20 h-20 bg-zinc-900 border-2 border-orange-500/30 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(249,115,22,0.3)]">
+                        <span className="text-xl font-black text-orange-500 animate-pulse uppercase tracking-widest">AI</span>
                     </div>
                 </motion.div>
                 
-                <div className="space-y-4">
-                    <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
-                        ROASTING IN PROGRESS
+                <div className="space-y-3">
+                    <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white uppercase">
+                        Roasting...
                     </h2>
-                    <p className="text-orange-400 font-mono text-sm animate-pulse">
+                    <p className="text-orange-400 font-mono text-[10px] animate-pulse uppercase tracking-widest">
                         {currentRoastPhase}
                     </p>
                 </div>
 
-                <div className="w-full max-w-md space-y-3">
-                    <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
+                <div className="w-full max-w-sm space-y-2.5">
+                    <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
                         <motion.div 
                             className="h-full bg-gradient-to-r from-orange-600 via-orange-500 to-orange-600"
                             initial={{ width: 0 }}
@@ -286,23 +281,23 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                             transition={{ duration: 0.8 }}
                         />
                     </div>
-                    <div className="text-zinc-500 text-xs font-mono">
-                        {Math.round(roastingProgress)}% • Preparing career destruction
+                    <div className="text-zinc-500 text-[9px] font-mono uppercase tracking-widest">
+                        {Math.round(roastingProgress)}% • DESTROYING CAREER
                     </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4 text-center">
-                    <div className="space-y-1">
-                        <div className="text-2xl font-black text-orange-500">{Math.floor(Math.random() * 50) + 20}</div>
-                        <div className="text-xs text-zinc-500 uppercase">Buzzwords</div>
+                <div className="grid grid-cols-3 gap-3 text-center">
+                    <div className="space-y-0.5">
+                        <div className="text-xl font-black text-orange-500">{Math.floor(Math.random() * 50) + 20}</div>
+                        <div className="text-[8px] text-zinc-500 uppercase tracking-widest">Buzzwords</div>
                     </div>
-                    <div className="space-y-1">
-                        <div className="text-2xl font-black text-zinc-400">{Math.floor(Math.random() * 15) + 5}</div>
-                        <div className="text-xs text-zinc-500 uppercase">Red Flags</div>
+                    <div className="space-y-0.5">
+                        <div className="text-xl font-black text-zinc-400">{Math.floor(Math.random() * 15) + 5}</div>
+                        <div className="text-[8px] text-zinc-500 uppercase tracking-widest">Red Flags</div>
                     </div>
-                    <div className="space-y-1">
-                        <div className="text-2xl font-black text-zinc-500">{Math.floor(Math.random() * 8) + 2}</div>
-                        <div className="text-xs text-zinc-500 uppercase">Cringe Level</div>
+                    <div className="space-y-0.5">
+                        <div className="text-xl font-black text-zinc-500">{Math.floor(Math.random() * 8) + 2}</div>
+                        <div className="text-[8px] text-zinc-500 uppercase tracking-widest">Cringe</div>
                     </div>
                 </div>
             </div>
@@ -313,43 +308,43 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                 <motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 1.0 }}
-                    className="space-y-6 sm:space-y-8"
+                    transition={{ duration: 0.8 }}
+                    className="space-y-4 sm:space-y-6"
                 >
                     
                     {/* Enhanced Scoreboard */}
-                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 sm:gap-4">
                         {/* Main Score */}
-                        <div className="lg:col-span-2 bg-gradient-to-br from-zinc-900 via-zinc-900 to-orange-950/20 border border-orange-900/30 p-6 sm:p-8 rounded-2xl flex flex-col items-center justify-center text-center shadow-2xl relative overflow-hidden">
+                        <div className="lg:col-span-2 bg-gradient-to-br from-zinc-900 via-zinc-900 to-orange-950/20 border border-orange-900/30 p-5 sm:p-6 rounded-xl flex flex-col items-center justify-center text-center shadow-2xl relative overflow-hidden">
                             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-600 via-orange-500 to-orange-600"></div>
                             
-                            <div className="text-zinc-400 text-xs font-bold uppercase tracking-widest mb-3">Employability Score</div>
-                            <div className="relative mb-4">
-                                <div className="text-5xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-orange-400 to-orange-600">
+                            <div className="text-zinc-400 text-[9px] font-bold uppercase tracking-widest mb-2">Employability Score</div>
+                            <div className="relative mb-3">
+                                <div className="text-4xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-orange-400 to-orange-600">
                                     {roastScore}
                                 </div>
-                                <div className="text-xl font-bold text-zinc-500 absolute -bottom-1 -right-8">/100</div>
+                                <div className="text-lg font-bold text-zinc-500 absolute -bottom-1 -right-6">/100</div>
                             </div>
                             
-                            <div className="flex items-center gap-2 text-orange-400 text-sm font-bold bg-orange-950/40 px-4 py-2 rounded-full border border-orange-500/20">
-                                {roastScore < 25 ? "Medically Unhireable" : 
-                                 roastScore < 40 ? "Spiritually Unemployable" : 
-                                 roastScore < 55 ? "Barely Breathing" : "Surprisingly Decent"}
+                            <div className="flex items-center gap-2 text-orange-400 text-[10px] font-black bg-orange-950/40 px-3 py-1.5 rounded-full border border-orange-500/20 uppercase tracking-widest">
+                                {roastScore < 25 ? "Unhireable" : 
+                                 roastScore < 40 ? "Unemployable" : 
+                                 roastScore < 55 ? "Mediocre" : "Decent"}
                             </div>
                         </div>
                         
                         {/* Category Breakdown */}
-                        <div className="bg-zinc-900/80 border border-zinc-800 p-4 sm:p-6 rounded-2xl relative overflow-hidden">
-                            <div className="text-zinc-400 text-xs font-bold uppercase tracking-widest mb-4">Damage Report</div>
-                            <div className="h-32 w-full">
+                        <div className="bg-zinc-900/80 border border-zinc-800 p-3 sm:p-4 rounded-xl relative overflow-hidden flex flex-col items-center">
+                            <div className="text-zinc-400 text-[9px] font-bold uppercase tracking-widest mb-2">Damage Report</div>
+                            <div className="h-24 w-full">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <PieChart>
                                         <Pie
                                             data={roastCategories}
                                             cx="50%"
                                             cy="50%"
-                                            innerRadius={25}
-                                            outerRadius={50}
+                                            innerRadius={20}
+                                            outerRadius={40}
                                             paddingAngle={2}
                                             dataKey="value"
                                         >
@@ -362,7 +357,7 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                                                 backgroundColor: '#18181b', 
                                                 border: '1px solid #27272a', 
                                                 borderRadius: '8px', 
-                                                fontSize: '12px',
+                                                fontSize: '10px',
                                                 color: '#e4e4e7'
                                             }}
                                             itemStyle={{ color: '#e4e4e7' }}
@@ -373,9 +368,9 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                         </div>
                         
                         {/* Cringe Analytics */}
-                        <div className="bg-zinc-900/80 border border-zinc-800 p-4 sm:p-6 rounded-2xl relative overflow-hidden">
-                            <div className="text-zinc-400 text-xs font-bold uppercase tracking-widest mb-4">Cringe Metrics</div>
-                            <div className="h-32 w-full">
+                        <div className="bg-zinc-900/80 border border-zinc-800 p-3 sm:p-4 rounded-xl relative overflow-hidden flex flex-col items-center">
+                            <div className="text-zinc-400 text-[9px] font-bold uppercase tracking-widest mb-2">Cringe Metrics</div>
+                            <div className="h-24 w-full">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <AreaChart data={roastData}>
                                         <defs>
@@ -390,7 +385,7 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                                                 backgroundColor: '#18181b', 
                                                 border: '1px solid #27272a', 
                                                 borderRadius: '8px', 
-                                                fontSize: '12px' 
+                                                fontSize: '10px' 
                                             }} 
                                         />
                                         <Area 
@@ -408,7 +403,7 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                     </div>
 
                     {/* Quick Stats */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
                         {[
                             { label: 'Buzzword Density', value: `${Math.floor(Math.random() * 40) + 20}%`, color: 'text-orange-500' },
                             { label: 'Cringe Factor', value: `${Math.floor(Math.random() * 30) + 70}/100`, color: 'text-zinc-400' },
@@ -419,11 +414,11 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                                 key={index}
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: index * 0.2, duration: 0.8 }}
-                                className="bg-zinc-900/60 border border-zinc-800 p-4 rounded-xl text-center"
+                                transition={{ delay: index * 0.1, duration: 0.6 }}
+                                className="bg-zinc-900/60 border border-zinc-800 p-3 rounded-xl text-center"
                             >
-                                <div className="text-lg font-bold text-white mb-1">{stat.value}</div>
-                                <div className="text-[10px] text-zinc-500 uppercase tracking-widest">{stat.label}</div>
+                                <div className="text-base font-black text-white mb-0.5">{stat.value}</div>
+                                <div className="text-[8px] text-zinc-500 uppercase tracking-widest">{stat.label}</div>
                             </motion.div>
                         ))}
                     </div>
@@ -432,53 +427,45 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                     <motion.div 
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.6, duration: 0.8 }}
-                        className="bg-gradient-to-br from-zinc-900 via-zinc-900 to-orange-950/10 border border-zinc-800 rounded-2xl p-6 sm:p-8 md:p-12 shadow-2xl relative overflow-hidden"
+                        transition={{ delay: 0.4, duration: 0.6 }}
+                        className="bg-gradient-to-br from-zinc-900 via-zinc-900 to-orange-950/10 border border-zinc-800 rounded-xl p-6 sm:p-8 md:p-10 shadow-2xl relative overflow-hidden"
                     >
                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-600 via-orange-600 to-orange-600"></div>
                         
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="px-4 py-1 bg-orange-500/10 rounded-lg border border-orange-500/20">
-                                <span className="text-orange-500 font-black text-xs uppercase tracking-widest">Master Verdict</span>
-                            </div>
-                            <div>
-                                <h2 className="text-3xl font-bold text-white uppercase tracking-tighter">The Verdict</h2>
+                        <div className="flex items-center gap-2.5 mb-5">
+                            <div className="px-3 py-1 bg-orange-500/10 rounded-md border border-orange-500/20">
+                                <span className="text-orange-500 font-black text-[10px] uppercase tracking-widest">Master Verdict</span>
                             </div>
                         </div>
                         
                         <div className="roast-content prose prose-invert max-w-none
-                            prose-headings:text-orange-400 prose-headings:font-bold prose-headings:tracking-tight
-                            prose-h1:text-3xl prose-h1:mb-8 prose-h1:pb-4 prose-h1:border-b prose-h1:border-orange-500/20
-                            prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-6 prose-h2:pb-2 prose-h2:border-b prose-h2:border-orange-500/10 prose-h2:text-orange-400
-                            prose-h3:text-lg prose-h3:font-bold prose-h3:text-orange-300 prose-h3:mt-6 prose-h3:mb-3
-                            prose-p:text-zinc-300 prose-p:leading-relaxed prose-p:text-sm sm:prose-p:text-base prose-p:mb-6 prose-p:font-medium
-                            prose-strong:text-white prose-strong:font-bold prose-strong:bg-orange-950/40 prose-strong:px-1.5 prose-strong:py-0.5 prose-strong:rounded prose-strong:border prose-strong:border-orange-500/20
-                            prose-em:text-orange-400 prose-em:not-italic prose-em:font-semibold
-                            prose-ul:my-6 prose-ul:space-y-4
-                            prose-li:text-zinc-300 prose-li:text-sm sm:prose-li:text-base prose-li:leading-relaxed prose-li:pl-2
+                            prose-headings:text-orange-400 prose-headings:font-black prose-headings:tracking-tight
+                            prose-h1:text-2xl prose-h1:mb-6 prose-h1:pb-3 prose-h1:border-b prose-h1:border-orange-500/20
+                            prose-h2:text-xl prose-h2:mt-8 prose-h2:mb-4 prose-h2:pb-1.5 prose-h2:border-b prose-h2:border-orange-500/10
+                            prose-h3:text-base prose-h3:mt-5 prose-h3:mb-2
+                            prose-p:text-zinc-300 prose-p:leading-relaxed prose-p:text-xs sm:prose-p:text-sm prose-p:mb-4 prose-p:font-medium
+                            prose-strong:text-white prose-strong:font-bold prose-strong:bg-orange-950/40 prose-strong:px-1.5 prose-strong:py-0.5 prose-strong:rounded
+                            prose-em:text-orange-400 prose-em:not-italic prose-em:font-bold
+                            prose-ul:my-4 prose-ul:space-y-3
+                            prose-li:text-zinc-300 prose-li:text-xs sm:prose-li:text-sm prose-li:leading-relaxed
                             prose-li:marker:text-orange-500
-                            prose-ol:my-6 prose-ol:space-y-4
-                            prose-hr:my-10 prose-hr:border-zinc-800
-                            prose-blockquote:border-l-4 prose-blockquote:border-orange-500 prose-blockquote:bg-gradient-to-r prose-blockquote:from-orange-950/20 prose-blockquote:to-transparent prose-blockquote:p-6 prose-blockquote:rounded-r-lg prose-blockquote:my-8 prose-blockquote:shadow-sm
-                            prose-code:bg-zinc-800 prose-code:text-orange-400 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-sm
-                            [&_ul]:list-disc [&_ul]:pl-5
-                            [&_li_strong]:text-orange-200 [&_li_strong]:bg-transparent [&_li_strong]:border-none [&_li_strong]:px-0
+                            prose-blockquote:border-l-4 prose-blockquote:border-orange-500 prose-blockquote:bg-orange-950/20 prose-blockquote:p-4 prose-blockquote:rounded-r-lg prose-blockquote:my-6
+                            prose-code:bg-zinc-800 prose-code:text-orange-400 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-[10px]
                         ">
                             <ReactMarkdown 
                                 remarkPlugins={[remarkGfm]}
                                 components={{
-                                    h1: ({node, ...props}) => <h1 className="text-3xl font-bold text-orange-500 mb-6 pb-4 border-b border-orange-500/20 tracking-tight" {...props} />,
-                                    h2: ({node, ...props}) => <h2 className="text-2xl font-bold text-orange-500 mt-10 mb-4 pb-2 border-b border-white/5" {...props} />,
-                                    h3: ({node, ...props}) => <h3 className="text-lg font-bold text-orange-400 mt-6 mb-2" {...props} />,
-                                    p: ({node, ...props}) => <p className="text-zinc-300 leading-relaxed mb-4 text-sm sm:text-base" {...props} />,
-                                    ul: ({node, ...props}) => <ul className="space-y-3 my-4 list-disc pl-5 text-zinc-300 text-sm sm:text-base" {...props} />,
-                                    ol: ({node, ...props}) => <ol className="space-y-3 my-4 list-decimal pl-5 text-zinc-300 text-sm sm:text-base" {...props} />,
+                                    h1: ({node, ...props}) => <h1 className="text-2xl font-black text-orange-500 mb-5 pb-3 border-b border-orange-500/20 tracking-tight" {...props} />,
+                                    h2: ({node, ...props}) => <h2 className="text-xl font-black text-orange-500 mt-8 mb-3 pb-1.5 border-b border-white/5" {...props} />,
+                                    h3: ({node, ...props}) => <h3 className="text-base font-black text-orange-400 mt-5 mb-2 uppercase tracking-wide" {...props} />,
+                                    p: ({node, ...props}) => <p className="text-zinc-300 leading-relaxed mb-3 text-xs sm:text-sm font-medium" {...props} />,
+                                    ul: ({node, ...props}) => <ul className="space-y-2.5 my-3 list-disc pl-4 text-zinc-300 text-xs sm:text-sm" {...props} />,
                                     li: ({node, ...props}) => <li className="pl-1" {...props} />,
                                     blockquote: ({node, ...props}) => (
-                                        <blockquote className="my-8 border-l-4 border-orange-500 bg-gradient-to-r from-orange-950/30 to-transparent p-6 rounded-r-lg shadow-sm" {...props} />
+                                        <blockquote className="my-6 border-l-4 border-orange-500 bg-orange-950/20 p-4 rounded-r-lg" {...props} />
                                     ),
-                                    strong: ({node, ...props}) => <strong className="font-bold text-white bg-white/5 px-1.5 py-0.5 rounded border border-white/10" {...props} />,
-                                    hr: ({node, ...props}) => <hr className="my-10 border-zinc-800" {...props} />
+                                    strong: ({node, ...props}) => <strong className="font-black text-white bg-white/5 px-1.5 py-0.5 rounded border border-white/10" {...props} />,
+                                    hr: ({node, ...props}) => <hr className="my-8 border-zinc-800" {...props} />
                                 }}
                             >
                                 {roastResult}
@@ -490,22 +477,20 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                     <motion.div 
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 1.0, duration: 0.8 }}
-                        className="bg-gradient-to-br from-zinc-900 via-zinc-900 to-orange-950/20 border border-zinc-800 rounded-2xl p-6 sm:p-8 relative overflow-hidden"
+                        transition={{ delay: 0.6, duration: 0.6 }}
+                        className="bg-gradient-to-br from-zinc-900 via-zinc-900 to-orange-950/20 border border-zinc-800 rounded-xl p-5 sm:p-6 relative overflow-hidden"
                     >
                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-600 to-red-600"></div>
                         
-                        <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
-                            <div className="flex items-start gap-4">
-                                <div>
-                                    <h3 className="text-3xl font-bold text-white mb-2 uppercase tracking-tighter">Ready to stop being a punchline?</h3>
-                                    <p className="text-zinc-400 text-sm sm:text-base max-w-md leading-relaxed font-medium">
-                                        We've roasted thousands and hired hundreds. Your resume doesn't have to be a comedy show.
-                                    </p>
-                                </div>
+                        <div className="flex flex-col lg:flex-row items-center justify-between gap-5">
+                            <div>
+                                <h3 className="text-2xl font-black text-white mb-1 uppercase tracking-tighter">Ready to fix it?</h3>
+                                <p className="text-zinc-400 text-xs sm:text-sm max-w-sm leading-relaxed font-medium">
+                                    We've roasted thousands. Your resume doesn't have to be a joke.
+                                </p>
                             </div>
                             
-                            <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                            <div className="flex flex-col sm:flex-row gap-2.5 w-full lg:w-auto">
                                 <a 
                                     href="/roast-my-resume"
                                     onClick={(e) => {
@@ -513,9 +498,9 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                                         e.preventDefault();
                                         window.location.reload();
                                     }} 
-                                    className="px-6 sm:px-10 py-3.5 sm:py-4 bg-zinc-900 hover:bg-zinc-800 active:bg-zinc-700 text-white font-mono font-bold text-sm uppercase tracking-wide shadow-[4px_4px_0px_0px_rgba(255,255,255,0.1)] hover:shadow-none active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[2px] active:translate-y-[2px] transition-all rounded-sm cursor-pointer border border-zinc-800 flex items-center justify-center gap-2"
+                                    className="px-6 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white font-mono font-black text-[10px] uppercase tracking-widest transition-all rounded-sm border border-zinc-800 flex items-center justify-center gap-2"
                                 >
-                                    <span>Roast Another</span>
+                                    <span>Try Again</span>
                                 </a>
                                 <a 
                                     href="/app"
@@ -524,7 +509,7 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                                         e.preventDefault();
                                         onNavigate('scan');
                                     }}
-                                    className="px-6 sm:px-10 py-3.5 sm:py-4 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-sm sm:text-base uppercase tracking-wide flex items-center justify-center gap-2 sm:gap-3 shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[2px] active:translate-y-[2px] transition-all rounded-sm cursor-pointer border-none touch-target"
+                                    className="px-6 py-2.5 bg-orange-600 hover:bg-orange-500 text-white font-mono font-black text-[10px] sm:text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all rounded-sm touch-target"
                                 >
                                     Fix It Fast
                                 </a>

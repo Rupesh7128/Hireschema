@@ -19,29 +19,29 @@ interface AnalysisDashboardProps {
 }
 
 const ScoreRing = ({ value, label, icon: Icon, color = "orange", subtext }: { value: number, label: string, icon: any, color?: string, subtext?: string }) => {
-  const radius = 32;
+  const radius = 28;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (value / 100) * circumference;
   
   return (
-    <div className="flex items-center gap-5 bg-zinc-900/40 border border-white/5 p-5 rounded-[2rem] hover:border-white/10 transition-all group">
-      <div className="relative w-20 h-20 shrink-0">
+    <div className="flex items-center gap-4 bg-zinc-900/40 border border-white/5 p-4 rounded-2xl hover:border-white/10 transition-all group">
+      <div className="relative w-16 h-16 shrink-0">
         <svg className="w-full h-full transform -rotate-90">
           <circle
-            cx="40"
-            cy="40"
+            cx="32"
+            cy="32"
             r={radius}
             stroke="currentColor"
-            strokeWidth="5"
+            strokeWidth="4"
             fill="transparent"
             className="text-zinc-800"
           />
           <circle
-            cx="40"
-            cy="40"
+            cx="32"
+            cy="32"
             r={radius}
             stroke="currentColor"
-            strokeWidth="5"
+            strokeWidth="4"
             fill="transparent"
             strokeDasharray={circumference}
             style={{ strokeDashoffset }}
@@ -50,17 +50,17 @@ const ScoreRing = ({ value, label, icon: Icon, color = "orange", subtext }: { va
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-lg font-black text-white leading-none">{value}%</span>
+          <span className="text-sm font-black text-white leading-none">{value}%</span>
         </div>
       </div>
       <div>
-        <div className="flex items-center gap-1.5 mb-1">
-          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest">{label}</h3>
+        <div className="flex items-center gap-1.5 mb-0.5">
+          <h3 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{label}</h3>
         </div>
-        <p className="text-sm text-white font-bold mb-0.5">
+        <p className="text-xs text-white font-bold mb-0.5">
           {value >= 80 ? "Interview Ready" : value >= 60 ? "Strong Potential" : "Critical Gaps"}
         </p>
-        <p className="text-[10px] text-zinc-500 font-medium uppercase tracking-wider">{subtext || "Target: 85%+"}</p>
+        <p className="text-[9px] text-zinc-500 font-medium uppercase tracking-wider">{subtext || "Target: 85%+"}</p>
       </div>
     </div>
   );
@@ -70,21 +70,21 @@ const BulletList = ({ title, items, icon: Icon, color = "zinc" }: { title: strin
   if (!items || items.length === 0) return null;
   
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-3">
-        <h3 className="text-sm font-black text-white tracking-tight uppercase">{title}</h3>
+    <div className="space-y-3">
+      <div className="flex items-center gap-2">
+        <h3 className="text-xs font-black text-white tracking-tight uppercase">{title}</h3>
       </div>
-      <div className="grid gap-3">
+      <div className="grid gap-2">
         {items.map((item, idx) => (
           <motion.div 
             key={idx}
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: idx * 0.05 }}
-            className="flex items-start gap-4 p-4 bg-zinc-950/40 border border-white/5 rounded-2xl hover:border-white/10 transition-colors group/item"
+            className="flex items-start gap-3 p-3 bg-zinc-950/40 border border-white/5 rounded-xl hover:border-white/10 transition-colors group/item"
           >
-            <div className={`mt-2 w-1.5 h-1.5 rounded-full bg-${color}-500 shrink-0 group-hover/item:scale-125 transition-transform`} />
-            <p className="text-sm text-zinc-300 leading-relaxed font-medium">{item}</p>
+            <div className={`mt-1.5 w-1 h-1 rounded-full bg-${color}-500 shrink-0 group-hover/item:scale-125 transition-transform`} />
+            <p className="text-xs text-zinc-300 leading-relaxed font-medium">{item}</p>
           </motion.div>
         ))}
       </div>
@@ -176,43 +176,43 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
   };
 
   return (
-    <div className="flex flex-col gap-8 max-w-6xl mx-auto pb-12">
+    <div className="container mx-auto max-w-4xl px-4 py-4 sm:py-6 flex flex-col gap-4 sm:gap-6">
       
       {/* --- HEADER: TARGET ROLE --- */}
       {(result.jobTitle || result.company) && (
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-zinc-950/50 border border-white/5 p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden"
+          className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-zinc-900/40 border border-white/5 p-4 sm:p-6 rounded-2xl shadow-xl relative overflow-hidden"
         >
-          <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/5 blur-[100px] -mr-32 -mt-32" />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/5 blur-[60px] -mr-16 -mt-16" />
           <div className="relative z-10">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.3em]">Target Opportunity</span>
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className="text-[8px] font-black text-zinc-600 uppercase tracking-[0.2em]">Target Opportunity</span>
             </div>
-            <h1 className="text-3xl font-black text-white tracking-tight flex flex-wrap items-center gap-x-3">
+            <h1 className="text-xl font-black text-white tracking-tight flex flex-wrap items-center gap-x-2">
               {result.jobTitle || "Target Role"}
               {result.company && (
                 <>
-                  <span className="text-zinc-700 mx-2">/</span>
+                  <span className="text-zinc-700 mx-1">/</span>
                   <span className="text-orange-500">{result.company}</span>
                 </>
               )}
             </h1>
           </div>
           
-          <div className="flex items-center gap-4 relative z-10">
-            <div className="px-6 py-3 bg-zinc-900/50 border border-white/5 rounded-2xl flex items-center gap-6 backdrop-blur-xl">
+          <div className="flex items-center gap-3 relative z-10">
+            <div className="px-3 py-1.5 bg-zinc-900/50 border border-white/5 rounded-lg flex items-center gap-3 backdrop-blur-xl">
               <div className="text-center">
-                <span className="block text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1">Analysis Date</span>
-                <span className="text-xs font-mono font-bold text-zinc-400">{new Date().toLocaleDateString()}</span>
+                <span className="block text-[7px] font-black text-zinc-600 uppercase tracking-widest mb-0.5">Date</span>
+                <span className="text-[9px] font-mono font-bold text-zinc-500">{new Date().toLocaleDateString()}</span>
               </div>
-              <div className="w-px h-8 bg-white/5" />
+              <div className="w-px h-5 bg-white/5" />
               <div className="text-center">
-                <span className="block text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1">Status</span>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-orange-500" />
-                  <span className="text-xs font-bold text-orange-500 uppercase">Live Report</span>
+                <span className="block text-[7px] font-black text-zinc-600 uppercase tracking-widest mb-0.5">Status</span>
+                <div className="flex items-center gap-1">
+                  <div className="w-1 h-1 rounded-full bg-orange-500" />
+                  <span className="text-[9px] font-bold text-orange-500 uppercase">Live</span>
                 </div>
               </div>
             </div>
@@ -221,15 +221,15 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
       )}
 
       {/* --- TOP ROW: PROFILE & SCORES --- */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
         
         {/* Profile Card */}
-        <div className="lg:col-span-5 bg-zinc-900/40 border border-white/5 p-8 rounded-[2.5rem] shadow-xl relative overflow-hidden flex flex-col justify-between">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/[0.02] to-transparent pointer-events-none" />
+        <div className="lg:col-span-5 bg-zinc-900/40 border border-white/5 p-4 rounded-2xl shadow-xl relative overflow-hidden flex flex-col justify-between">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/[0.01] to-transparent pointer-events-none" />
           
-          <div className="relative z-10 flex items-center gap-6">
+          <div className="relative z-10 flex items-center gap-3">
             <div 
-              className="w-24 h-24 rounded-3xl bg-zinc-800 border-2 border-zinc-700/50 flex items-center justify-center shrink-0 overflow-hidden relative shadow-2xl group/photo cursor-pointer"
+              className="w-14 h-14 rounded-xl bg-zinc-800 border border-zinc-700/50 flex items-center justify-center shrink-0 overflow-hidden relative shadow-lg group/photo cursor-pointer"
               onClick={() => document.getElementById('photo-upload')?.click()}
             >
               <input 
@@ -240,52 +240,38 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
                 onChange={handlePhotoUpload}
               />
               {editProfileData.photo ? (
-                <img src={editProfileData.photo} alt="Profile" className="w-full h-full object-cover transition-transform group-hover/photo:scale-110" />
+                <img src={editProfileData.photo} alt="Profile" className="w-full h-full object-cover" />
               ) : (
-                <User className="w-12 h-12 text-zinc-600" />
+                <User className="w-6 h-6 text-zinc-600" />
               )}
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/photo:opacity-100 transition-opacity flex items-center justify-center">
-                <Camera className="w-6 h-6 text-white" />
+                <Camera className="w-3 h-3 text-white" />
               </div>
             </div>
             
             <div className="flex-1 min-w-0">
               {isEditingProfile ? (
-                <div className="space-y-3">
+                <div className="space-y-1.5">
                   <input 
                     value={editProfileData.name} 
                     onChange={e => setEditProfileData({...editProfileData, name: e.target.value})}
-                    className="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2 text-sm text-white font-bold focus:border-orange-500/50 transition-colors"
+                    className="w-full bg-zinc-950 border border-zinc-700 rounded-md px-2 py-1 text-[10px] text-white font-bold focus:border-orange-500/50 outline-none"
                     placeholder="Full Name"
                   />
-                  <div className="grid grid-cols-1 gap-2">
-                    <input 
-                      value={editProfileData.email} 
-                      onChange={e => setEditProfileData({...editProfileData, email: e.target.value})}
-                      className="bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-zinc-300"
-                      placeholder="Email"
-                    />
-                  </div>
                 </div>
               ) : (
-                <div className="space-y-2">
-                  <h2 className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
+                <div className="space-y-0.5">
+                  <h2 className="text-base font-black text-white tracking-tight flex items-center gap-1.5">
                     {result.contactProfile.name || "Candidate"}
-                    <button onClick={() => setIsEditingProfile(true)} className="p-2 hover:bg-orange-500/10 rounded-xl text-zinc-600 hover:text-orange-500 transition-all">
-                      <Pencil className="w-4 h-4" />
+                    <button onClick={() => setIsEditingProfile(true)} className="p-1 hover:bg-orange-500/10 rounded-md text-zinc-600 hover:text-orange-500 transition-all">
+                      <Pencil className="w-2.5 h-2.5" />
                     </button>
                   </h2>
-                  <div className="flex flex-col gap-1.5">
+                  <div className="flex flex-col gap-0.5">
                     {result.contactProfile.email && (
-                      <div className="flex items-center gap-2.5 text-xs text-zinc-500 font-bold group/info">
-                        <Mail className="w-3.5 h-3.5 text-zinc-700 group-hover/info:text-orange-500 transition-colors" />
+                      <div className="flex items-center gap-1.5 text-[9px] text-zinc-500 font-bold">
+                        <Mail className="w-2.5 h-2.5 text-zinc-700" />
                         {result.contactProfile.email}
-                      </div>
-                    )}
-                    {result.contactProfile.location && (
-                      <div className="flex items-center gap-2.5 text-xs text-zinc-500 font-bold group/info">
-                        <MapPin className="w-3.5 h-3.5 text-zinc-700 group-hover/info:text-orange-500 transition-colors" />
-                        {result.contactProfile.location}
                       </div>
                     )}
                   </div>
@@ -294,34 +280,28 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
             </div>
           </div>
           
-          <div className="mt-8 flex items-center justify-between pt-6 border-t border-white/5 relative z-10">
-            <div className="flex gap-3">
+          <div className="mt-4 flex items-center justify-between pt-3 border-t border-white/5 relative z-10">
+            <div className="flex gap-1.5">
               {isEditingProfile ? (
                 <>
-                  <button onClick={handleSaveProfile} className="px-5 py-2.5 bg-orange-600 hover:bg-orange-500 text-white text-xs font-black rounded-xl transition-all shadow-xl shadow-orange-900/20 flex items-center gap-2"><Check className="w-4 h-4" /> Save</button>
-                  <button onClick={handleCancelEdit} className="px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 text-xs font-black rounded-xl transition-all">Cancel</button>
+                  <button onClick={handleSaveProfile} className="px-2 py-1 bg-orange-600 hover:bg-orange-500 text-white text-[9px] font-black rounded-md transition-all flex items-center gap-1">Save</button>
+                  <button onClick={handleCancelEdit} className="px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-500 text-[9px] font-black rounded-md transition-all">Cancel</button>
                 </>
               ) : (
                 <button 
                   onClick={handleDownloadCSV}
-                  className="px-5 py-2.5 bg-zinc-800/50 hover:bg-zinc-800 border border-white/5 rounded-xl text-xs font-black text-zinc-400 hover:text-white transition-all flex items-center gap-2 group"
+                  className="px-2 py-1 bg-zinc-800/50 hover:bg-zinc-800 border border-white/5 rounded-md text-[9px] font-black text-zinc-500 hover:text-white transition-all flex items-center gap-1"
                 >
-                  <Download className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" /> Export Report
+                  <Download className="w-2.5 h-2.5" /> Export
                 </button>
               )}
-            </div>
-            
-            <div className="flex items-center gap-2">
-              {result.languages && result.languages.slice(0, 2).map((l, i) => (
-                <div key={i} className="px-2.5 py-1 bg-zinc-950/50 border border-white/5 rounded-lg text-[10px] text-zinc-500 font-black uppercase tracking-wider">{l}</div>
-              ))}
             </div>
           </div>
         </div>
 
         {/* Scores Grid */}
-        <div className="lg:col-span-7 flex flex-col gap-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
+        <div className="lg:col-span-7 flex flex-col gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1">
             <ScoreRing 
               value={result.atsScore} 
               label="ATS Compliance" 
@@ -338,38 +318,25 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
             />
           </div>
           
-          {/* Main Verdict: Job Seeker First */}
-          <div className="p-8 bg-zinc-900/40 border border-white/5 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
-            <div className={`absolute top-0 right-0 w-48 h-48 blur-[80px] -mr-24 -mt-24 opacity-30 bg-orange-500`} />
-            
-            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-              <div className="flex items-center gap-6">
-                <div>
-                  <h4 className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.3em] mb-1.5">Master Verdict</h4>
-                  <div className="flex flex-col">
-                    <p className="text-2xl font-black text-white leading-tight">{result.atsScore >= 70 ? 'Interview Candidate' : 'Optimization Required'}</p>
-                    <p className="text-sm text-zinc-500 font-bold mt-1">
-                      {result.atsScore >= 80 ? "Your profile matches top-tier requirements." : 
-                       result.atsScore >= 60 ? "Strong base, but missing critical identifiers." : 
-                       "Significant gaps detected for this specific role."}
-                    </p>
-                  </div>
-                </div>
+          {/* Main Verdict */}
+          <div className="p-4 bg-zinc-900/40 border border-white/5 rounded-2xl shadow-xl relative overflow-hidden group">
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-4">
+              <div>
+                <h4 className="text-[8px] font-black text-zinc-600 uppercase tracking-[0.2em] mb-0.5">Master Verdict</h4>
+                <p className="text-lg font-black text-white leading-tight">{result.atsScore >= 70 ? 'Interview Candidate' : 'Optimization Required'}</p>
               </div>
 
-              <div className="flex items-center gap-10 w-full md:w-auto px-8 py-4 bg-zinc-950/50 rounded-3xl border border-white/5 backdrop-blur-xl">
+              <div className="flex items-center gap-4 px-4 py-2 bg-zinc-950/50 rounded-xl border border-white/5 backdrop-blur-xl">
                 <div className="text-center">
-                  <span className="block text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1.5">Likelihood</span>
-                  <span className={`text-xl font-black ${result.atsScore >= 80 ? 'text-white' : result.atsScore >= 60 ? 'text-orange-400' : 'text-orange-600'}`}>
+                  <span className="block text-[7px] font-black text-zinc-600 uppercase tracking-widest mb-0.5">Likelihood</span>
+                  <span className={`text-xs font-black ${result.atsScore >= 80 ? 'text-white' : result.atsScore >= 60 ? 'text-orange-400' : 'text-orange-600'}`}>
                     {result.atsScore >= 80 ? 'HIGH' : result.atsScore >= 60 ? 'MEDIUM' : 'LOW'}
                   </span>
                 </div>
-                <div className="w-px h-10 bg-white/10" />
+                <div className="w-px h-6 bg-white/10" />
                 <div className="text-center">
-                  <span className="block text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1.5">Impact Issues</span>
-                  <div className="flex items-center justify-center gap-2">
-                    <span className={`text-xl font-black ${result.criticalIssues.length > 0 ? 'text-orange-500' : 'text-white'}`}>{result.criticalIssues.length + result.missingKeywords.length}</span>
-                  </div>
+                  <span className="block text-[7px] font-black text-zinc-600 uppercase tracking-widest mb-0.5">Impact Issues</span>
+                  <span className={`text-xs font-black ${result.criticalIssues.length > 0 ? 'text-orange-500' : 'text-white'}`}>{result.criticalIssues.length + result.missingKeywords.length}</span>
                 </div>
               </div>
             </div>
@@ -377,136 +344,114 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
         </div>
       </div>
 
-      {/* --- STRATEGIC ROADMAP: THE "HOW TO FIX" SECTION --- */}
-      <div className="bg-gradient-to-br from-orange-600/10 to-transparent border border-orange-500/20 p-10 rounded-[3rem] shadow-2xl relative overflow-hidden group">
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-orange-500/50 to-transparent" />
-        <div className="flex flex-col lg:flex-row gap-12 items-center">
-          <div className="lg:w-[40%]">
-            <div className="flex items-center gap-3 mb-4">
-              <h2 className="text-2xl font-black text-white tracking-tight italic">Mission Critical: Next Steps</h2>
-            </div>
-            <p className="text-base text-zinc-400 leading-relaxed mb-8 font-medium">
-              We've identified the fastest path to an interview. Focus on these <span className="text-white font-black underline decoration-orange-500 underline-offset-4">4 key areas</span> to transform your application.
+      {/* --- STRATEGIC ROADMAP --- */}
+      <div className="bg-gradient-to-br from-orange-600/5 to-transparent border border-orange-500/10 p-5 sm:p-6 rounded-2xl shadow-xl relative overflow-hidden">
+        <div className="flex flex-col lg:flex-row gap-6 items-center">
+          <div className="lg:w-[30%]">
+            <h2 className="text-lg font-black text-white tracking-tight mb-1">Mission Critical</h2>
+            <p className="text-[10px] text-zinc-500 leading-relaxed mb-4 font-medium">
+              Fix these <span className="text-white font-black">4 key areas</span>.
             </p>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-5 bg-zinc-950/60 rounded-2xl border border-white/5 hover:border-orange-500/30 transition-all">
-                <h4 className="text-[10px] font-black text-zinc-500 uppercase mb-2 tracking-widest">Priority</h4>
-                <p className="text-sm text-white font-black">Fix Gaps</p>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="p-2 bg-zinc-950/60 rounded-lg border border-white/5 text-center">
+                <h4 className="text-[7px] font-black text-zinc-600 uppercase mb-0.5 tracking-widest">Priority</h4>
+                <p className="text-[10px] text-white font-black">Fix Gaps</p>
               </div>
-              <div className="p-5 bg-zinc-950/60 rounded-2xl border border-white/5 hover:border-orange-500/30 transition-all">
-                <h4 className="text-[10px] font-black text-zinc-500 uppercase mb-2 tracking-widest">Est. Time</h4>
-                <p className="text-sm text-white font-black">~12 Mins</p>
+              <div className="p-2 bg-zinc-950/60 rounded-lg border border-white/5 text-center">
+                <h4 className="text-[7px] font-black text-zinc-600 uppercase mb-0.5 tracking-widest">Est. Time</h4>
+                <p className="text-[10px] text-white font-black">~12 Mins</p>
               </div>
             </div>
           </div>
           
-          <div className="lg:w-[60%] grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div className="lg:w-[70%] grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              { title: "Skill Injection", desc: "Embed the top 3 missing keywords into your bullet points.", action: "Go to Editor", onClick: () => onNavigateTab?.('generator') },
-              { title: "Format Cleanup", desc: "Remove identified risks to ensure 100% ATS readability.", action: "View Risks", onClick: scrollToRisks },
-              { title: "Story Alignment", desc: "Sync your summary with the Role Fit analysis below.", action: "Update Bio", onClick: () => onNavigateTab?.('generator') },
-              { title: "Final Validation", desc: "Re-run analysis to hit the 85% golden score.", action: "Re-Scan", onClick: onReScan },
+              { title: "Skill Injection", desc: "Embed keywords.", onClick: () => onNavigateTab?.('generator') },
+              { title: "Format Cleanup", desc: "Remove risks.", onClick: scrollToRisks },
+              { title: "Story Alignment", desc: "Sync summary.", onClick: () => onNavigateTab?.('generator') },
+              { title: "Final Validation", desc: "Re-run scan.", onClick: onReScan },
             ].map((step, i) => (
               <div 
                 key={i} 
                 onClick={step.onClick}
-                className="flex flex-col gap-4 p-6 bg-zinc-900/60 border border-white/5 rounded-3xl hover:bg-zinc-900/80 hover:border-orange-500/30 transition-all cursor-pointer group/card relative"
+                className="flex flex-col gap-1 p-3 bg-zinc-900/60 border border-white/5 rounded-xl hover:border-orange-500/30 transition-all cursor-pointer group/card"
               >
-                <div className="flex items-center gap-4">
-                  <h4 className="text-base font-black text-white">{step.title}</h4>
-                </div>
-                <p className="text-xs text-zinc-400 leading-relaxed font-medium">{step.desc}</p>
-                <div className="flex items-center gap-1.5 text-[10px] font-black text-orange-500 uppercase tracking-widest mt-2 group-hover/card:gap-2.5 transition-all">
-                  {step.action} <span className="ml-1">→</span>
-                </div>
+                <h4 className="text-[10px] font-black text-white">{step.title}</h4>
+                <p className="text-[9px] text-zinc-500 leading-tight">{step.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* --- DETAILED DIAGNOSTICS: THE "WHY" SECTION --- */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      {/* --- DETAILED DIAGNOSTICS --- */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         
-        {/* Gap Analysis & Risks (Right for Job Seeker to see first) */}
-        <div className="lg:col-span-5 space-y-8 lg:order-2">
-          
-          {/* Missing Keywords / Gaps */}
-          <div className="bg-zinc-900/40 border border-white/5 p-8 rounded-[3rem] shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/5 blur-3xl -mr-16 -mt-16" />
-            <div className="flex items-center justify-between gap-4 mb-6">
-              <div className="flex items-center gap-3">
-                <h3 className="text-sm font-black text-white uppercase tracking-widest">The Skill Gap</h3>
-              </div>
+        <div className="lg:col-span-5 space-y-4 lg:order-2">
+          {/* Missing Keywords */}
+          <div className="bg-zinc-900/40 border border-white/5 p-4 rounded-2xl shadow-xl relative overflow-hidden">
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <h3 className="text-[9px] font-black text-white uppercase tracking-widest">The Skill Gap</h3>
               <button 
                 onClick={copyKeywords}
-                className="px-3 py-1.5 bg-zinc-950 border border-white/10 rounded-xl text-[10px] font-black text-zinc-400 hover:text-white hover:border-orange-500/50 transition-all flex items-center gap-2"
+                className="px-1.5 py-0.5 bg-zinc-950 border border-white/10 rounded text-[7px] font-black text-zinc-500 hover:text-white transition-all"
               >
-                {copiedKeywords ? <span className="text-orange-500 font-bold">DONE</span> : <span className="font-bold">COPY ALL</span>}
+                {copiedKeywords ? 'DONE' : 'COPY ALL'}
               </button>
             </div>
             
-            <div className="flex flex-wrap gap-2.5 mb-8">
+            <div className="flex flex-wrap gap-1.5 mb-2">
               {result.missingKeywords.length > 0 ? (
                 result.missingKeywords.map((keyword, idx) => (
-                  <span key={idx} className="px-4 py-2 bg-orange-500/5 text-orange-500 border border-orange-500/20 rounded-2xl text-xs font-black tracking-tight hover:bg-orange-500/10 transition-colors cursor-default">
+                  <span key={idx} className="px-2 py-0.5 bg-orange-500/5 text-orange-500 border border-orange-500/10 rounded-lg text-[9px] font-black tracking-tight">
                     {keyword}
                   </span>
                 ))
               ) : (
-                <div className="flex items-center gap-3 text-zinc-500 text-sm font-bold bg-zinc-950/50 p-4 rounded-2xl w-full border border-orange-500/20">
-                  100% Keyword Match Found
+                <div className="text-zinc-600 text-[9px] font-bold bg-zinc-950/50 p-2 rounded-lg w-full border border-orange-500/10 text-center">
+                  100% Keyword Match
                 </div>
               )}
             </div>
-            
-            <div className="p-4 bg-zinc-950/50 rounded-2xl border border-white/5 flex gap-4 items-start">
-              <p className="text-xs text-zinc-500 leading-relaxed font-medium">
-                <span className="text-zinc-300 font-bold">Pro Tip:</span> Sprinkle these into your <span className="text-white">Summary</span> and <span className="text-white">Experience</span> sections. Don't just list them; show how you used them.
-              </p>
-            </div>
           </div>
 
-          {/* Critical Risks / Issues */}
-          <div ref={risksRef} className="bg-zinc-900/40 border border-white/5 p-8 rounded-[3rem] shadow-xl">
-            <div className="flex items-center gap-3 mb-6">
-              <h3 className="text-sm font-black text-white uppercase tracking-widest">Technical Risks</h3>
-            </div>
-            <div className="space-y-4">
+          {/* Technical Risks */}
+          <div ref={risksRef} className="bg-zinc-900/40 border border-white/5 p-4 rounded-2xl shadow-xl">
+            <h3 className="text-[9px] font-black text-white uppercase tracking-widest mb-3">Technical Risks</h3>
+            <div className="space-y-2">
               {result.criticalIssues.length > 0 ? (
                 result.criticalIssues.map((issue, idx) => (
-                  <div key={idx} className="flex items-start gap-4 p-4 bg-orange-500/5 border border-orange-500/10 rounded-2xl group/risk hover:bg-orange-500/10 transition-all">
-                    <span className="text-sm text-zinc-300 leading-snug font-bold">{issue}</span>
+                  <div key={idx} className="p-2 bg-orange-500/5 border border-orange-500/10 rounded-lg">
+                    <span className="text-[9px] text-zinc-400 leading-snug font-bold">{issue}</span>
                   </div>
                 ))
               ) : (
-                <div className="flex items-center gap-3 text-zinc-500 text-sm font-bold bg-zinc-950/50 p-4 rounded-2xl border border-orange-500/20">
-                  Clean Formatting - ATS Optimized
+                <div className="text-zinc-600 text-[9px] font-bold bg-zinc-950/50 p-2 rounded-lg border border-orange-500/10 text-center">
+                  Clean Formatting
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* Deep Analysis Column (Left for detailed reading) */}
-        <div className="lg:col-span-7 space-y-8 lg:order-1">
-          <div className="bg-zinc-900/40 border border-white/5 p-10 rounded-[3rem] shadow-xl relative overflow-hidden min-h-full">
-            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-zinc-800/10 blur-[120px] -mr-48 -mt-48" />
-            <div className="relative z-10 space-y-12">
+        {/* Deep Analysis Column */}
+        <div className="lg:col-span-7 space-y-4 lg:order-1">
+          <div className="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl shadow-xl min-h-full">
+            <div className="space-y-6">
               <BulletList 
                 title="Strategic Role Fit" 
                 items={verdictBullets} 
                 icon={Target} 
                 color="orange" 
               />
-              <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+              <div className="h-px bg-white/5" />
               <BulletList 
                 title="Marketable Strengths" 
                 items={result.keyStrengths} 
                 icon={Award} 
                 color="orange" 
               />
-              <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+              <div className="h-px bg-white/5" />
               <BulletList 
                 title="Profile Narrative" 
                 items={summaryBullets} 
