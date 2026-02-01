@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FileData, AnalysisResult, HistoryItem, ContactProfile } from './types';
-import { analyzeResume, extractTextFromPdf } from './services/geminiService';
+import { analyzeResume, extractTextFromPdf, fetchJobDescriptionContent } from './services/geminiService';
 import { db } from './services/db';
 import { logEvent, logPageView } from './services/analytics';
 import { verifyDodoPayment, savePaymentState, isIdPaid } from './services/paymentService';
@@ -525,7 +525,20 @@ export default function App() {
     setAnalysisStartTs(Date.now());
     
     try {
-      const result = await analyzeResume(resumeFile, jobDescription);
+      // Scrape JD if it's a URL
+      let finalJobDescription = jobDescription;
+      if (jobDescription.trim().startsWith('http')) {
+          console.log('[App] Job Description is a URL, attempting to scrape content...');
+          const scraped = await fetchJobDescriptionContent(jobDescription.trim());
+          if (scraped) {
+              finalJobDescription = scraped;
+              console.log('[App] Successfully scraped JD content. Length:', finalJobDescription.length);
+          } else {
+              console.warn('[App] JD scraping failed or returned empty. Falling back to URL.');
+          }
+      }
+
+      const result = await analyzeResume(resumeFile, finalJobDescription);
       setAnalysisResult(result);
       
       const newItem: HistoryItem = {
@@ -537,7 +550,7 @@ export default function App() {
           status: 'To Do',
           resumeFile,
           resumeText,
-          jobDescription,
+          jobDescription: finalJobDescription, // Save the actual content (scraped or text)
           analysisResult: result
       };
       

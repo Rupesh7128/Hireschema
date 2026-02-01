@@ -8,7 +8,7 @@ import {
   ShieldAlert, Info, User, BrainCircuit, Globe, Briefcase, DollarSign, 
   Pencil, X, Check, Camera, Mail, Phone, Linkedin, MapPin, 
   ChevronRight, AlertCircle, Zap, ShieldCheck, ListChecks, Award,
-  Copy, ExternalLink, Sparkles, Rocket
+  Copy, ExternalLink, Sparkles, Rocket, ArrowRight
 } from 'lucide-react';
 
 interface AnalysisDashboardProps {
@@ -348,9 +348,9 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
       <div className="bg-gradient-to-br from-orange-600/5 to-transparent border border-orange-500/10 p-5 sm:p-6 rounded-2xl shadow-xl relative overflow-hidden">
         <div className="flex flex-col lg:flex-row gap-6 items-center">
           <div className="lg:w-[30%]">
-            <h2 className="text-lg font-black text-white tracking-tight mb-1">Mission Critical</h2>
+            <h2 className="text-lg font-black text-white tracking-tight mb-1">Mission Critical: Next Steps</h2>
             <p className="text-[10px] text-zinc-500 leading-relaxed mb-4 font-medium">
-              Fix these <span className="text-white font-black">4 key areas</span>.
+              We've identified the fastest path to an interview. Focus on these <span className="text-orange-500 font-black underline underline-offset-4 decoration-2">4 key areas</span> to transform your application.
             </p>
             <div className="grid grid-cols-2 gap-2">
               <div className="p-2 bg-zinc-950/60 rounded-lg border border-white/5 text-center">
@@ -364,20 +364,25 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
             </div>
           </div>
           
-          <div className="lg:w-[70%] grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="lg:w-[70%] grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
-              { title: "Skill Injection", desc: "Embed keywords.", onClick: () => onNavigateTab?.('generator') },
-              { title: "Format Cleanup", desc: "Remove risks.", onClick: scrollToRisks },
-              { title: "Story Alignment", desc: "Sync summary.", onClick: () => onNavigateTab?.('generator') },
-              { title: "Final Validation", desc: "Re-run scan.", onClick: onReScan },
+              { title: "Skill Injection", desc: "Embed the top 3 missing keywords into your bullet points.", linkText: "GO TO EDITOR", onClick: () => onNavigateTab?.('generator') },
+              { title: "Format Cleanup", desc: "Remove identified risks to ensure 100% ATS readability.", linkText: "VIEW RISKS", onClick: () => onNavigateTab?.('generator') },
+              { title: "Story Alignment", desc: "Sync your summary with the Role Fit analysis below.", linkText: "UPDATE BIO", onClick: () => onNavigateTab?.('generator') },
+              { title: "Final Validation", desc: "Re-run analysis to hit the 85% golden score.", linkText: "RE-SCAN", onClick: () => onNavigateTab?.('generator') },
             ].map((step, i) => (
               <div 
                 key={i} 
                 onClick={step.onClick}
-                className="flex flex-col gap-1 p-3 bg-zinc-900/60 border border-white/5 rounded-xl hover:border-orange-500/30 transition-all cursor-pointer group/card"
+                className="flex flex-col justify-between p-4 bg-zinc-950/40 border border-white/5 rounded-2xl hover:border-orange-500/30 transition-all cursor-pointer group/card min-h-[120px]"
               >
-                <h4 className="text-[10px] font-black text-white">{step.title}</h4>
-                <p className="text-[9px] text-zinc-500 leading-tight">{step.desc}</p>
+                <div>
+                  <h4 className="text-[12px] font-black text-white mb-1.5">{step.title}</h4>
+                  <p className="text-[10px] text-zinc-500 leading-relaxed font-medium">{step.desc}</p>
+                </div>
+                <div className="mt-4 flex items-center gap-2 text-orange-500 font-black text-[9px] tracking-widest uppercase">
+                  {step.linkText} <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                </div>
               </div>
             ))}
           </div>

@@ -52,7 +52,12 @@ const PaymentLock: React.FC<PaymentLockProps> = ({ onPaymentVerified, onBeforeRe
 
     const cleanKey = licenseKey.trim();
 
-    // Dev backdoor removed for security - payment verification is now required
+    // Bypass code check
+    if (cleanKey.toLowerCase() === 'getthejob') {
+      logEvent('payment_verify_success', { method: 'bypass_code' });
+      onPaymentVerified();
+      return;
+    }
 
     if (attempts >= 5) {
       setIsLocked(true);

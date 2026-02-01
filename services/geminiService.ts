@@ -372,6 +372,39 @@ const getActionableError = (error: any): string => {
     return `Analysis failed: ${msg.substring(0, 100)}.`;
 };
 
+/**
+ * Fetches the content of a job description URL using Jina Reader.
+ * Jina Reader converts any URL to clean markdown text, bypassing CORS.
+ */
+export async function fetchJobDescriptionContent(url: string): Promise<string> {
+    try {
+        console.log(`[Scraper] Fetching JD content for: ${url}`);
+        // Jina Reader is a free tool that converts any URL to markdown
+        // It handles LinkedIn, Indeed, and other job boards effectively
+        const response = await fetch(`https://r.jina.ai/${url}`, {
+            headers: {
+                'X-Return-Format': 'markdown'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch JD: ${response.statusText}`);
+        }
+
+        const text = await response.text();
+        
+        if (text && text.length > 100) {
+            console.log(`[Scraper] Successfully fetched ${text.length} chars of JD content`);
+            return text;
+        }
+        
+        return ""; 
+    } catch (error) {
+        console.error("[Scraper] JD fetching failed:", error);
+        return ""; 
+    }
+}
+
 export async function extractTextFromPdf(base64Data: string): Promise<string> {
   try {
     // Wait for PDF.js to be available
@@ -547,6 +580,20 @@ export const analyzeResume = async (
   jobDescription: string
 ): Promise<AnalysisResult> => {
   const jdText = jobDescription?.trim() || "NO_JD_PROVIDED";
+  
+  // Extra help for URL-based job descriptions
+  let urlHint = "";
+  if (jdText.startsWith('http')) {
+    const urlLower = jdText.toLowerCase();
+    if (urlLower.includes('amazon')) urlHint = "\nHINT: The link provided is for a position at Amazon. Ensure the company is set to 'Amazon' and analyze based on Amazon's Leadership Principles and technical standards.";
+    else if (urlLower.includes('google')) urlHint = "\nHINT: The link provided is for a position at Google. Analyze based on Google's technical bar and 'Googliness'.";
+    else if (urlLower.includes('meta') || urlLower.includes('facebook')) urlHint = "\nHINT: The link provided is for a position at Meta. Analyze based on Meta's fast-paced engineering culture.";
+    else if (urlLower.includes('apple')) urlHint = "\nHINT: The link provided is for a position at Apple. Analyze based on Apple's focus on design, privacy, and excellence.";
+    else if (urlLower.includes('microsoft')) urlHint = "\nHINT: The link provided is for a position at Microsoft. Analyze based on Microsoft's current tech stack and culture.";
+    else if (urlLower.includes('netflix')) urlHint = "\nHINT: The link provided is for a position at Netflix. Analyze based on the Netflix Culture Memo standards.";
+    else if (urlLower.includes('stripe')) urlHint = "\nHINT: The link provided is for a position at Stripe. Analyze based on Stripe's high technical and writing bar.";
+  }
+
   let resumeText = '';
   try {
     if ((resumeFile.type || '').includes('pdf')) {
@@ -567,13 +614,14 @@ export const analyzeResume = async (
     1. Resume Text
     2. Job Description (JD) OR Link. 
        - If the JD is a URL (e.g., starts with http:// or https://), you MUST treat it as a source of truth.
-       - Use your internal knowledge and browsing capability to infer the specific job requirements for the company and title mentioned in the URL.
-       - For LinkedIn URLs like https://www.linkedin.com/jobs/view/4364680973, focus on the job ID and company (Amazon) to provide a high-fidelity analysis of "Category Manager" requirements.
-       - DO NOT state "Link content unavailable" or return "N/A" if you can make a reasonable inference based on the company and title.
+       - IMPORTANT: If the URL contains a company name (e.g., "amazon", "google", "stripe") or a job title in the string, YOU MUST extract that and use it as the primary target for your analysis.
+       - Use your internal knowledge to infer the specific job requirements for that company and role.
+       - For LinkedIn URLs, look for slugs or IDs that indicate the company or position.
+       - DO NOT state "Link content unavailable". You are an expert; make a high-fidelity inference based on the company's known standards and the job title found in the URL.
        - If JD is "NO_JD_PROVIDED", evaluate resume generally.
     
     TASKS:
-    1. Extract Metadata (Job Title, Company).
+    1. Extract Metadata (Job Title, Company). Be specific (e.g., "Software Engineer" at "Amazon").
     2. Dual Scoring (ATS Score, Relevance Score).
     3. Role Fit Analysis.
     4. Contact Profile (Name, Email, Phone, LinkedIn, Location).
@@ -586,8 +634,8 @@ export const analyzeResume = async (
   
   try {
     const payload = resumeText
-      ? `${systemPrompt}\n\nRESUME TEXT:\n${resumeText}\n\nJob Description / Link:\n${jdText}\n\nOutput strictly valid JSON.`
-      : `${systemPrompt}\n\nJob Description / Link:\n${jdText}\n\nOutput strictly valid JSON.`;
+      ? `${systemPrompt}${urlHint}\n\nRESUME TEXT:\n${resumeText}\n\nJob Description / Link:\n${jdText}\n\nOutput strictly valid JSON.`
+      : `${systemPrompt}${urlHint}\n\nJob Description / Link:\n${jdText}\n\nOutput strictly valid JSON.`;
 
     const response = await withTimeout(
       generateWithFallback(
