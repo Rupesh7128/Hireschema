@@ -35,7 +35,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
     onNavigate(view);
   };
 
-  const navItemClasses = "text-[11px] font-bold uppercase tracking-[0.2em] text-zinc-400 hover:text-white transition-all duration-300 relative group py-2 px-1";
+  const navItemClasses = "text-xs font-bold uppercase tracking-[0.2em] text-zinc-400 hover:text-white transition-all duration-300 relative group py-2 px-1";
   const navItemUnderline = "absolute bottom-0 left-0 w-0 h-[1px] bg-orange-500 transition-all duration-300 group-hover:w-full";
 
   return (
@@ -81,7 +81,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
                 <a 
                     href="/app"
                     onClick={(e) => handleNavClick(e, 'scan')}
-                    className="px-5 py-2.5 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-[10px] uppercase tracking-widest shadow-[3px_3px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none active:shadow-none hover:translate-x-[1.5px] hover:translate-y-[1.5px] active:translate-x-[1.5px] active:translate-y-[1.5px] transition-all rounded-sm cursor-pointer border-none flex items-center gap-2"
+                    className="px-5 py-2.5 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-xs uppercase tracking-widest shadow-[3px_3px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none active:shadow-none hover:translate-x-[1.5px] hover:translate-y-[1.5px] active:translate-x-[1.5px] active:translate-y-[1.5px] transition-all rounded-sm cursor-pointer border-none flex items-center gap-2"
                 >
                     Start Analysis
                 </a>
@@ -89,7 +89,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
                 {/* Mobile Menu Toggle */}
                 <button 
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                    className="md:hidden text-white p-2 hover:bg-white/5 rounded-full transition-colors font-bold text-[10px] uppercase tracking-widest"
+                    className="md:hidden text-white p-2 hover:bg-white/5 rounded-full transition-colors font-bold text-xs uppercase tracking-widest"
                 >
                     {isMobileMenuOpen ? 'Close' : 'Menu'}
                 </button>

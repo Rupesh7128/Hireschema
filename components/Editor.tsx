@@ -219,7 +219,7 @@ export const Editor: React.FC<EditorProps> = ({
                 <div className="flex items-center gap-6">
                     <div className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
-                        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500">Workspace</span>
+                        <span className="text-xs font-black uppercase tracking-[0.2em] text-zinc-500">Workspace</span>
                     </div>
                     
                     <div className="flex bg-zinc-900/50 p-1 rounded-lg border border-white/5">
@@ -232,7 +232,7 @@ export const Editor: React.FC<EditorProps> = ({
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-[9px] font-black uppercase tracking-widest transition-all ${activeTab === tab.id ? 'bg-zinc-800 text-white shadow-lg' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-black uppercase tracking-widest transition-all ${activeTab === tab.id ? 'bg-zinc-800 text-white shadow-lg' : 'text-zinc-500 hover:text-zinc-300'}`}
                             >
                                 <tab.icon className={`w-3 h-3 ${activeTab === tab.id ? 'text-orange-500' : ''}`} />
                                 {tab.label}
@@ -243,8 +243,8 @@ export const Editor: React.FC<EditorProps> = ({
 
                 <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900/50 border border-white/5 rounded-full">
-                        <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Score</span>
-                        <span className="text-xs font-black text-orange-500">{optimizedScore || analysis.atsScore}%</span>
+                        <span className="text-xs font-black text-zinc-500 uppercase tracking-widest">Score</span>
+                        <span className="text-sm font-black text-orange-500">{optimizedScore || analysis.atsScore}%</span>
                     </div>
                     
                     <div className="h-5 w-px bg-white/10" />
@@ -255,7 +255,7 @@ export const Editor: React.FC<EditorProps> = ({
                         <button 
                             onClick={handleDownloadPDF} 
                             disabled={isDownloading}
-                            className="flex items-center gap-1.5 px-4 py-1.5 bg-orange-600 hover:bg-orange-500 text-white font-black text-[9px] uppercase tracking-widest rounded-sm transition-all disabled:opacity-50"
+                            className="flex items-center gap-1.5 px-4 py-1.5 bg-orange-600 hover:bg-orange-500 text-white font-black text-xs uppercase tracking-widest rounded-sm transition-all disabled:opacity-50"
                         >
                             {isDownloading ? <Loader2 className="w-2.5 h-2.5 animate-spin" /> : <Download className="w-2.5 h-2.5" />}
                             PDF
@@ -281,7 +281,7 @@ export const Editor: React.FC<EditorProps> = ({
                                 {loadingStates[activeTab] ? (
                                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
                                         <div className="w-12 h-12 border-3 border-orange-500/20 border-t-orange-500 rounded-full animate-spin" />
-                                        <p className="text-[9px] font-black text-zinc-500 uppercase tracking-[0.3em]">AI Drafting...</p>
+                                        <p className="text-xs font-black text-zinc-500 uppercase tracking-[0.3em]">AI Drafting...</p>
                                     </div>
                                 ) : (
                                     <>
@@ -289,7 +289,7 @@ export const Editor: React.FC<EditorProps> = ({
                                             <textarea
                                                 value={generatedData[activeTab] || ''}
                                                 onChange={(e) => setGeneratedData(prev => ({ ...prev, [activeTab]: e.target.value }))}
-                                                className="w-full h-[700px] bg-transparent text-zinc-800 font-mono text-xs resize-none focus:outline-none"
+                                                className="w-full h-[700px] bg-transparent text-zinc-800 font-mono text-sm resize-none focus:outline-none"
                                             />
                                         ) : (
                                             renderMarkdown(generatedData[activeTab] || '')
@@ -311,7 +311,7 @@ export const Editor: React.FC<EditorProps> = ({
                 {/* --- RIGHT CONTROL PANEL --- */}
                 <div className="w-[260px] border-l border-white/5 bg-zinc-950 flex flex-col shrink-0">
                     <div className="p-3 border-b border-white/5">
-                        <h3 className="text-[8px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-3">Tools</h3>
+                        <h3 className="text-xs font-black text-zinc-500 uppercase tracking-[0.2em] mb-3">Tools</h3>
                         
                         <div className="space-y-2">
                             {QUICK_ACTIONS.map(action => (
@@ -325,8 +325,8 @@ export const Editor: React.FC<EditorProps> = ({
                                         <action.icon className="w-3 h-3 text-orange-500 group-hover:text-white" />
                                     </div>
                                     <div>
-                                        <div className="text-[9px] font-black text-white uppercase tracking-wider">{action.label}</div>
-                                        <div className="text-[8px] text-zinc-600 mt-0.5 tracking-tight">One-click boost</div>
+                                        <div className="text-xs font-black text-white uppercase tracking-wider">{action.label}</div>
+                                        <div className="text-[10px] text-zinc-600 mt-0.5 tracking-tight">One-click boost</div>
                                     </div>
                                 </button>
                             ))}
@@ -335,28 +335,28 @@ export const Editor: React.FC<EditorProps> = ({
 
                     <div className="flex-1 p-3 overflow-y-auto custom-scrollbar">
                         <div className="flex items-center justify-between mb-2.5">
-                            <h3 className="text-[8px] font-black text-zinc-500 uppercase tracking-[0.2em]">Insights</h3>
+                            <h3 className="text-xs font-black text-zinc-500 uppercase tracking-[0.2em]">Insights</h3>
                         </div>
 
                         <div className="space-y-2 mb-5">
                             <div className="p-2.5 bg-orange-500/5 border border-orange-500/10 rounded-lg">
-                                <div className="text-[8px] font-black text-orange-500 uppercase tracking-widest mb-1.5">ATS Keywords Injected</div>
+                                <div className="text-xs font-black text-orange-500 uppercase tracking-widest mb-1.5">ATS Keywords Injected</div>
                                 <div className="flex flex-wrap gap-1.5">
                                     {analysis.missingKeywords.length > 0 ? (
                                         analysis.missingKeywords.map((keyword, idx) => (
-                                            <span key={idx} className="px-1.5 py-0.5 bg-orange-500/10 text-orange-500 border border-orange-500/20 rounded text-[7px] font-bold">
+                                            <span key={idx} className="px-1.5 py-0.5 bg-orange-500/10 text-orange-500 border border-orange-500/20 rounded text-xs font-bold">
                                                 {keyword}
                                             </span>
                                         ))
                                     ) : (
-                                        <p className="text-[9px] text-zinc-500 leading-tight">No missing keywords detected.</p>
+                                        <p className="text-sm text-zinc-500 leading-tight">No missing keywords detected.</p>
                                     )}
                                 </div>
                             </div>
                         </div>
 
                         <div className="flex items-center justify-between mb-2.5">
-                            <h3 className="text-[8px] font-black text-zinc-500 uppercase tracking-[0.2em]">Assistant</h3>
+                            <h3 className="text-xs font-black text-zinc-500 uppercase tracking-[0.2em]">Assistant</h3>
                         </div>
 
                         <div className="relative">
@@ -364,7 +364,7 @@ export const Editor: React.FC<EditorProps> = ({
                                 value={chatInput}
                                 onChange={(e) => setChatInput(e.target.value)}
                                 placeholder="Instructions..."
-                                className="w-full bg-zinc-900/50 border border-white/5 rounded-lg p-2.5 text-[10px] text-white placeholder:text-zinc-700 focus:outline-none focus:border-orange-500/50 resize-none h-20 transition-all"
+                                className="w-full bg-zinc-900/50 border border-white/5 rounded-lg p-2.5 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-orange-500/50 resize-none h-20 transition-all"
                             />
                             <button
                                 onClick={() => handleRefine()}
@@ -378,10 +378,10 @@ export const Editor: React.FC<EditorProps> = ({
 
                     <div className="p-3 border-t border-white/5 bg-zinc-950/80 backdrop-blur-md">
                         <div className="flex items-center justify-between mb-2.5">
-                            <span className="text-[8px] font-black text-zinc-500 uppercase tracking-widest">Language</span>
+                            <span className="text-xs font-black text-zinc-500 uppercase tracking-widest">Language</span>
                             <button 
                                 onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-                                className="flex items-center gap-1 text-[8px] font-black text-orange-500 uppercase tracking-widest hover:text-orange-400 transition-colors"
+                                className="flex items-center gap-1 text-xs font-black text-orange-500 uppercase tracking-widest hover:text-orange-400 transition-colors"
                             >
                                 {appLanguage} <ChevronDown className="w-2 h-2" />
                             </button>
@@ -390,7 +390,7 @@ export const Editor: React.FC<EditorProps> = ({
                         <div className="flex gap-2">
                             <button 
                                 onClick={() => setIsEditing(!isEditing)}
-                                className={`flex-1 py-2 rounded-sm border font-black text-[8px] uppercase tracking-widest transition-all ${isEditing ? 'bg-orange-600 border-orange-700 text-white' : 'bg-zinc-900 border-white/5 text-zinc-500 hover:text-white'}`}
+                                className={`flex-1 py-2 rounded-sm border font-black text-xs uppercase tracking-widest transition-all ${isEditing ? 'bg-orange-600 border-orange-700 text-white' : 'bg-zinc-900 border-white/5 text-zinc-500 hover:text-white'}`}
                             >
                                 {isEditing ? 'Save' : 'Manual Edit'}
                             </button>

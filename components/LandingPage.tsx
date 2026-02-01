@@ -140,7 +140,7 @@ const StepGraphic = ({ step }: { step: 1 | 2 | 3 }) => {
          <>
             {/* Upload UI */}
             <div className="w-12 h-16 bg-zinc-800 rounded border border-zinc-700 flex flex-col items-center justify-center gap-1 z-10 shadow-lg group-hover:scale-110 transition-transform">
-                <div className="text-[10px] font-black text-zinc-500 group-hover:text-orange-500 transition-colors uppercase">PDF</div>
+                <div className="text-xs font-black text-zinc-500 group-hover:text-orange-500 transition-colors uppercase">PDF</div>
                 <div className="w-8 h-1 bg-zinc-700 rounded-full group-hover:bg-orange-500/50 transition-colors"></div>
             </div>
             {/* Floating particles */}
@@ -172,7 +172,7 @@ const StepGraphic = ({ step }: { step: 1 | 2 | 3 }) => {
                 <div className="w-6 h-1 bg-zinc-500 rounded-full"></div>
                 <div className="w-full h-1 bg-orange-500/80 rounded-full shadow-[0_0_5px_rgba(249,115,22,0.5)]"></div>
                 
-                <div className="absolute -bottom-2 -right-2 bg-orange-500 text-black px-2 py-0.5 rounded-full border-2 border-zinc-900 text-[8px] font-black">
+                <div className="absolute -bottom-2 -right-2 bg-orange-500 text-black px-2 py-0.5 rounded-full border-2 border-zinc-900 text-xs font-black">
                     OK
                 </div>
             </div>
@@ -392,7 +392,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 transition={{ duration: 1.2 }}
                 className="mb-5 px-3 py-1.5 bg-orange-500/10 border border-orange-500/20 rounded-full inline-flex items-center gap-2"
             >
-                <span className="text-orange-400 text-[10px] sm:text-xs font-black uppercase tracking-widest">75% of resumes are auto-rejected by robots</span>
+                <span className="text-orange-400 text-xs sm:text-sm font-black uppercase tracking-widest">75% of resumes are auto-rejected by robots</span>
             </motion.div>
 
             <motion.h1 
@@ -409,7 +409,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1.4, delay: 0.4 }}
-                className="max-w-2xl text-base sm:text-lg text-zinc-400 mb-5 leading-relaxed font-light"
+                className="max-w-2xl text-base sm:text-xl text-zinc-400 mb-5 leading-relaxed font-light"
             >
                Companies use <span className="text-white font-semibold">ATS</span> to auto-reject resumes missing keywords. 
                We scan your resume and show you exactly what's missing to get hired.
@@ -420,7 +420,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1.4, delay: 0.6 }}
-                className="flex flex-wrap justify-center gap-2 mb-8 text-[11px]"
+                className="flex flex-wrap justify-center gap-2 mb-8 text-xs"
             >
                 <div className="flex items-center gap-2 px-2.5 py-1 bg-zinc-900 border border-zinc-800 rounded-full">
                     <span className="text-zinc-400">See ATS score</span>
@@ -469,8 +469,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                     onChange={(e) => handleHeroUpload(e)}
                 />
                 
-                <p className="sm:hidden text-zinc-600 text-[10px] mt-1">Tap to upload PDF</p>
-                <p className="hidden sm:block text-zinc-600 text-[10px] mt-1 absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap opacity-60">
+                <p className="sm:hidden text-zinc-600 text-xs mt-1">Tap to upload PDF</p>
+                <p className="hidden sm:block text-zinc-600 text-xs mt-1 absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap opacity-60">
                     or drag and drop PDF here
                 </p>
             </motion.div>
@@ -479,7 +479,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.2 }}
-                className="flex flex-wrap justify-center gap-3 sm:gap-4 text-[9px] sm:text-[10px] text-zinc-600 font-mono items-center px-4"
+                className="flex flex-wrap justify-center gap-3 sm:gap-4 text-xs text-zinc-600 font-mono items-center px-4"
             >
                 <span className="flex items-center gap-2 whitespace-nowrap">50,000+ scanned</span>
                 <span className="w-1 h-1 rounded-full bg-zinc-800 hidden sm:block"></span>
@@ -517,8 +517,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                     >
                         <div className="flex gap-3">
                             <div>
-                                <h3 className="text-base font-bold text-white mb-0.5 uppercase tracking-tighter">Missing Keywords</h3>
-                                <p className="text-zinc-500 text-[11px] leading-relaxed">
+                                <h3 className="text-base font-bold text-white mb-1 uppercase tracking-tighter">Missing Keywords</h3>
+                                <p className="text-zinc-500 text-sm leading-relaxed">
                                     If you don't have the exact keywords from the job description, the ATS scores you zero.
                                 </p>
                             </div>
@@ -535,8 +535,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                     >
                         <div className="flex gap-3">
                             <div>
-                                <h3 className="text-base font-bold text-white mb-0.5 uppercase tracking-tighter">Bad Formatting</h3>
-                                <p className="text-zinc-500 text-[11px] leading-relaxed">
+                                <h3 className="text-base font-bold text-white mb-1 uppercase tracking-tighter">Bad Formatting</h3>
+                                <p className="text-zinc-500 text-sm leading-relaxed">
                                     Columns and graphics confuse the parser. Your resume ends up looking like gibberish to the robot.
                                 </p>
                             </div>
@@ -553,8 +553,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                     >
                         <div className="flex gap-3">
                             <div>
-                                <h3 className="text-base font-bold text-white mb-0.5 uppercase tracking-tighter">The HireSchema Fix</h3>
-                                <p className="text-zinc-500 text-[11px] leading-relaxed">
+                                <h3 className="text-base font-bold text-white mb-1 uppercase tracking-tighter">The HireSchema Fix</h3>
+                                <p className="text-zinc-500 text-sm leading-relaxed">
                                     We rewrite your bullets to include high-value keywords naturally, boosting your match score to 90%+.
                                 </p>
                             </div>
@@ -575,10 +575,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                         className="absolute w-full max-w-[350px] bg-zinc-900/80 border border-white/5 rounded-xl p-4 shadow-2xl z-10 backdrop-blur-md"
                     >
                         <div className="flex justify-between items-center mb-2 border-b border-white/5 pb-2">
-                            <span className="text-[8px] font-black text-red-500/50 uppercase tracking-widest">Before</span>
-                            <div className="text-[8px] font-mono text-zinc-600 uppercase tracking-tight">Score: 42/100</div>
+                            <span className="text-xs font-black text-red-500/50 uppercase tracking-widest">Before</span>
+                            <div className="text-xs font-mono text-zinc-600 uppercase tracking-tight">Score: 42/100</div>
                         </div>
-                        <p className="text-zinc-600 text-[11px] italic font-serif leading-relaxed line-through decoration-red-500/20">
+                        <p className="text-zinc-600 text-sm italic font-serif leading-relaxed line-through decoration-red-500/20">
                             Responsible for sales and managing the team during the quarter.
                         </p>
                     </motion.div>
@@ -594,17 +594,17 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                         <div className="flex justify-between items-center mb-4 border-b border-white/5 pb-3">
                             <div className="flex items-center gap-1.5">
                                 <div className="w-1.5 h-1.5 rounded-full bg-orange-500"></div>
-                                <span className="text-[9px] font-black text-white uppercase tracking-widest">Optimized</span>
+                                <span className="text-xs font-black text-white uppercase tracking-widest">Optimized</span>
                             </div>
-                            <div className="text-[9px] font-mono text-orange-400 font-bold uppercase tracking-tight">Score: 94/100</div>
+                            <div className="text-xs font-mono text-orange-400 font-bold uppercase tracking-tight">Score: 94/100</div>
                         </div>
                         
-                        <p className="text-white text-sm sm:text-base leading-relaxed font-medium">
+                        <p className="text-white text-base sm:text-lg leading-relaxed font-medium">
                             Led a <span className="text-orange-200 border-b-2 border-orange-500/50 pb-0.5 px-0.5 font-bold">sales team of 10</span>, achieving <span className="text-orange-200 border-b-2 border-orange-500/50 pb-0.5 px-0.5 font-bold">150% of quota</span> ($2M ARR) through strategic <span className="text-orange-200 border-b-2 border-orange-500/50 pb-0.5 px-0.5 font-bold">CRM implementation</span>.
                         </p>
                         
                         <div className="mt-4 flex flex-wrap gap-2">
-                            <span className="text-[7px] bg-orange-500/10 text-orange-400 px-1.5 py-0.5 rounded-full border border-orange-500/20 font-mono uppercase tracking-widest">Quantified Impact</span>
+                            <span className="text-xs bg-orange-500/10 text-orange-400 px-1.5 py-0.5 rounded-full border border-orange-500/20 font-mono uppercase tracking-widest">Quantified Impact</span>
                         </div>
 
                         {/* Success Badge */}
@@ -613,7 +613,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                             whileInView={{ scale: 1, rotate: 12 }}
                             viewport={{ once: true }}
                             transition={{ type: "spring", delay: 1, damping: 10 }}
-                            className="absolute -right-2 -bottom-2 bg-orange-500 text-white font-black px-3 py-1.5 rounded-lg shadow-2xl z-40 border-2 border-zinc-950 text-[10px] uppercase"
+                            className="absolute -right-2 -bottom-2 bg-orange-500 text-white font-black px-3 py-1.5 rounded-lg shadow-2xl z-40 border-2 border-zinc-950 text-xs uppercase"
                         >
                             ATS PASS
                         </motion.div>
@@ -639,7 +639,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                   >
                       <StepGraphic step={1} />
                       <h4 className="text-sm font-black text-white mb-1.5 group-hover:text-orange-500 transition-colors uppercase tracking-widest">1. Upload</h4>
-                      <p className="text-zinc-500 text-[11px] leading-relaxed max-w-[200px]">
+                      <p className="text-zinc-500 text-xs leading-relaxed max-w-[200px]">
                           Drop your resume and paste the job posting. Takes 10 seconds.
                       </p>
                   </div>
@@ -648,7 +648,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                   <div className="flex flex-col items-center text-center relative group">
                       <StepGraphic step={2} />
                       <h4 className="text-sm font-black text-white mb-1.5 uppercase tracking-widest">2. Analyze</h4>
-                      <p className="text-zinc-500 text-[11px] leading-relaxed max-w-[200px]">
+                      <p className="text-zinc-500 text-xs leading-relaxed max-w-[200px]">
                           See your score and the exact keywords the job wants that you lack.
                       </p>
                   </div>
@@ -657,7 +657,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                   <div className="flex flex-col items-center text-center relative group">
                       <StepGraphic step={3} />
                       <h4 className="text-sm font-black text-white mb-1.5 uppercase tracking-widest">3. Optimize</h4>
-                      <p className="text-zinc-500 text-[11px] leading-relaxed max-w-[200px]">
+                      <p className="text-zinc-500 text-xs leading-relaxed max-w-[200px]">
                           Rewrite your resume with the right keywords and download the PDF.
                       </p>
                   </div>
@@ -688,11 +688,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                             {f.title}
                             <span className="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-orange-500 ml-1">→</span>
                         </h3>
-                        <p className="text-zinc-500 text-[11px] leading-relaxed mb-2.5">
+                        <p className="text-zinc-500 text-xs leading-relaxed mb-2.5">
                             {f.desc}
                         </p>
                         <div className="border-t border-white/5 pt-2.5">
-                            <p className="text-[9px] text-zinc-600 font-mono italic">
+                            <p className="text-xs text-zinc-600 font-mono italic">
                                 {f.micro}
                             </p>
                         </div>
@@ -711,12 +711,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
                   {/* Free Tier */}
                   <div className="bg-zinc-900/30 border border-zinc-800 p-6 rounded-2xl flex flex-col items-center">
-                      <span className="text-zinc-600 font-black uppercase tracking-[0.2em] text-[10px] mb-4">Analysis</span>
+                      <span className="text-zinc-600 font-black uppercase tracking-[0.2em] text-xs mb-4">Analysis</span>
                       <div className="text-3xl font-black text-white mb-6 uppercase tracking-tighter">Free</div>
                       <ul className="space-y-3 text-left w-full mb-8 flex-1">
-                          <li className="flex items-center gap-2 text-xs text-zinc-400 font-bold uppercase tracking-tight">ATS score</li>
-                          <li className="flex items-center gap-2 text-xs text-zinc-400 font-bold uppercase tracking-tight">Keyword gaps</li>
-                          <li className="flex items-center gap-2 text-xs text-zinc-400 font-bold uppercase tracking-tight">AI Preview</li>
+                          <li className="flex items-center gap-2 text-sm text-zinc-400 font-bold uppercase tracking-tight">ATS score</li>
+                          <li className="flex items-center gap-2 text-sm text-zinc-400 font-bold uppercase tracking-tight">Keyword gaps</li>
+                          <li className="flex items-center gap-2 text-sm text-zinc-400 font-bold uppercase tracking-tight">AI Preview</li>
                       </ul>
                     <a 
                         href="/app"
@@ -726,7 +726,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                             logEvent('cta_click', { tier: 'free' }); 
                             onStart('scan'); 
                         }} 
-                        className={ORANGE_BUTTON_STYLE + " w-full py-3.5 text-xs"}
+                        className={ORANGE_BUTTON_STYLE + " w-full py-3.5 text-sm"}
                     >
                         Start now
                     </a>
@@ -734,16 +734,16 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
 
                 {/* Paid Tier */}
                 <div className="bg-gradient-to-b from-zinc-900 to-zinc-950 border border-orange-500/30 p-6 rounded-2xl flex flex-col items-center relative shadow-2xl">
-                     <div className="absolute top-0 right-0 bg-orange-600 text-white text-[9px] font-black px-3 py-1 rounded-bl-lg rounded-tr-lg uppercase tracking-widest">
+                     <div className="absolute top-0 right-0 bg-orange-600 text-white text-xs font-black px-3 py-1 rounded-bl-lg rounded-tr-lg uppercase tracking-widest">
                          Unlock
                      </div>
-                    <span className="text-orange-500 font-black uppercase tracking-[0.2em] text-[10px] mb-4">Full Access</span>
+                    <span className="text-orange-500 font-black uppercase tracking-[0.2em] text-xs mb-4">Full Access</span>
                     <div className="text-3xl font-black text-white mb-6 uppercase tracking-tighter">$1 <span className="text-sm font-normal text-zinc-600 tracking-normal">/ download</span></div>
                     <ul className="space-y-3 text-left w-full mb-8 flex-1">
-                        <li className="flex items-center gap-2 text-xs text-zinc-200 font-bold uppercase tracking-tight">Optimized Resume PDF</li>
-                        <li className="flex items-center gap-2 text-xs text-zinc-200 font-bold uppercase tracking-tight">Tailored Cover Letter</li>
-                        <li className="flex items-center gap-2 text-xs text-zinc-200 font-bold uppercase tracking-tight">Interview Prep Kit</li>
-                        <li className="flex items-center gap-2 text-[10px] text-zinc-600 mt-3 border-t border-white/5 pt-3">Secure payment via Dodo</li>
+                        <li className="flex items-center gap-2 text-sm text-zinc-200 font-bold uppercase tracking-tight">Optimized Resume PDF</li>
+                        <li className="flex items-center gap-2 text-sm text-zinc-200 font-bold uppercase tracking-tight">Tailored Cover Letter</li>
+                        <li className="flex items-center gap-2 text-sm text-zinc-200 font-bold uppercase tracking-tight">Interview Prep Kit</li>
+                        <li className="flex items-center gap-2 text-xs text-zinc-600 mt-3 border-t border-white/5 pt-3">Secure payment via Dodo</li>
                     </ul>
                     <a 
                         href="/app"
@@ -753,7 +753,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                             logEvent('cta_click', { tier: 'paid' }); 
                             onStart('optimize'); 
                         }} 
-                        className={ORANGE_BUTTON_STYLE + " w-full py-3.5 text-xs"}
+                        className={ORANGE_BUTTON_STYLE + " w-full py-3.5 text-sm"}
                     >
                         Start now
                     </a>
@@ -795,7 +795,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                       <div className="w-64 h-64 bg-zinc-950 border border-zinc-800 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden">
                            <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.05)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] animate-[shimmer_3s_linear_infinite]"></div>
                            <div className="px-4 py-1 bg-orange-500/10 rounded-full text-orange-500 text-xs font-bold">Zero storage</div>
-                           <p className="text-[10px] text-zinc-500 mt-2">Ephemeral processing</p>
+                           <p className="text-xs text-zinc-500 mt-2">Ephemeral processing</p>
                       </div>
                   </div>
               </div>
@@ -833,12 +833,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                         
                         <div className="flex justify-between items-center mb-6 bg-zinc-950/50 p-3 rounded-lg border border-white/5">
                             <div className="text-center">
-                                <div className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">Before</div>
+                                <div className="text-xs text-zinc-500 uppercase font-bold tracking-wider">Before</div>
                                 <div className="text-xl font-mono text-zinc-400">{c.before}</div>
                             </div>
                             <span className="text-zinc-600">→</span>
                             <div className="text-center">
-                                <div className="text-[10px] text-orange-500 uppercase font-bold tracking-wider">After</div>
+                                <div className="text-xs text-orange-500 uppercase font-bold tracking-wider">After</div>
                                 <div className="text-xl font-mono text-orange-400 font-bold">{c.after}</div>
                             </div>
                         </div>

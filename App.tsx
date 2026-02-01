@@ -752,9 +752,9 @@ export default function App() {
                               className={`w-full text-left p-4 rounded-xl border transition-all group ${isSelected ? 'bg-orange-500/10 border-orange-500/50' : 'bg-zinc-900/50 border-white/5 hover:border-white/10'}`}
                             >
                               <div className="flex justify-between items-start mb-1">
-                                <span className="text-[10px] font-mono text-zinc-500">{item.date}</span>
+                                <span className="text-xs font-mono text-zinc-500">{item.date}</span>
                                 {paid && (
-                                  <div className="flex items-center gap-1 px-1.5 py-0.5 bg-orange-500/10 border border-orange-500/20 rounded text-[8px] font-black text-orange-500 uppercase">
+                                  <div className="flex items-center gap-1 px-1.5 py-0.5 bg-orange-500/10 border border-orange-500/20 rounded text-xs font-black text-orange-500 uppercase">
                                     PAID
                                   </div>
                                 )}
@@ -816,14 +816,14 @@ export default function App() {
                           className="p-1.5 text-zinc-500 hover:text-white hover:bg-white/5 rounded-lg transition-all flex items-center gap-2"
                           title="View History"
                        >
-                          <span className="text-[9px] font-black uppercase tracking-[0.2em]">History</span>
+                          <span className="text-xs font-black uppercase tracking-[0.2em]">History</span>
                        </button>
                        
                        <div className="h-5 w-[1px] bg-white/5 mx-1"></div>
 
                        {isPaid && (
                            <div className="hidden sm:flex items-center gap-2 px-2.5 py-0.5 bg-orange-500/10 border border-orange-500/20 rounded-full">
-                               <span className="text-[9px] font-black text-orange-500 uppercase tracking-widest">Premium</span>
+                               <span className="text-xs font-black text-orange-500 uppercase tracking-widest">Premium</span>
                            </div>
                        )}
                        <a 
@@ -833,7 +833,7 @@ export default function App() {
                               e.preventDefault();
                               startNewScan();
                           }} 
-                          className="flex items-center gap-1.5 px-3 py-1.5 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-[10px] uppercase tracking-wide transition-all rounded-sm cursor-pointer border-none touch-target"
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-xs uppercase tracking-wide transition-all rounded-sm cursor-pointer border-none touch-target"
                        >
                            <span className="hidden xs:inline">New Scan</span>
                        </a>
@@ -865,13 +865,13 @@ export default function App() {
                                            analysisProgress < 85 ? "Comparing with Job..." : 
                                            "Finalizing Insights..."}
                                       </h2>
-                                      <p className="text-zinc-500 font-mono text-[10px]">{Math.round(analysisProgress)}% COMPLETE</p>
+                                      <p className="text-zinc-500 font-mono text-xs">{Math.round(analysisProgress)}% COMPLETE</p>
                                   </div>
                                ) : (
                                    <div className="w-full space-y-8 sm:space-y-10 py-4">
                                       <div className="text-center space-y-2">
                                           <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight uppercase">Scan Your Resume</h1>
-                                          <p className="text-zinc-500 text-[10px] sm:text-xs font-medium uppercase tracking-[0.2em]">
+                                          <p className="text-zinc-500 text-xs sm:text-sm font-medium uppercase tracking-[0.2em]">
                                               Ready to beat the ATS? Follow these <span className="text-orange-500">2 quick steps</span>.
                                           </p>
                                       </div>
@@ -879,8 +879,8 @@ export default function App() {
                                           {/* Step 1: Resume */}
                                           <div className={`flex flex-col gap-4 group ${inputWizardStep === 1 ? 'hidden md:flex' : ''}`}>
                                               <div className="flex items-center gap-3">
-                                                  <div className="w-6 h-6 rounded-full bg-orange-600 flex items-center justify-center text-[10px] font-black text-white shadow-[0_0_15px_rgba(234,88,12,0.4)]">1</div>
-                                                  <h3 className="text-[11px] font-black text-white uppercase tracking-widest">Upload Resume</h3>
+                                                  <div className="w-6 h-6 rounded-full bg-orange-600 flex items-center justify-center text-xs font-black text-white shadow-[0_0_15px_rgba(234,88,12,0.4)]">1</div>
+                                                  <h3 className="text-xs font-black text-white uppercase tracking-widest">Upload Resume</h3>
                                               </div>
                                               
                                               <div className="flex-1 min-h-[220px] bg-zinc-900/40 border border-white/5 rounded-2xl p-1 group-hover:border-orange-500/20 transition-all shadow-2xl">
@@ -893,7 +893,7 @@ export default function App() {
                                                   <button 
                                                       onClick={() => setInputWizardStep(1)} 
                                                       disabled={!resumeFile} 
-                                                      className="w-full py-4 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-xl transition-all disabled:opacity-30 disabled:grayscale touch-target shadow-lg shadow-orange-900/20"
+                                                      className="w-full py-4 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-black text-xs uppercase tracking-[0.2em] rounded-xl transition-all disabled:opacity-30 disabled:grayscale touch-target shadow-lg shadow-orange-900/20"
                                                   >
                                                       Next: Target Job
                                                   </button>
@@ -902,27 +902,27 @@ export default function App() {
                                           {/* Step 2: Job Details */}
                                           <div className={`flex flex-col gap-4 group ${inputWizardStep === 0 ? 'hidden md:flex' : ''}`}>
                                                <div className="md:hidden">
-                                                   <button onClick={() => setInputWizardStep(0)} className="text-zinc-500 py-1.5 text-[10px] font-black uppercase tracking-widest flex items-center gap-2 touch-target">
+                                                   <button onClick={() => setInputWizardStep(0)} className="text-zinc-500 py-1.5 text-xs font-black uppercase tracking-widest flex items-center gap-2 touch-target">
                                                        <X className="w-3 h-3" /> Back
                                                    </button>
                                                </div>
                                                
                                                <div className="flex items-center justify-between">
                                                    <div className="flex items-center gap-3">
-                                                       <div className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-[10px] font-black text-zinc-400 group-hover:bg-orange-600 group-hover:text-white transition-all">2</div>
-                                                       <h3 className="text-[11px] font-black text-white uppercase tracking-widest">Target Job</h3>
+                                                       <div className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-black text-zinc-400 group-hover:bg-orange-600 group-hover:text-white transition-all">2</div>
+                                                       <h3 className="text-xs font-black text-white uppercase tracking-widest">Target Job</h3>
                                                    </div>
                                                    
                                                    <div className="flex bg-zinc-900/80 p-1 rounded-lg border border-white/5">
                                                       <button 
                                                           onClick={() => setJobInputMode('link')} 
-                                                          className={`px-3 py-1 rounded-md text-[9px] font-black uppercase tracking-widest transition-all ${jobInputMode === 'link' ? 'bg-zinc-700 text-white shadow-lg' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                                          className={`px-3 py-1 rounded-md text-xs font-black uppercase tracking-widest transition-all ${jobInputMode === 'link' ? 'bg-zinc-700 text-white shadow-lg' : 'text-zinc-500 hover:text-zinc-300'}`}
                                                       >
                                                           Link
                                                       </button>
                                                       <button 
                                                           onClick={() => setJobInputMode('text')} 
-                                                          className={`px-3 py-1 rounded-md text-[9px] font-black uppercase tracking-widest transition-all ${jobInputMode === 'text' ? 'bg-zinc-700 text-white shadow-lg' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                                          className={`px-3 py-1 rounded-md text-xs font-black uppercase tracking-widest transition-all ${jobInputMode === 'text' ? 'bg-zinc-700 text-white shadow-lg' : 'text-zinc-500 hover:text-zinc-300'}`}
                                                       >
                                                           Text
                                                       </button>
@@ -936,8 +936,8 @@ export default function App() {
                                                                <LinkIcon className="w-4 h-4 text-orange-500" />
                                                            </div>
                                                            <div>
-                                                               <h4 className="text-white font-black text-[10px] uppercase tracking-[0.2em] mb-1">Paste Job Link</h4>
-                                                               <p className="text-zinc-500 text-[9px] font-medium leading-relaxed max-w-[180px]">LinkedIn, Indeed, or any company career page.</p>
+                                                               <h4 className="text-white font-black text-xs uppercase tracking-[0.2em] mb-1">Paste Job Link</h4>
+                                                               <p className="text-zinc-500 text-xs font-medium leading-relaxed max-w-[180px]">LinkedIn, Indeed, or any company career page.</p>
                                                            </div>
                                                            <input 
                                                                type="url" 
@@ -964,7 +964,7 @@ export default function App() {
                                           <motion.div 
                                               initial={{ opacity: 0, y: 5 }}
                                               animate={{ opacity: 1, y: 0 }}
-                                              className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-3 text-red-400 text-[10px] font-black uppercase tracking-widest"
+                                              className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-3 text-red-400 text-xs font-black uppercase tracking-widest"
                                           >
                                               <AlertCircle className="w-4 h-4 shrink-0" />
                                               <span>{error}</span>
@@ -975,7 +975,7 @@ export default function App() {
                                           <button 
                                               onClick={handleAnalysis} 
                                               disabled={!resumeFile || isAnalyzing || !jobDescription.trim()} 
-                                              className="group relative w-full sm:w-auto overflow-hidden px-12 py-4 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-black text-[11px] uppercase tracking-[0.2em] rounded-xl transition-all disabled:opacity-30 disabled:grayscale touch-target shadow-xl shadow-orange-900/20"
+                                              className="group relative w-full sm:w-auto overflow-hidden px-12 py-4 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-black text-xs uppercase tracking-[0.2em] rounded-xl transition-all disabled:opacity-30 disabled:grayscale touch-target shadow-xl shadow-orange-900/20"
                                           >
                                               <div className="relative z-10 flex items-center justify-center gap-2">
                                                   <span>Scan & Optimize</span>
@@ -991,8 +991,8 @@ export default function App() {
                                               <div className="w-8 h-8 rounded-full bg-orange-500/10 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
                                                   <Zap className="w-4 h-4 text-orange-500" />
                                               </div>
-                                              <h4 className="text-[10px] font-black text-white uppercase tracking-widest">Beat the ATS</h4>
-                                              <p className="text-zinc-500 text-[9px] font-medium leading-relaxed">
+                                              <h4 className="text-xs font-black text-white uppercase tracking-widest">Beat the ATS</h4>
+                                              <p className="text-zinc-500 text-xs font-medium leading-relaxed">
                                                   75% of resumes are rejected by bots. We ensure yours gets through.
                                               </p>
                                           </div>
@@ -1001,8 +1001,8 @@ export default function App() {
                                               <div className="w-8 h-8 rounded-full bg-orange-500/10 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
                                                   <Target className="w-4 h-4 text-orange-500" />
                                               </div>
-                                              <h4 className="text-[10px] font-black text-white uppercase tracking-widest">Keyword Match</h4>
-                                              <p className="text-zinc-500 text-[9px] font-medium leading-relaxed">
+                                              <h4 className="text-xs font-black text-white uppercase tracking-widest">Keyword Match</h4>
+                                              <p className="text-zinc-500 text-xs font-medium leading-relaxed">
                                                   Instantly identify and inject the specific skills hiring managers look for.
                                               </p>
                                           </div>
@@ -1011,8 +1011,8 @@ export default function App() {
                                               <div className="w-8 h-8 rounded-full bg-orange-500/10 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
                                                   <FileText className="w-4 h-4 text-orange-500" />
                                               </div>
-                                              <h4 className="text-[10px] font-black text-white uppercase tracking-widest">Role Alignment</h4>
-                                              <p className="text-zinc-500 text-[9px] font-medium leading-relaxed">
+                                              <h4 className="text-xs font-black text-white uppercase tracking-widest">Role Alignment</h4>
+                                              <p className="text-zinc-500 text-xs font-medium leading-relaxed">
                                                   Tailor your story to perfectly align with the job responsibilities.
                                               </p>
                                           </div>
@@ -1032,8 +1032,8 @@ export default function App() {
                                    <>
                                       <div className="flex justify-center mb-4">
                                          <div className="bg-zinc-900 p-1 rounded-lg border border-zinc-800 flex gap-1">
-                                           <button onClick={() => setResultTab('analysis')} className={`px-3 py-1.5 rounded text-[10px] font-bold transition-all ${resultTab === 'analysis' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>Diagnostic</button>
-                                           <button onClick={() => setResultTab('generator')} className={`px-3 py-1.5 rounded text-[10px] font-bold transition-all ${resultTab === 'generator' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>Editor</button>
+                                           <button onClick={() => setResultTab('analysis')} className={`px-3 py-1.5 rounded text-xs font-bold transition-all ${resultTab === 'analysis' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>Diagnostic</button>
+                                           <button onClick={() => setResultTab('generator')} className={`px-3 py-1.5 rounded text-xs font-bold transition-all ${resultTab === 'generator' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>Editor</button>
                                          </div>
                                       </div>
                                       <div className="flex-1 bg-zinc-900/30 border border-white/5 rounded-xl overflow-hidden">

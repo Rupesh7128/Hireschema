@@ -109,7 +109,7 @@ const ResumeUploader: React.FC<ResumeUploaderProps> = ({ onFileUpload, currentFi
                         <p className={`text-sm font-medium mb-1 ${isDragging ? 'text-orange-400' : 'text-zinc-300'}`}>
                             {isDragging ? 'Drop PDF here' : 'Drag & Drop PDF Resume'}
                         </p>
-                        <p className="text-[10px] text-zinc-500 font-mono mb-3">
+                        <p className="text-xs text-zinc-500 font-mono mb-3">
                             Max Size: {MAX_FILE_SIZE_MB}MB
                         </p>
                         <button 
@@ -155,7 +155,7 @@ const ResumeUploader: React.FC<ResumeUploaderProps> = ({ onFileUpload, currentFi
 
               <FileText className="w-10 h-10 text-orange-500 mb-3" />
               <p className="text-sm font-bold text-white max-w-[90%] truncate text-center">{currentFile.name}</p>
-              <p className="text-[10px] text-zinc-500 font-mono mb-4">{(currentFile.base64.length * 0.75 / 1024).toFixed(1)} KB</p>
+              <p className="text-xs text-zinc-500 font-mono mb-4">{(currentFile.base64.length * 0.75 / 1024).toFixed(1)} KB</p>
 
               <div className="flex items-center gap-2 flex-wrap justify-center">
                  {onPreview && (

@@ -55,12 +55,12 @@ const ScoreRing = ({ value, label, icon: Icon, color = "orange", subtext }: { va
       </div>
       <div>
         <div className="flex items-center gap-1.5 mb-0.5">
-          <h3 className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{label}</h3>
+          <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest">{label}</h3>
         </div>
-        <p className="text-xs text-white font-bold mb-0.5">
+        <p className="text-sm text-white font-bold mb-0.5">
           {value >= 80 ? "Interview Ready" : value >= 60 ? "Strong Potential" : "Critical Gaps"}
         </p>
-        <p className="text-[9px] text-zinc-500 font-medium uppercase tracking-wider">{subtext || "Target: 85%+"}</p>
+        <p className="text-xs text-zinc-500 font-medium uppercase tracking-wider">{subtext || "Target: 85%+"}</p>
       </div>
     </div>
   );
@@ -188,7 +188,7 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
           <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/5 blur-[60px] -mr-16 -mt-16" />
           <div className="relative z-10">
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Target Opportunity</span>
+              <span className="text-xs font-black text-zinc-500 uppercase tracking-[0.2em]">Target Opportunity</span>
             </div>
             <h1 className="text-2xl font-black text-white tracking-tight flex flex-wrap items-center gap-x-2">
               {result.jobTitle || "Target Role"}
@@ -204,15 +204,15 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
           <div className="flex items-center gap-3 relative z-10">
             <div className="px-4 py-2 bg-zinc-950/80 border border-white/10 rounded-xl flex items-center gap-4 backdrop-blur-xl shadow-inner">
               <div className="text-center">
-                <span className="block text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Date</span>
-                <span className="text-[11px] font-mono font-bold text-zinc-400">{new Date().toLocaleDateString()}</span>
+                <span className="block text-xs font-black text-zinc-500 uppercase tracking-widest mb-1">Date</span>
+                <span className="text-sm font-mono font-bold text-zinc-400">{new Date().toLocaleDateString()}</span>
               </div>
               <div className="w-px h-6 bg-white/10" />
               <div className="text-center">
-                <span className="block text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-1">Status</span>
+                <span className="block text-xs font-black text-zinc-500 uppercase tracking-widest mb-1">Status</span>
                 <div className="flex items-center gap-1.5 justify-center">
                   <div className="w-1.5 h-1.5 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.5)] animate-pulse" />
-                  <span className="text-[11px] font-bold text-orange-500 uppercase tracking-wider">Live</span>
+                  <span className="text-sm font-bold text-orange-500 uppercase tracking-wider">Live</span>
                 </div>
               </div>
             </div>
@@ -255,7 +255,7 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
                   <input 
                     value={editProfileData.name} 
                     onChange={e => setEditProfileData({...editProfileData, name: e.target.value})}
-                    className="w-full bg-zinc-950 border border-zinc-700 rounded-md px-2 py-1 text-[10px] text-white font-bold focus:border-orange-500/50 outline-none"
+                    className="w-full bg-zinc-950 border border-zinc-700 rounded-md px-2 py-1 text-sm text-white font-bold focus:border-orange-500/50 outline-none"
                     placeholder="Full Name"
                   />
                 </div>
@@ -269,7 +269,7 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
                   </h2>
                   <div className="flex flex-col gap-0.5">
                     {result.contactProfile.email && (
-                      <div className="flex items-center gap-1.5 text-[9px] text-zinc-500 font-bold">
+                      <div className="flex items-center gap-1.5 text-sm text-zinc-500 font-bold">
                         <Mail className="w-2.5 h-2.5 text-zinc-700" />
                         {result.contactProfile.email}
                       </div>
@@ -284,13 +284,13 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
             <div className="flex gap-1.5">
               {isEditingProfile ? (
                 <>
-                  <button onClick={handleSaveProfile} className="px-2 py-1 bg-orange-600 hover:bg-orange-500 text-white text-[9px] font-black rounded-md transition-all flex items-center gap-1">Save</button>
-                  <button onClick={handleCancelEdit} className="px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-500 text-[9px] font-black rounded-md transition-all">Cancel</button>
+                  <button onClick={handleSaveProfile} className="px-2 py-1 bg-orange-600 hover:bg-orange-500 text-white text-xs font-black rounded-md transition-all flex items-center gap-1">Save</button>
+                  <button onClick={handleCancelEdit} className="px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-500 text-xs font-black rounded-md transition-all">Cancel</button>
                 </>
               ) : (
                 <button 
                   onClick={handleDownloadCSV}
-                  className="px-2 py-1 bg-zinc-800/50 hover:bg-zinc-800 border border-white/5 rounded-md text-[9px] font-black text-zinc-500 hover:text-white transition-all flex items-center gap-1"
+                  className="px-2 py-1 bg-zinc-800/50 hover:bg-zinc-800 border border-white/5 rounded-md text-xs font-black text-zinc-500 hover:text-white transition-all flex items-center gap-1"
                 >
                   <Download className="w-2.5 h-2.5" /> Export
                 </button>
@@ -349,17 +349,17 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
         <div className="flex flex-col lg:flex-row gap-6 items-center">
           <div className="lg:w-[30%]">
             <h2 className="text-lg font-black text-white tracking-tight mb-1">Mission Critical: Next Steps</h2>
-            <p className="text-[10px] text-zinc-500 leading-relaxed mb-4 font-medium">
+            <p className="text-sm text-zinc-500 leading-relaxed mb-4 font-medium">
               We've identified the fastest path to an interview. Focus on these <span className="text-orange-500 font-black underline underline-offset-4 decoration-2">4 key areas</span> to transform your application.
             </p>
             <div className="grid grid-cols-2 gap-2">
               <div className="p-2 bg-zinc-950/60 rounded-lg border border-white/5 text-center">
-                <h4 className="text-[7px] font-black text-zinc-600 uppercase mb-0.5 tracking-widest">Priority</h4>
-                <p className="text-[10px] text-white font-black">Fix Gaps</p>
+                <h4 className="text-xs font-black text-zinc-600 uppercase mb-0.5 tracking-widest">Priority</h4>
+                <p className="text-sm text-white font-black">Fix Gaps</p>
               </div>
               <div className="p-2 bg-zinc-950/60 rounded-lg border border-white/5 text-center">
-                <h4 className="text-[7px] font-black text-zinc-600 uppercase mb-0.5 tracking-widest">Est. Time</h4>
-                <p className="text-[10px] text-white font-black">~12 Mins</p>
+                <h4 className="text-xs font-black text-zinc-600 uppercase mb-0.5 tracking-widest">Est. Time</h4>
+                <p className="text-sm text-white font-black">~12 Mins</p>
               </div>
             </div>
           </div>
@@ -377,10 +377,10 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
                 className="flex flex-col justify-between p-4 bg-zinc-950/40 border border-white/5 rounded-2xl hover:border-orange-500/30 transition-all cursor-pointer group/card min-h-[120px]"
               >
                 <div>
-                  <h4 className="text-[12px] font-black text-white mb-1.5">{step.title}</h4>
-                  <p className="text-[10px] text-zinc-500 leading-relaxed font-medium">{step.desc}</p>
+                  <h4 className="text-sm font-black text-white mb-1.5">{step.title}</h4>
+                  <p className="text-sm text-zinc-500 leading-relaxed font-medium">{step.desc}</p>
                 </div>
-                <div className="mt-4 flex items-center gap-2 text-orange-500 font-black text-[9px] tracking-widest uppercase">
+                <div className="mt-4 flex items-center gap-2 text-orange-500 font-black text-xs tracking-widest uppercase">
                   {step.linkText} <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
@@ -396,10 +396,10 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
           {/* Missing Keywords */}
           <div className="bg-zinc-900/40 border border-white/5 p-4 rounded-2xl shadow-xl relative overflow-hidden">
             <div className="flex items-center justify-between gap-3 mb-3">
-              <h3 className="text-[9px] font-black text-white uppercase tracking-widest">The Skill Gap</h3>
+              <h3 className="text-xs font-black text-white uppercase tracking-widest">The Skill Gap</h3>
               <button 
                 onClick={copyKeywords}
-                className="px-1.5 py-0.5 bg-zinc-950 border border-white/10 rounded text-[7px] font-black text-zinc-500 hover:text-white transition-all"
+                className="px-2 py-1 bg-zinc-950 border border-white/10 rounded text-xs font-black text-zinc-500 hover:text-white transition-all"
               >
                 {copiedKeywords ? 'DONE' : 'COPY ALL'}
               </button>
@@ -408,12 +408,12 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
             <div className="flex flex-wrap gap-1.5 mb-2">
               {result.missingKeywords.length > 0 ? (
                 result.missingKeywords.map((keyword, idx) => (
-                  <span key={idx} className="px-2 py-0.5 bg-orange-500/5 text-orange-500 border border-orange-500/10 rounded-lg text-[9px] font-black tracking-tight">
+                  <span key={idx} className="px-2 py-1 bg-orange-500/5 text-orange-500 border border-orange-500/10 rounded-lg text-sm font-black tracking-tight">
                     {keyword}
                   </span>
                 ))
               ) : (
-                <div className="text-zinc-600 text-[9px] font-bold bg-zinc-950/50 p-2 rounded-lg w-full border border-orange-500/10 text-center">
+                <div className="text-zinc-600 text-sm font-bold bg-zinc-950/50 p-2 rounded-lg w-full border border-orange-500/10 text-center">
                   100% Keyword Match
                 </div>
               )}
@@ -422,16 +422,16 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
 
           {/* Technical Risks */}
           <div ref={risksRef} className="bg-zinc-900/40 border border-white/5 p-4 rounded-2xl shadow-xl">
-            <h3 className="text-[9px] font-black text-white uppercase tracking-widest mb-3">Technical Risks</h3>
+            <h3 className="text-xs font-black text-white uppercase tracking-widest mb-3">Technical Risks</h3>
             <div className="space-y-2">
               {result.criticalIssues.length > 0 ? (
                 result.criticalIssues.map((issue, idx) => (
                   <div key={idx} className="p-2 bg-orange-500/5 border border-orange-500/10 rounded-lg">
-                    <span className="text-[9px] text-zinc-400 leading-snug font-bold">{issue}</span>
+                    <span className="text-sm text-zinc-400 leading-snug font-bold">{issue}</span>
                   </div>
                 ))
               ) : (
-                <div className="text-zinc-600 text-[9px] font-bold bg-zinc-950/50 p-2 rounded-lg border border-orange-500/10 text-center">
+                <div className="text-zinc-600 text-sm font-bold bg-zinc-950/50 p-2 rounded-lg border border-orange-500/10 text-center">
                   Clean Formatting
                 </div>
               )}
