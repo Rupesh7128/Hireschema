@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 
 interface LoadingIndicatorProps {
@@ -12,6 +12,8 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
     size = 'md',
     type = 'random'
 }) => {
+    const [hasError, setHasError] = useState(false);
+
     // Choose the dog image
     const dogImage = type === 'muffin' ? '/assets/dog1.png' : 
                      type === 'shepherd' ? '/assets/dog2.png' :
@@ -37,16 +39,16 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
                 }}
                 className={`${sizeClasses[size]} relative`}
             >
-                <img 
-                    src={dogImage} 
-                    alt="Loading..." 
-                    className="w-full h-full object-contain"
-                    onError={(e) => {
-                        // Fallback to a pulse animation if image is missing
-                        (e.target as HTMLImageElement).style.display = 'none';
-                        (e.target as any).parentElement.innerHTML = '<div class="w-full h-full bg-orange-500 rounded-full animate-pulse" />'
-                    }}
-                />
+                {hasError ? (
+                    <div className="w-full h-full bg-orange-500 rounded-full animate-pulse" />
+                ) : (
+                    <img 
+                        src={dogImage} 
+                        alt="Loading..." 
+                        className="w-full h-full object-contain"
+                        onError={() => setHasError(true)}
+                    />
+                )}
             </motion.div>
             {message && (
                 <p className="text-zinc-500 text-sm font-mono animate-pulse uppercase tracking-widest">
