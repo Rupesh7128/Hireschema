@@ -164,6 +164,14 @@ export const Editor: React.FC<EditorProps> = ({
 
     const handleDownloadPDF = async () => {
         if (!generatedData[activeTab] || !pdfRef.current) return;
+        
+        // @ts-ignore
+        if (typeof window.html2pdf === 'undefined') {
+            console.error('html2pdf library not loaded');
+            alert('PDF library is still loading. Please try again in a moment.');
+            return;
+        }
+
         setIsDownloading(true);
         try {
             const element = pdfRef.current;
@@ -177,7 +185,8 @@ export const Editor: React.FC<EditorProps> = ({
                     letterRendering: true,
                     scrollY: 0,
                     windowWidth: 794,
-                    logging: false
+                    logging: false,
+                    backgroundColor: '#ffffff'
                 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
                 pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
