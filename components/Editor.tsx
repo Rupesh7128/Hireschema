@@ -165,15 +165,25 @@ export const Editor: React.FC<EditorProps> = ({
         if (!generatedData[activeTab] || !pdfRef.current) return;
         setIsDownloading(true);
         try {
+            const element = pdfRef.current;
             const opt = {
-                margin: 0.5,
-                filename: `HireSchema_Optimized_${activeTab}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                margin: [0, 0, 0, 0],
+                filename: `HireSchema_Optimized_${activeTab.replace(/\s+/g, '_')}.pdf`,
+                image: { type: 'jpeg', quality: 1.0 },
+                html2canvas: { 
+                    scale: 3, 
+                    useCORS: true, 
+                    letterRendering: true,
+                    scrollY: 0,
+                    windowWidth: 794 // 210mm at 96dpi
+                },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
             };
             // @ts-ignore
-            await window.html2pdf().set(opt).from(pdfRef.current).save();
+            await window.html2pdf().set(opt).from(element).save();
+        } catch (err) {
+            console.error('PDF Generation Error:', err);
         } finally {
             setIsDownloading(false);
         }
@@ -291,11 +301,11 @@ export const Editor: React.FC<EditorProps> = ({
                     </div>
 
                     {/* Hidden PDF Template */}
-                    <div className="hidden">
-                        <div ref={pdfRef} className="p-8 bg-white text-black font-sans">
-                            {renderMarkdown(generatedData[activeTab] || '')}
-                        </div>
-                    </div>
+                    <PdfTemplate 
+                        ref={pdfRef} 
+                        content={generatedData[activeTab] || ''} 
+                        themeColor={accentColor.value} 
+                    />
                 </div>
 
                 {/* --- RIGHT CONTROL PANEL --- */}
