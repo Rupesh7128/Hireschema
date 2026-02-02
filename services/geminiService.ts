@@ -582,6 +582,95 @@ export const analyzeResume = async (
   jobDescription: string
 ): Promise<AnalysisResult> => {
   const jdText = jobDescription?.trim() || "NO_JD_PROVIDED";
+
+  const normalizeMeta = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
+  const stripInferred = (value: string): string =>
+    value
+      .replace(/\s*\(inferred\)\s*/ig, ' ')
+      .replace(/\s*-\s*inferred\s*$/i, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+  const isGenericMeta = (value: string): boolean => {
+    const v = value.trim();
+    if (!v) return true;
+    if (/\(inferred\)/i.test(v)) return true;
+    return /^(unknown company|unknown|n\/a|na|general application|general resume scan|self-initiated|self initiated|general|unspecified)$/i.test(v);
+  };
+  const looksLikeJobTitle = (value: string): boolean => {
+    const v = value.trim();
+    if (!v) return false;
+    if (v.length > 90) return false;
+    return /(engineer|developer|designer|analyst|manager|lead|director|intern|specialist|consultant|product|marketing|sales|data|scientist|accountant|associate|coordinator|architect|administrator|owner|founder|executive)/i.test(v);
+  };
+  const looksLikeCompany = (value: string): boolean => {
+    const v = value.trim();
+    if (!v) return false;
+    if (v.length > 90) return false;
+    if (/^(about|job description|responsibilities|requirements|what you will|who we are)/i.test(v)) return false;
+    return true;
+  };
+  const extractJobMetaFromText = (text: string): { jobTitle?: string; company?: string } => {
+    if (!text || text === "NO_JD_PROVIDED") return {};
+    const lines = text
+      .split(/\r?\n/)
+      .map(l => l.trim())
+      .filter(Boolean)
+      .slice(0, 50);
+
+    let jobTitle = '';
+    let company = '';
+
+    for (const line of lines) {
+      const titleMatch = line.match(/^(job\s*title|title|role|position)\s*[:\-–]\s*(.+)$/i);
+      if (!jobTitle && titleMatch) {
+        const candidate = titleMatch[2].trim();
+        if (looksLikeJobTitle(candidate)) jobTitle = candidate;
+      }
+      const companyMatch = line.match(/^(company|organization|employer|company\s*name)\s*[:\-–]\s*(.+)$/i);
+      if (!company && companyMatch) {
+        const candidate = companyMatch[2].trim();
+        if (looksLikeCompany(candidate)) company = candidate;
+      }
+      if (jobTitle && company) break;
+    }
+
+    if ((!jobTitle || !company) && lines.length > 0) {
+      const headerCandidates = lines.slice(0, 6);
+      for (const line of headerCandidates) {
+        const atMatch = line.match(/^(.+?)\s+(?:at|@)\s+(.+?)$/i);
+        if (atMatch) {
+          const titleCandidate = atMatch[1].trim();
+          const companyCandidate = atMatch[2].trim();
+          if (!jobTitle && looksLikeJobTitle(titleCandidate)) jobTitle = titleCandidate;
+          if (!company && looksLikeCompany(companyCandidate)) company = companyCandidate;
+        }
+        const barMatch = line.match(/^(.+?)\s+[|•·]\s+(.+?)$/);
+        if (barMatch) {
+          const left = barMatch[1].trim();
+          const right = barMatch[2].trim();
+          if (!jobTitle && looksLikeJobTitle(left)) jobTitle = left;
+          if (!company && looksLikeCompany(right)) company = right;
+        }
+        if (jobTitle && company) break;
+      }
+    }
+
+    return {
+      jobTitle: jobTitle || undefined,
+      company: company || undefined
+    };
+  };
+  const extractedMeta = (() => {
+    if (jdText.startsWith('http')) {
+      const lines = jdText.split(/\r?\n/);
+      const rest = lines.slice(1).join('\n').trim();
+      return extractJobMetaFromText(rest);
+    }
+    return extractJobMetaFromText(jdText);
+  })();
+  const extractedMetaHint = extractedMeta.jobTitle || extractedMeta.company
+    ? `\nEXTRACTED_METADATA_FROM_JD_TEXT:\njobTitle: ${extractedMeta.jobTitle || ''}\ncompany: ${extractedMeta.company || ''}\n`
+    : '';
   
   // Extra help for URL-based job descriptions
   let urlHint = "";
@@ -623,7 +712,7 @@ export const analyzeResume = async (
        - If JD is "NO_JD_PROVIDED", evaluate resume generally.
     
     TASKS:
-    1. Extract Metadata (Job Title, Company). Be specific (e.g., "Software Engineer" at "Amazon").
+    1. Extract Metadata (Job Title, Company). Use the full, exact strings from the JD when present. Do not shorten, truncate, or add labels like "(Inferred)".
     2. Dual Scoring (ATS Score, Relevance Score).
     3. Role Fit Analysis.
     4. Contact Profile (Name, Email, Phone, LinkedIn, Location).
@@ -646,8 +735,8 @@ export const analyzeResume = async (
   
   try {
     const payload = resumeText
-      ? `${systemPrompt}${urlHint}\n\nRESUME TEXT:\n${resumeText}\n\nJob Description / Link:\n${jdText}\n\nOutput strictly valid JSON.`
-      : `${systemPrompt}${urlHint}\n\nJob Description / Link:\n${jdText}\n\nOutput strictly valid JSON.`;
+      ? `${systemPrompt}${urlHint}${extractedMetaHint}\n\nRESUME TEXT:\n${resumeText}\n\nJob Description / Link:\n${jdText}\n\nOutput strictly valid JSON.`
+      : `${systemPrompt}${urlHint}${extractedMetaHint}\n\nJob Description / Link:\n${jdText}\n\nOutput strictly valid JSON.`;
 
     const response = await withTimeout(
       generateWithFallback(
@@ -661,7 +750,21 @@ export const analyzeResume = async (
 
     const txt = response.response.text();
     const parsed = safeJson(txt);
-    if (parsed) return parsed as AnalysisResult;
+    if (parsed) {
+      const jobTitle = stripInferred(normalizeMeta((parsed as any).jobTitle));
+      const company = stripInferred(normalizeMeta((parsed as any).company));
+      const resolvedJobTitle = extractedMeta.jobTitle && (isGenericMeta(jobTitle) || !looksLikeJobTitle(jobTitle))
+        ? extractedMeta.jobTitle
+        : jobTitle;
+      const resolvedCompany = extractedMeta.company && (isGenericMeta(company) || !looksLikeCompany(company))
+        ? extractedMeta.company
+        : company;
+      return {
+        ...(parsed as AnalysisResult),
+        jobTitle: resolvedJobTitle || (parsed as any).jobTitle,
+        company: resolvedCompany || (parsed as any).company
+      };
+    }
     throw new Error("Empty response.");
 
   } catch (primaryError: any) {

@@ -526,13 +526,15 @@ export default function App() {
       // Scrape JD if it's a URL
       let finalJobDescription = jobDescription;
       if (jobDescription.trim().startsWith('http')) {
+          const url = jobDescription.trim();
           console.log('[App] Job Description is a URL, attempting to scrape content...');
-          const scraped = await fetchJobDescriptionContent(jobDescription.trim());
+          const scraped = await fetchJobDescriptionContent(url);
           if (scraped) {
-              finalJobDescription = scraped;
+              finalJobDescription = `${url}\n\n${scraped}`;
               console.log('[App] Successfully scraped JD content. Length:', finalJobDescription.length);
           } else {
               console.warn('[App] JD scraping failed or returned empty. Falling back to URL.');
+              finalJobDescription = url;
           }
       }
 
@@ -757,8 +759,8 @@ export default function App() {
                                   </div>
                                 )}
                               </div>
-                              <h4 className={`text-sm font-black truncate ${isSelected ? 'text-orange-500' : 'text-white'}`}>{item.jobTitle}</h4>
-                              <p className="text-xs text-zinc-500 truncate">{item.company}</p>
+                              <h4 className={`text-sm font-black leading-tight break-words ${isSelected ? 'text-orange-500' : 'text-white'}`}>{item.jobTitle}</h4>
+                              <p className="text-xs text-zinc-500 leading-tight break-words">{item.company}</p>
                               <div className="mt-3 flex items-center justify-between">
                                  <div className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">ATS Score: <span className="text-white">{item.atsScore}%</span></div>
                                  <span className={`text-xs transition-transform group-hover:translate-x-1 ${isSelected ? 'text-orange-500' : 'text-zinc-700'}`}>→</span>
@@ -966,13 +968,13 @@ export default function App() {
                                           <button 
                                               onClick={handleAnalysis} 
                                               disabled={!resumeFile || isAnalyzing || !jobDescription.trim()} 
-                                              className="group relative w-full sm:w-auto overflow-hidden px-12 py-4 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-black text-xs uppercase tracking-[0.2em] rounded-xl transition-all disabled:opacity-30 disabled:grayscale touch-target shadow-xl shadow-orange-900/20"
+                                              className="px-6 sm:px-8 py-3 sm:py-3.5 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-xs sm:text-sm tracking-wide flex items-center justify-center gap-2 sm:gap-2.5 shadow-[3px_3px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none active:shadow-none hover:translate-x-[1.5px] hover:translate-y-[1.5px] active:translate-x-[1.5px] active:translate-y-[1.5px] transition-all rounded-sm cursor-pointer border-none touch-target w-full sm:w-auto relative overflow-hidden group uppercase disabled:opacity-30 disabled:grayscale disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-[3px_3px_0px_0px_rgba(255,255,255,0.2)]"
                                           >
-                                              <div className="relative z-10 flex items-center justify-center gap-2">
+                                              <span className="relative z-10 flex items-center gap-2">
                                                   <span>Scan & Optimize</span>
                                                   <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-                                              </div>
-                                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                                              </span>
+                                              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                                           </button>
                                       </div>
 

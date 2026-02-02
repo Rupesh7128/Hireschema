@@ -175,26 +175,43 @@ export const Editor: React.FC<EditorProps> = ({
         setIsDownloading(true);
         try {
             const element = pdfRef.current;
+            // Ensure fonts/layout are settled before rasterizing for PDF
+            // @ts-ignore
+            if (document.fonts?.ready) {
+                // @ts-ignore
+                await document.fonts.ready;
+            }
+            await new Promise<void>(requestAnimationFrame);
+            await new Promise<void>(requestAnimationFrame);
+
+            const exportWidth = Math.max(794, element.scrollWidth, element.clientWidth);
+            const exportHeight = Math.max(1123, element.scrollHeight, element.clientHeight);
+            const maxCanvasHeight = 30000;
+            const preferredScale = 2;
+            const safeScale = Math.max(1, Math.min(preferredScale, maxCanvasHeight / exportHeight));
             const opt = {
                 margin: [0, 0, 0, 0],
                 filename: `HireSchema_Optimized_${activeTab.replace(/\s+/g, '_')}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { 
-                    scale: 2, 
+                    scale: safeScale, 
                     useCORS: true, 
                     letterRendering: true,
+                    scrollX: 0,
                     scrollY: 0,
-                    windowWidth: 794,
+                    windowWidth: exportWidth,
+                    windowHeight: exportHeight,
                     logging: false,
                     backgroundColor: '#ffffff'
                 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                pagebreak: { mode: ['css', 'legacy'] }
             };
             // @ts-ignore
             await window.html2pdf().set(opt).from(element).save();
         } catch (err) {
             console.error('PDF Generation Error:', err);
+            alert('Unable to generate a PDF right now. Please try again in a moment.');
         } finally {
             setIsDownloading(false);
         }

@@ -17,9 +17,9 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
     const [imgLoaded, setImgLoaded] = useState(false);
 
     // Choose the dog image
-    const dogImage = type === 'muffin' ? '/assets/muffin.png' : 
-                     type === 'bruno' ? '/assets/bruno.png' :
-                     Math.random() > 0.5 ? '/assets/muffin.png' : '/assets/bruno.png';
+    const dogImage = type === 'muffin' ? '/assets/muffin.svg' : 
+                     type === 'bruno' ? '/assets/bruno.svg' :
+                     Math.random() > 0.5 ? '/assets/muffin.svg' : '/assets/bruno.svg';
 
     const sizeClasses = {
         sm: 'w-12 h-12',

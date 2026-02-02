@@ -84,11 +84,15 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
             color: #000000 !important; 
           }
           /* Page breaking safety */
-          h1, h2, h3 { 
+          .pdf-export-container h1, .pdf-export-container h2, .pdf-export-container h3 { 
             page-break-after: avoid;
             break-after: avoid;
           }
-          ul, p {
+          .pdf-export-container p, .pdf-export-container ul { 
+            page-break-inside: auto;
+            break-inside: auto;
+          }
+          .pdf-export-container li { 
             page-break-inside: avoid;
             break-inside: avoid;
           }
