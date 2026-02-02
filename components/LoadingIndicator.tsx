@@ -17,9 +17,9 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
     const [imgLoaded, setImgLoaded] = useState(false);
 
     // Choose the dog image
-    const dogImage = type === 'muffin' ? '/assets/dog1.png' : 
-                     type === 'shepherd' ? '/assets/dog2.png' :
-                     Math.random() > 0.5 ? '/assets/dog1.png' : '/assets/dog2.png';
+    const dogImage = type === 'muffin' ? '/assets/muffin.png' : 
+                     type === 'shepherd' ? '/assets/shepherd.png' :
+                     Math.random() > 0.5 ? '/assets/muffin.png' : '/assets/shepherd.png';
 
     const sizeClasses = {
         sm: 'w-12 h-12',
@@ -41,10 +41,11 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
                     animate={{ 
                         y: [0, -15, 0],
                         rotate: [0, 8, -8, 0],
+                        scaleX: [1, -1, 1],
                         scale: [1, 1.05, 1]
                     }}
                     transition={{ 
-                        duration: 2.5, 
+                        duration: 3, 
                         repeat: Infinity, 
                         ease: "easeInOut" 
                     }}
@@ -62,9 +63,12 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
                             src={dogImage} 
                             alt="Loading..." 
                             className={`w-full h-full object-contain transition-opacity duration-500 ${imgLoaded ? 'opacity-100' : 'opacity-0 absolute'}`}
-                            onLoad={() => setImgLoaded(true)}
+                            onLoad={() => {
+                                console.log(`[LoadingIndicator] Successfully loaded: ${dogImage}`);
+                                setImgLoaded(true);
+                            }}
                             onError={() => {
-                                console.warn(`[LoadingIndicator] Failed to load image: ${dogImage}`);
+                                console.error(`[LoadingIndicator] Failed to load image at: ${window.location.origin}${dogImage}. Please ensure the file exists in public/assets/`);
                                 setHasError(true);
                             }}
                         />
