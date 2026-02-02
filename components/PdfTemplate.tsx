@@ -10,9 +10,10 @@ interface PdfTemplateProps {
 export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ content, themeColor = '#ea580c' }, ref) => {
   return (
     <div style={{ 
-      position: 'absolute', 
-      top: '-10000px', 
-      left: '-10000px', 
+      position: 'fixed', 
+      top: '0', 
+      left: '0', 
+      transform: 'translateX(-10000px)',
       width: '210mm', 
       height: 'auto',
       overflow: 'visible',
@@ -88,14 +89,11 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
             page-break-after: avoid;
             break-after: avoid;
           }
-          .pdf-export-container p, .pdf-export-container ul { 
+          .pdf-export-container p, .pdf-export-container ul, .pdf-export-container li { 
             page-break-inside: auto;
             break-inside: auto;
           }
-          .pdf-export-container li { 
-            page-break-inside: avoid;
-            break-inside: avoid;
-          }
+          .pdf-export-container p, .pdf-export-container li { overflow-wrap: anywhere; word-break: break-word; }
         `}</style>
         <ReactMarkdown>{content}</ReactMarkdown>
       </div>

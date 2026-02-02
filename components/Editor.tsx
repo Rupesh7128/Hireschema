@@ -181,14 +181,15 @@ export const Editor: React.FC<EditorProps> = ({
                 // @ts-ignore
                 await document.fonts.ready;
             }
-            await new Promise<void>(requestAnimationFrame);
-            await new Promise<void>(requestAnimationFrame);
+            await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
+            await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
 
             const exportWidth = Math.max(794, element.scrollWidth, element.clientWidth);
             const exportHeight = Math.max(1123, element.scrollHeight, element.clientHeight);
             const maxCanvasHeight = 30000;
             const preferredScale = 2;
-            const safeScale = Math.max(1, Math.min(preferredScale, maxCanvasHeight / exportHeight));
+            const minScale = 0.25;
+            const safeScale = Math.max(minScale, Math.min(preferredScale, maxCanvasHeight / exportHeight));
             const opt = {
                 margin: [0, 0, 0, 0],
                 filename: `HireSchema_Optimized_${activeTab.replace(/\s+/g, '_')}.pdf`,
@@ -199,10 +200,20 @@ export const Editor: React.FC<EditorProps> = ({
                     letterRendering: true,
                     scrollX: 0,
                     scrollY: 0,
+                    x: 0,
+                    y: 0,
                     windowWidth: exportWidth,
                     windowHeight: exportHeight,
                     logging: false,
-                    backgroundColor: '#ffffff'
+                    backgroundColor: '#ffffff',
+                    onclone: (clonedDoc: Document) => {
+                        const clonedContainer = clonedDoc.querySelector('.pdf-export-container') as HTMLElement | null;
+                        if (clonedContainer) {
+                            clonedContainer.style.position = 'relative';
+                            clonedContainer.style.left = '0';
+                            clonedContainer.style.top = '0';
+                        }
+                    }
                 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
                 pagebreak: { mode: ['css', 'legacy'] }
