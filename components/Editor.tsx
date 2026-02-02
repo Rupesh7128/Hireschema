@@ -289,7 +289,7 @@ export const Editor: React.FC<EditorProps> = ({
                             >
                                 {loadingStates[activeTab] ? (
                                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-                                        <LoadingIndicator message="AI Drafting..." size="md" type="shepherd" />
+                                        <LoadingIndicator message="AI Drafting..." size="md" />
                                     </div>
                                 ) : (
                                     <>

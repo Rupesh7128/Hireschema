@@ -5,7 +5,7 @@ import { Dog } from 'lucide-react';
 interface LoadingIndicatorProps {
     message?: string;
     size?: 'sm' | 'md' | 'lg';
-    type?: 'muffin' | 'shepherd' | 'random';
+    type?: 'muffin' | 'bruno' | 'random';
 }
 
 export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({ 
@@ -18,8 +18,8 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
 
     // Choose the dog image
     const dogImage = type === 'muffin' ? '/assets/muffin.png' : 
-                     type === 'shepherd' ? '/assets/shepherd.png' :
-                     Math.random() > 0.5 ? '/assets/muffin.png' : '/assets/shepherd.png';
+                     type === 'bruno' ? '/assets/bruno.png' :
+                     Math.random() > 0.5 ? '/assets/muffin.png' : '/assets/bruno.png';
 
     const sizeClasses = {
         sm: 'w-12 h-12',
