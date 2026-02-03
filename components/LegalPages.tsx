@@ -24,7 +24,7 @@ const LegalPages: React.FC<LegalPagesProps> = ({ page, onBack }) => {
               <Shield className="w-8 h-8 text-orange-500" /> Privacy Policy
             </h1>
             <p><strong>Last Updated: January 2026</strong></p>
-            <p>At HireSchema (by <a href="https://kingdomofkumar.com/" target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:text-orange-400 hover:underline">KoK Labs</a>), we prioritize your data privacy and security. This Privacy Policy outlines how we handle your information.</p>
+            <p>At HireSchema (by <a href="https://kingdomofkumar.com/" target="_blank" rel="noopener noreferrer" className="text-white hover:text-zinc-200 underline underline-offset-4">KoK Labs</a>), we prioritize your data privacy and security. This Privacy Policy outlines how we handle your information.</p>
             
             <h3 className="text-xl font-bold text-white mt-6">1. Data Collection & Usage</h3>
             <ul className="list-disc pl-5 space-y-2">

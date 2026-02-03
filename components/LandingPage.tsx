@@ -770,19 +770,19 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                        <h2 className="text-3xl font-bold text-white mb-6">Your data, protected.</h2>
                        <ul className="space-y-4">
                            <li className="flex items-start gap-3">
-                               <span className="text-zinc-300 text-sm"><strong>Zero Data Retention.</strong> We do not store your resumes or personal data on our servers.</span>
+                               <span className="text-zinc-300 text-sm"><strong>No server-side storage.</strong> Your resume is not saved on HireSchema servers.</span>
                            </li>
                            <li className="flex items-start gap-3">
-                               <span className="text-zinc-300 text-sm">Processing occurs in ephemeral memory and is wiped after your session.</span>
+                               <span className="text-zinc-300 text-sm"><strong>Local by default.</strong> Any history you keep is saved in your browser storage, and you can delete it anytime.</span>
                            </li>
                            <li className="flex items-start gap-3">
-                               <span className="text-zinc-300 text-sm">Security: TLS encryption in transit.</span>
+                               <span className="text-zinc-300 text-sm"><strong>Encrypted in transit.</strong> Data is sent over TLS.</span>
                            </li>
                            <li className="flex items-start gap-3">
-                               <span className="text-zinc-300 text-sm">We don’t share or sell your data.</span>
+                               <span className="text-zinc-300 text-sm"><strong>No selling.</strong> We don’t sell your personal data.</span>
                            </li>
                            <li className="flex items-start gap-3">
-                               <span className="text-zinc-300 text-sm">Payments handled securely by Dodo Payments.</span>
+                               <span className="text-zinc-300 text-sm"><strong>Secure payments.</strong> Checkout is handled by Dodo Payments — we don’t store card details.</span>
                            </li>
                        </ul>
                        <div className="flex gap-4 mt-8">

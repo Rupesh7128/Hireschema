@@ -426,7 +426,7 @@ export const Editor: React.FC<EditorProps> = ({
                             <span className="text-xs font-black text-zinc-500 uppercase tracking-widest">Language</span>
                             <button 
                                 onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-                                className="flex items-center gap-1 text-xs font-black text-orange-500 uppercase tracking-widest hover:text-orange-400 transition-colors"
+                                className="flex items-center gap-1 text-xs font-black text-white uppercase tracking-widest hover:text-zinc-200 transition-colors"
                             >
                                 {appLanguage} <ChevronDown className="w-2 h-2" />
                             </button>
@@ -435,7 +435,7 @@ export const Editor: React.FC<EditorProps> = ({
                         <div className="flex gap-2">
                             <button 
                                 onClick={() => setIsEditing(!isEditing)}
-                                className={`flex-1 py-2 rounded-sm border font-black text-xs uppercase tracking-widest transition-all ${isEditing ? 'bg-orange-600 border-orange-700 text-white' : 'bg-zinc-900 border-white/5 text-zinc-500 hover:text-white'}`}
+                                className={`flex-1 py-2 rounded-sm border font-black text-xs uppercase tracking-widest transition-all ${isEditing ? 'bg-orange-600 border-orange-700 text-white' : 'bg-transparent border-white/20 text-white hover:bg-white/5'}`}
                             >
                                 {isEditing ? 'Save' : 'Manual Edit'}
                             </button>

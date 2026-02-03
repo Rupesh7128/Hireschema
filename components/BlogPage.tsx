@@ -58,7 +58,7 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onBack, initialSlug, onNavig
           if (internalLinks.length > 0) {
             internalLinks.forEach(link => {
               const regex = new RegExp(`\\b(${link.keyword})\\b`, 'gi');
-              content = content.replace(regex, `<a href="${link.url}" class="text-orange-500 hover:underline font-bold">$1</a>`);
+              content = content.replace(regex, `<a href="${link.url}" class="text-white underline underline-offset-4 font-bold hover:text-zinc-200">$1</a>`);
             });
           }
           post.content = content;
@@ -116,7 +116,7 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onBack, initialSlug, onNavig
          if (internalLinks.length > 0) {
            internalLinks.forEach(link => {
              const regex = new RegExp(`\\b(${link.keyword})\\b`, 'gi');
-             content = content.replace(regex, `<a href="${link.url}" class="text-orange-500 hover:underline font-bold">$1</a>`);
+             content = content.replace(regex, `<a href="${link.url}" class="text-white underline underline-offset-4 font-bold hover:text-zinc-200">$1</a>`);
            });
          }
          post.content = content;

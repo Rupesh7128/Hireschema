@@ -15,7 +15,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
     onNavigate(view);
   };
 
-  const footerLinkClasses = "text-zinc-500 hover:text-orange-500 transition-all duration-300 text-sm flex items-center gap-2 group cursor-pointer";
+  const footerLinkClasses = "text-zinc-500 hover:text-white transition-all duration-300 text-sm flex items-center gap-2 group cursor-pointer";
   const columnHeaderClasses = "text-xs font-black uppercase tracking-[0.25em] text-zinc-300 mb-8";
 
   return (
@@ -119,7 +119,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                     © {currentYear} HireSchema. All rights reserved.
                 </div>
                 <div className="flex items-center gap-2 text-zinc-600 text-xs font-bold uppercase tracking-widest">
-                    Built by <a href="https://kingdomofkumar.com/" target="_blank" rel="noopener noreferrer" className="text-orange-500/80 hover:text-orange-500 transition-colors">KoK Labs</a>
+                    Built by <a href="https://kingdomofkumar.com/" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors">KoK Labs</a>
                 </div>
             </div>
         </div>

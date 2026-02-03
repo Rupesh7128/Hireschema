@@ -115,13 +115,13 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
                 </button>
 
                 <div className="flex flex-col gap-8">
-                    <a href="/blog" onClick={(e) => handleNavClick(e, 'blog')} className="text-4xl font-black text-white text-left uppercase tracking-tighter hover:text-orange-500 transition-colors">
+                    <a href="/blog" onClick={(e) => handleNavClick(e, 'blog')} className="text-4xl font-black text-white text-left uppercase tracking-tighter hover:text-zinc-200 transition-colors">
                         Blog
                     </a>
-                    <a href="/pricing" onClick={(e) => handleNavClick(e, 'pricing')} className="text-4xl font-black text-white text-left uppercase tracking-tighter hover:text-orange-500 transition-colors">
+                    <a href="/pricing" onClick={(e) => handleNavClick(e, 'pricing')} className="text-4xl font-black text-white text-left uppercase tracking-tighter hover:text-zinc-200 transition-colors">
                         Pricing
                     </a>
-                    <a href="/roast-my-resume" onClick={(e) => handleNavClick(e, 'roast')} className="text-4xl font-black text-white text-left uppercase tracking-tighter hover:text-orange-500 transition-colors">
+                    <a href="/roast-my-resume" onClick={(e) => handleNavClick(e, 'roast')} className="text-4xl font-black text-white text-left uppercase tracking-tighter hover:text-zinc-200 transition-colors">
                         Roast
                     </a>
                     

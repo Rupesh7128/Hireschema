@@ -171,6 +171,8 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
 
   const [copiedKeywords, setCopiedKeywords] = useState(false);
 
+  const secondaryButtonClasses = "px-2 py-1 bg-transparent border border-white/20 rounded-md text-xs font-black text-white hover:bg-white/5 transition-all";
+
   const normalizeLanguageToken = (value: string) => {
     return value
       .trim()
@@ -296,7 +298,7 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
                 <div className="space-y-0.5">
                   <h2 className="text-base font-black text-white tracking-tight flex items-center gap-1.5">
                     {result.contactProfile.name || "Candidate"}
-                    <button onClick={() => setIsEditingProfile(true)} className="p-1 hover:bg-orange-500/10 rounded-md text-zinc-600 hover:text-orange-500 transition-all">
+                    <button onClick={() => setIsEditingProfile(true)} className="p-1 hover:bg-white/5 rounded-md text-zinc-500 hover:text-white transition-all">
                       <Pencil className="w-2.5 h-2.5" />
                     </button>
                   </h2>
@@ -318,12 +320,12 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
               {isEditingProfile ? (
                 <>
                   <button onClick={handleSaveProfile} className="px-2 py-1 bg-orange-600 hover:bg-orange-500 text-white text-xs font-black rounded-md transition-all flex items-center gap-1">Save</button>
-                  <button onClick={handleCancelEdit} className="px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-500 text-xs font-black rounded-md transition-all">Cancel</button>
+                  <button onClick={handleCancelEdit} className={secondaryButtonClasses}>Cancel</button>
                 </>
               ) : (
                 <button 
                   onClick={handleDownloadCSV}
-                  className="px-2 py-1 bg-zinc-800/50 hover:bg-zinc-800 border border-white/5 rounded-md text-xs font-black text-zinc-500 hover:text-white transition-all flex items-center gap-1"
+                  className={secondaryButtonClasses + " flex items-center gap-1"}
                 >
                   <Download className="w-2.5 h-2.5" /> Export
                 </button>
@@ -432,7 +434,7 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
               <h3 className="text-xs font-black text-white uppercase tracking-widest">The Skill Gap</h3>
               <button 
                 onClick={copyKeywords}
-                className="px-2 py-1 bg-zinc-950 border border-white/10 rounded text-xs font-black text-zinc-500 hover:text-white transition-all"
+                className={secondaryButtonClasses}
               >
                 {copiedKeywords ? 'DONE' : 'COPY ALL'}
               </button>
