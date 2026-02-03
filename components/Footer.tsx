@@ -3,13 +3,13 @@ import { AnimatedLogo } from './AnimatedLogo';
 import { ArrowRight, Zap, Mail } from 'lucide-react';
 
 interface FooterProps {
-  onNavigate: (view: 'landing' | 'blog' | 'pricing' | 'roast' | 'scan' | 'changelog' | 'success-stories') => void;
+  onNavigate: (view: 'landing' | 'blog' | 'pricing' | 'roast' | 'scan' | 'changelog' | 'success-stories' | 'what-is-hireschema') => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
   const currentYear = new Date().getFullYear();
 
-  const handleNavClick = (e: React.MouseEvent, view: 'landing' | 'blog' | 'pricing' | 'roast' | 'scan' | 'changelog' | 'success-stories') => {
+  const handleNavClick = (e: React.MouseEvent, view: 'landing' | 'blog' | 'pricing' | 'roast' | 'scan' | 'changelog' | 'success-stories' | 'what-is-hireschema') => {
     if (e.metaKey || e.ctrlKey) return;
     e.preventDefault();
     onNavigate(view);
@@ -67,6 +67,11 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                 <div className="col-span-1 md:col-span-2">
                     <h4 className={columnHeaderClasses}>Resources</h4>
                     <ul className="space-y-4">
+                        <li>
+                            <a href="/what-is-hireschema" className={footerLinkClasses} onClick={(e) => handleNavClick(e, 'what-is-hireschema')}>
+                                What is HireSchema?
+                            </a>
+                        </li>
                         <li>
                             <a href="/blog" className={footerLinkClasses} onClick={(e) => handleNavClick(e, 'blog')}>
                                 Blog

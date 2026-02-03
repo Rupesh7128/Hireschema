@@ -26,6 +26,7 @@ const RoastPage = lazy(() => import('./components/RoastPage'));
 const BlogPage = lazy(() => import('./components/BlogPage'));
 const FeaturePage = lazy(() => import('./components/FeaturePage'));
 const PricingPage = lazy(() => import('./components/PricingPage'));
+const WhatIsHireschemaPage = lazy(() => import('./components/WhatIsHireschemaPage'));
 
 // --- CONSTANTS ---
 const FEATURES_DATA = {
@@ -196,7 +197,7 @@ export default function App() {
   );
 
   // --- VIEWS ---
-  const [view, setView] = useState<'landing' | 'dashboard' | 'legal' | 'roast' | 'blog' | 'feature' | 'pricing' | 'changelog' | 'success-stories'>(() => {
+  const [view, setView] = useState<'landing' | 'dashboard' | 'legal' | 'roast' | 'blog' | 'feature' | 'pricing' | 'changelog' | 'success-stories' | 'what-is-hireschema'>(() => {
     const path = window.location.pathname;
     const searchParams = new URLSearchParams(window.location.search);
     const hasPayment = !!(
@@ -213,6 +214,7 @@ export default function App() {
     if (['/privacy', '/terms', '/cookies'].includes(path)) return 'legal';
     if (path === '/roast' || path === '/roast-my-resume') return 'roast';
     if (path === '/pricing') return 'pricing';
+    if (path === '/what-is-hireschema') return 'what-is-hireschema';
     if (path.startsWith('/feature/')) return 'feature';
     if (path.startsWith('/blog')) return 'blog';
     if (path === '/changelog') return 'changelog';
@@ -443,7 +445,7 @@ export default function App() {
     }
   };
 
-  const handleLandingStart = async (intent: 'landing' | 'scan' | 'optimize' | 'launch' | 'roast' | 'blog' | 'feature' | 'pricing' | 'changelog' | 'success-stories', file?: FileData, featureSlug?: string) => {
+  const handleLandingStart = async (intent: 'landing' | 'scan' | 'optimize' | 'launch' | 'roast' | 'blog' | 'feature' | 'pricing' | 'changelog' | 'success-stories' | 'what-is-hireschema', file?: FileData, featureSlug?: string) => {
     if (intent === 'landing') {
       setView('landing');
       window.history.pushState({}, '', '/');
@@ -460,6 +462,13 @@ export default function App() {
     if (intent === 'pricing') {
       setView('pricing');
       window.history.pushState({}, '', '/pricing');
+      return;
+    }
+
+    if (intent === 'what-is-hireschema') {
+      setView('what-is-hireschema');
+      window.history.pushState({}, '', '/what-is-hireschema');
+      window.scrollTo(0, 0);
       return;
     }
 
@@ -624,6 +633,16 @@ export default function App() {
         {view === 'pricing' && (
           <motion.div key="pricing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <Suspense fallback={<LoadingFallback />}><PricingPage onBack={() => { setView('landing'); window.history.pushState({}, '', '/'); }} onStart={handleNav} /></Suspense>
+          </motion.div>
+        )}
+        {view === 'what-is-hireschema' && (
+          <motion.div key="what-is-hireschema" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <Suspense fallback={<LoadingFallback />}>
+              <WhatIsHireschemaPage
+                onBack={() => { setView('landing'); window.history.pushState({}, '', '/'); }}
+                onStart={handleNav}
+              />
+            </Suspense>
           </motion.div>
         )}
         {view === 'blog' && (

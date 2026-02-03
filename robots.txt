@@ -3,5 +3,6 @@ Allow: /
 Allow: /roast-my-resume
 Allow: /blog
 Allow: /pricing
+Allow: /what-is-hireschema
 
 Sitemap: https://hireschema.com/sitemap.xml
