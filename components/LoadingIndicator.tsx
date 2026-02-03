@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Dog } from 'lucide-react';
 
@@ -15,11 +15,40 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
 }) => {
     const [hasError, setHasError] = useState(false);
     const [imgLoaded, setImgLoaded] = useState(false);
+    const [activeDog, setActiveDog] = useState<'muffin' | 'bruno'>(() => (Math.random() > 0.5 ? 'muffin' : 'bruno'));
+    const [srcIndex, setSrcIndex] = useState(0);
 
-    // Choose the dog image
-    const dogImage = type === 'muffin' ? '/assets/muffin.svg' : 
-                     type === 'bruno' ? '/assets/bruno.svg' :
-                     Math.random() > 0.5 ? '/assets/muffin.svg' : '/assets/bruno.svg';
+    const sources = useMemo(() => ({
+        muffin: ['/assets/muffin.png', '/assets/muffin.svg'],
+        bruno: ['/assets/bruno.png', '/assets/bruno.svg']
+    }), []);
+
+    useEffect(() => {
+        const nextDog = type === 'muffin' || type === 'bruno' ? type : (Math.random() > 0.5 ? 'muffin' : 'bruno');
+        setActiveDog(nextDog);
+        setSrcIndex(0);
+        setHasError(false);
+        setImgLoaded(false);
+    }, [type]);
+
+    useEffect(() => {
+        if (type !== 'random') return;
+        const id = window.setInterval(() => {
+            setActiveDog(prev => (prev === 'muffin' ? 'bruno' : 'muffin'));
+            setSrcIndex(0);
+            setHasError(false);
+            setImgLoaded(false);
+        }, 1200);
+        return () => window.clearInterval(id);
+    }, [type]);
+
+    useEffect(() => {
+        setSrcIndex(0);
+        setHasError(false);
+        setImgLoaded(false);
+    }, [activeDog]);
+
+    const dogImage = sources[activeDog][Math.min(srcIndex, sources[activeDog].length - 1)];
 
     const sizeClasses = {
         sm: 'w-12 h-12',
@@ -41,7 +70,6 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
                     animate={{ 
                         y: [0, -15, 0],
                         rotate: [0, 8, -8, 0],
-                        scaleX: [1, -1, 1],
                         scale: [1, 1.05, 1]
                     }}
                     transition={{ 
@@ -64,12 +92,17 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
                             alt="Loading..." 
                             className={`w-full h-full object-contain transition-opacity duration-500 ${imgLoaded ? 'opacity-100' : 'opacity-0 absolute'}`}
                             onLoad={() => {
-                                console.log(`[LoadingIndicator] Successfully loaded: ${dogImage}`);
                                 setImgLoaded(true);
                             }}
                             onError={() => {
-                                console.error(`[LoadingIndicator] Failed to load image at: ${window.location.origin}${dogImage}. Please ensure the file exists in public/assets/`);
-                                setHasError(true);
+                                const remaining = sources[activeDog].length;
+                                if (srcIndex + 1 < remaining) {
+                                    setSrcIndex(prev => prev + 1);
+                                    setImgLoaded(false);
+                                    setHasError(false);
+                                } else {
+                                    setHasError(true);
+                                }
                             }}
                         />
                     )}
