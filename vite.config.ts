@@ -17,12 +17,7 @@ export default defineConfig(({ mode }) => {
           // Proxy for other Vercel functions (requires a backend or vercel dev)
           '/api': {
             target: 'http://localhost:3002', 
-            changeOrigin: true,
-            bypass: (req, res) => {
-              if (req.url?.startsWith('/api/massblog')) return false;
-              console.warn(`[Vite Proxy] API route ${req.url} called but no backend is running. Use 'vercel dev' if available.`);
-              return true; // Bypass proxy and let it fail normally (404) instead of returning index.html
-            }
+            changeOrigin: true
           }
         },
       },
@@ -45,6 +40,7 @@ export default defineConfig(({ mode }) => {
         }
       },
       define: {
+        '__ASSET_VERSION__': JSON.stringify(process.env.VERCEL_GIT_COMMIT_SHA || process.env.VERCEL_DEPLOYMENT_ID || Date.now().toString()),
         'process.env.API_KEY': JSON.stringify(env.VITE_GEMINI_API_KEY || env.GEMINI_API_KEY),
         'process.env.GEMINI_API_KEY': JSON.stringify(env.VITE_GEMINI_API_KEY || env.GEMINI_API_KEY),
         'process.env.OPENAI_API_KEY': JSON.stringify(env.VITE_OPENAI_API_KEY || env.OPENAI_API_KEY),

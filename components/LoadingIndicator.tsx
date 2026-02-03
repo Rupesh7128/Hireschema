@@ -18,10 +18,12 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
     const [activeDog, setActiveDog] = useState<'muffin' | 'bruno'>(() => (Math.random() > 0.5 ? 'muffin' : 'bruno'));
     const [srcIndex, setSrcIndex] = useState(0);
 
+    const assetVersion = typeof __ASSET_VERSION__ !== 'undefined' ? __ASSET_VERSION__ : 'dev';
+
     const sources = useMemo(() => ({
-        muffin: ['/assets/muffin.png', '/assets/muffin.svg'],
-        bruno: ['/assets/bruno.png', '/assets/bruno.svg']
-    }), []);
+        muffin: [`/assets/muffin.png?v=${assetVersion}`, `/assets/muffin.svg?v=${assetVersion}`],
+        bruno: [`/assets/bruno.png?v=${assetVersion}`, `/assets/bruno.svg?v=${assetVersion}`]
+    }), [assetVersion]);
 
     useEffect(() => {
         const nextDog = type === 'muffin' || type === 'bruno' ? type : (Math.random() > 0.5 ? 'muffin' : 'bruno');
