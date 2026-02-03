@@ -142,7 +142,9 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
       ["Missing Keywords", `"${result.missingKeywords.join(", ")}"`],
       ["Key Strengths", `"${result.keyStrengths.join(", ")}"`],
       ["Critical Issues", `"${result.criticalIssues.join(", ")}"`],
-      ["Languages", `"${(result.languages || []).join(", ")}"`]
+      ["Resume Languages", `"${resumeLanguages.join(", ")}"`],
+      ["JD Required Languages", `"${requiredLanguages.join(", ")}"`],
+      ["Language Match", requiredLanguages.length === 0 ? "Not specified" : (languageMatch.isMatch ? "Match" : `Missing: ${languageMatch.missing.join(", ")}`)]
     ];
     const csvContent = "data:text/csv;charset=utf-8," + headers.join(",") + "\n" + rows.map(e => e.join(",")).join("\n");
     const encodedUri = encodeURI(csvContent);
@@ -168,6 +170,37 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
   const verdictBullets = textToBullets(result.roleFitAnalysis);
 
   const [copiedKeywords, setCopiedKeywords] = useState(false);
+
+  const normalizeLanguageToken = (value: string) => {
+    return value
+      .trim()
+      .replace(/[\u2022•·]/g, ' ')
+      .replace(/\(.*?\)/g, ' ')
+      .replace(/\b(fluent|native|professional|working|basic|beginner|intermediate|advanced|proficient|bilingual|conversational)\b/gi, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toLowerCase();
+  };
+
+  const computeLanguageMatch = (required: string[], available: string[]) => {
+    const requiredNorm = required.map(normalizeLanguageToken).filter(Boolean);
+    const availableNorm = available.map(normalizeLanguageToken).filter(Boolean);
+    const availableSet = new Set(availableNorm);
+    const matched: string[] = [];
+    const missing: string[] = [];
+    for (let i = 0; i < requiredNorm.length; i += 1) {
+      const req = requiredNorm[i];
+      if (!req) continue;
+      if (availableSet.has(req)) matched.push(required[i]);
+      else missing.push(required[i]);
+    }
+    const isMatch = requiredNorm.length > 0 ? missing.length === 0 : true;
+    return { matched, missing, isMatch };
+  };
+
+  const requiredLanguages = (result.requiredLanguages || []).filter(Boolean);
+  const resumeLanguages = (result.languages || []).filter(Boolean);
+  const languageMatch = result.languageMatch || computeLanguageMatch(requiredLanguages, resumeLanguages);
 
   const copyKeywords = () => {
     navigator.clipboard.writeText(result.missingKeywords.join(", "));
@@ -415,6 +448,66 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
               ) : (
                 <div className="text-zinc-600 text-sm font-bold bg-zinc-950/50 p-2 rounded-lg w-full border border-orange-500/10 text-center">
                   100% Keyword Match
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Language Match */}
+          <div className="bg-zinc-900/40 border border-white/5 p-4 rounded-2xl shadow-xl relative overflow-hidden">
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <h3 className="text-xs font-black text-white uppercase tracking-widest">Language Check</h3>
+              <div className="flex items-center gap-2">
+                {requiredLanguages.length === 0 ? (
+                  <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Not specified</span>
+                ) : languageMatch.isMatch ? (
+                  <span className="text-[10px] font-black text-white uppercase tracking-widest">Match</span>
+                ) : (
+                  <span className="text-[10px] font-black text-orange-500 uppercase tracking-widest">Missing</span>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <p className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-2">JD Required</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {requiredLanguages.length > 0 ? (
+                    requiredLanguages.map((lang, idx) => (
+                      <span key={`${lang}-${idx}`} className="px-2 py-1 bg-white/5 text-white border border-white/10 rounded-lg text-sm font-black tracking-tight">
+                        {lang}
+                      </span>
+                    ))
+                  ) : (
+                    <div className="text-zinc-600 text-sm font-bold bg-zinc-950/50 p-2 rounded-lg w-full border border-white/5 text-center">
+                      No language requirement found
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-2">Resume Languages</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {resumeLanguages.length > 0 ? (
+                    resumeLanguages.map((lang, idx) => (
+                      <span key={`${lang}-${idx}`} className="px-2 py-1 bg-zinc-950/40 text-zinc-300 border border-white/5 rounded-lg text-sm font-black tracking-tight">
+                        {lang}
+                      </span>
+                    ))
+                  ) : (
+                    <div className="text-zinc-600 text-sm font-bold bg-zinc-950/50 p-2 rounded-lg w-full border border-white/5 text-center">
+                      No languages detected in resume
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {requiredLanguages.length > 0 && !languageMatch.isMatch && languageMatch.missing.length > 0 && (
+                <div className="p-2 bg-orange-500/5 border border-orange-500/10 rounded-lg">
+                  <span className="text-sm text-zinc-400 leading-snug font-bold">
+                    Missing: {languageMatch.missing.join(', ')}
+                  </span>
                 </div>
               )}
             </div>

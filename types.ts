@@ -16,6 +16,12 @@ export interface AnalysisResult {
   roleFitAnalysis: string; 
   contactProfile: ContactProfile;
   languages: string[]; 
+  requiredLanguages?: string[];
+  languageMatch?: {
+    matched: string[];
+    missing: string[];
+    isMatch: boolean;
+  };
   missingKeywords: string[];
   criticalIssues: string[];
   keyStrengths: string[];

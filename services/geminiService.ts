@@ -698,6 +698,37 @@ export const analyzeResume = async (
     throw new Error(NON_RESUME_MESSAGE);
   }
   
+  const normalizeLanguageToken = (value: string) => {
+    const cleaned = value
+      .trim()
+      .replace(/[\u2022•·]/g, ' ')
+      .replace(/\(.*?\)/g, ' ')
+      .replace(/\b(fluent|native|professional|working|basic|beginner|intermediate|advanced|proficient|bilingual|conversational)\b/gi, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toLowerCase();
+    return cleaned;
+  };
+
+  const computeLanguageMatch = (required: string[], available: string[]) => {
+    const requiredNorm = required.map(normalizeLanguageToken).filter(Boolean);
+    const availableNorm = available.map(normalizeLanguageToken).filter(Boolean);
+    const availableSet = new Set(availableNorm);
+
+    const matched: string[] = [];
+    const missing: string[] = [];
+
+    for (let i = 0; i < requiredNorm.length; i += 1) {
+      const req = requiredNorm[i];
+      if (!req) continue;
+      if (availableSet.has(req)) matched.push(required[i]);
+      else missing.push(required[i]);
+    }
+
+    const isMatch = requiredNorm.length > 0 ? missing.length === 0 : true;
+    return { matched, missing, isMatch };
+  };
+
   const systemPrompt = `
     You are an impartial, evidence-based ATS Algorithm and Career Coach.
     
@@ -716,6 +747,9 @@ export const analyzeResume = async (
     2. Dual Scoring (ATS Score, Relevance Score).
     3. Role Fit Analysis.
     4. Contact Profile (Name, Email, Phone, LinkedIn, Location).
+    5. Language Requirements:
+       - Extract languages explicitly REQUIRED by the JD (requiredLanguages).
+       - Extract languages explicitly listed in the resume (languages).
     
     Return structured JSON:
     jobTitle: string, 
@@ -724,7 +758,8 @@ export const analyzeResume = async (
     relevanceScore: number, 
     roleFitAnalysis: string (SUPER SHORT, exactly 2-3 concise bullet points separated by dots),
     contactProfile: object, 
-    languages: array, 
+    languages: array,
+    requiredLanguages: array,
     missingKeywords: array, 
     criticalIssues: array, 
     keyStrengths: array (Limit to exactly 2-3 super short items, max 5 words each),
@@ -751,6 +786,10 @@ export const analyzeResume = async (
     const txt = response.response.text();
     const parsed = safeJson(txt);
     if (parsed) {
+      const requiredLanguages = Array.isArray((parsed as any).requiredLanguages) ? (parsed as any).requiredLanguages : [];
+      const resumeLanguages = Array.isArray((parsed as any).languages) ? (parsed as any).languages : [];
+      const languageMatch = computeLanguageMatch(requiredLanguages, resumeLanguages);
+
       const jobTitle = stripInferred(normalizeMeta((parsed as any).jobTitle));
       const company = stripInferred(normalizeMeta((parsed as any).company));
       const resolvedJobTitle = extractedMeta.jobTitle && (isGenericMeta(jobTitle) || !looksLikeJobTitle(jobTitle))
@@ -762,7 +801,10 @@ export const analyzeResume = async (
       return {
         ...(parsed as AnalysisResult),
         jobTitle: resolvedJobTitle || (parsed as any).jobTitle,
-        company: resolvedCompany || (parsed as any).company
+        company: resolvedCompany || (parsed as any).company,
+        languages: resumeLanguages,
+        requiredLanguages,
+        languageMatch
       };
     }
     throw new Error("Empty response.");
@@ -777,6 +819,8 @@ export const analyzeResume = async (
         roleFitAnalysis: 'Analysis degraded due to model availability. Provide a JD for relevance.',
         contactProfile: { name: '', email: '', phone: '', linkedin: '', location: '' },
         languages: [],
+        requiredLanguages: [],
+        languageMatch: { matched: [], missing: [], isMatch: true },
         missingKeywords: [],
         criticalIssues: [msg],
         keyStrengths: [],
