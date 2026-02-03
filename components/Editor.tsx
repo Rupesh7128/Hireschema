@@ -197,9 +197,10 @@ export const Editor: React.FC<EditorProps> = ({
             const minScale = 0.25;
             const safeScale = Math.max(minScale, Math.min(preferredScale, maxCanvasHeight / exportHeight));
             const opt = {
-                margin: [0, 0, 0, 0],
+                margin: [4, 4, 6, 4],
                 filename: `HireSchema_Optimized_${activeTab.replace(/\s+/g, '_')}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
+                enableLinks: true,
                 html2canvas: { 
                     scale: safeScale, 
                     useCORS: true, 

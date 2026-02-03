@@ -844,7 +844,7 @@ export const generateContent = async (
       • Copy ALL job titles exactly as shown  
       • Copy ALL school names exactly as shown
       • Copy ALL dates exactly as shown
-      • Copy the candidate's contact info exactly
+      • Do NOT fabricate or guess missing details
       
       YOU MAY IMPROVE:
       • Reword bullet points to sound more impactful (same facts, better phrasing)
@@ -858,7 +858,8 @@ export const generateContent = async (
       **OUTPUT FORMAT:**
       - Markdown format: # for name, ## for sections, - for bullets
       - Single column layout, NO tables
-      - Include: Contact Info, Summary, Experience, Education, Skills
+      - Include: Summary, Experience, Education, Skills
+      - Do NOT include Contact Info (it will be added separately)
       
       **LANGUAGE:** ${langInstruction}
       

@@ -10,6 +10,57 @@ interface PdfTemplateProps {
   showContactHeader?: boolean;
 }
 
+const isMeaningfulText = (value: string) => {
+  const trimmed = value.trim();
+  if (!trimmed) return false;
+  const lowered = trimmed.toLowerCase();
+  return !['not provided', 'n/a', 'na', 'none', 'null', 'undefined', '-'].includes(lowered);
+};
+
+const normalizeUrl = (value: string) => {
+  const trimmed = value.trim();
+  if (!trimmed) return '';
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed.replace(/^\/+/, '')}`;
+};
+
+const toTelHref = (value: string) => {
+  const digits = value.replace(/[^\d+]/g, '');
+  return digits ? `tel:${digits}` : '';
+};
+
+const looksLikeContactLine = (line: string) => {
+  const text = line.trim();
+  if (!text) return false;
+  if (text.length > 220) return false;
+
+  const hasEmail = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i.test(text);
+  const hasPhone = /\+?\d[\d\s().-]{7,}\d/.test(text);
+  const hasLinkedIn = /\blinkedin\b/i.test(text) || /\blinkedIn\.com\b/i.test(text);
+  const hasSeparator = text.includes('|') || text.includes('•');
+
+  if (!(hasEmail || hasPhone || hasLinkedIn)) return false;
+  return hasSeparator || (hasEmail && hasPhone) || (hasLinkedIn && (hasEmail || hasPhone));
+};
+
+const stripLeadingContactInfo = (raw: string) => {
+  const lines = raw.split(/\r?\n/);
+  let firstNonEmpty = 0;
+  while (firstNonEmpty < lines.length && lines[firstNonEmpty].trim() === '') firstNonEmpty += 1;
+
+  const firstLine = lines[firstNonEmpty] ?? '';
+  const startsWithHeading = /^\s*#{1,6}\s+/.test(firstLine);
+  const candidateIndex = startsWithHeading ? firstNonEmpty + 1 : firstNonEmpty;
+  const candidateLine = lines[candidateIndex] ?? '';
+
+  if (looksLikeContactLine(candidateLine)) {
+    lines.splice(candidateIndex, 1);
+    if (lines[candidateIndex]?.trim() === '') lines.splice(candidateIndex, 1);
+  }
+
+  return lines.join('\n');
+};
+
 export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ content, themeColor = '#ea580c', profile, showContactHeader = true }, ref) => {
   const name = (profile?.name || '').trim();
   const email = (profile?.email || '').trim();
@@ -17,8 +68,33 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
   const linkedin = (profile?.linkedin || '').trim();
   const location = (profile?.location || '').trim();
 
-  const contactParts = [email, phone, linkedin, location].filter(Boolean);
-  const hasContactInfo = contactParts.length > 0 || !!name;
+  const hasEmail = isMeaningfulText(email);
+  const hasPhone = isMeaningfulText(phone);
+  const hasLocation = isMeaningfulText(location);
+  const hasLinkedin = isMeaningfulText(linkedin);
+
+  const contactItems: Array<{ key: string; node: React.ReactNode }> = [
+    hasPhone
+      ? { key: 'phone', node: <a href={toTelHref(phone)}>{phone}</a> }
+      : null,
+    hasEmail
+      ? { key: 'email', node: <a href={`mailto:${email}`}>{email}</a> }
+      : null,
+    hasLocation ? { key: 'location', node: <span>{location}</span> } : null,
+    hasLinkedin
+      ? {
+          key: 'linkedin',
+          node: (
+            <a href={normalizeUrl(linkedin)} target="_blank" rel="noopener noreferrer">
+              LinkedIn
+            </a>
+          )
+        }
+      : null
+  ].filter(Boolean) as Array<{ key: string; node: React.ReactNode }>;
+
+  const hasContactInfo = contactItems.length > 0 || !!name;
+  const contentToRender = showContactHeader && hasContactInfo ? stripLeadingContactInfo(content) : content;
   const contentStartsWithHeading = /^\s*#{1,6}\s+/m.test(content.trimStart());
   return (
     <div style={{ 
@@ -53,6 +129,7 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
           .pdf-contact-name { font-size: 24pt; font-weight: 900; letter-spacing: -0.04em; line-height: 1.1; margin: 0 0 6px 0; color: #000000 !important; text-transform: uppercase; border-bottom: 3.5px solid ${themeColor}; padding-bottom: 8px; }
           .pdf-contact-line { font-size: 10pt; color: #222222 !important; margin: 0; line-height: 1.35; }
           .pdf-contact-sep { color: #9ca3af !important; padding: 0 6px; }
+          .pdf-contact-line a { color: #111111 !important; text-decoration: none; }
           .pdf-export-container h1 { 
             font-size: 28pt; 
             font-weight: 900; 
@@ -114,19 +191,19 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
         {showContactHeader && hasContactInfo && (
           <div className="pdf-contact-header">
             {name && !contentStartsWithHeading && <div className="pdf-contact-name">{name}</div>}
-            {contactParts.length > 0 && (
+            {contactItems.length > 0 && (
               <p className="pdf-contact-line">
-                {contactParts.map((part, idx) => (
-                  <React.Fragment key={`${part}-${idx}`}>
+                {contactItems.map((item, idx) => (
+                  <React.Fragment key={item.key}>
                     {idx > 0 && <span className="pdf-contact-sep">•</span>}
-                    <span>{part}</span>
+                    {item.node}
                   </React.Fragment>
                 ))}
               </p>
             )}
           </div>
         )}
-        <ReactMarkdown>{content}</ReactMarkdown>
+        <ReactMarkdown>{contentToRender}</ReactMarkdown>
         <div style={{ height: '10mm' }} />
       </div>
     </div>
