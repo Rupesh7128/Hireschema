@@ -74,6 +74,12 @@ export const Editor: React.FC<EditorProps> = ({
 
     // --- INITIALIZATION & AUTO-GENERATION ---
     useEffect(() => {
+        if (!localResumeText && resumeText) {
+            setLocalResumeText(resumeText);
+        }
+    }, [resumeText, localResumeText]);
+
+    useEffect(() => {
         if (isPaid && localResumeText) {
             generateAllContent();
         }
@@ -341,6 +347,8 @@ export const Editor: React.FC<EditorProps> = ({
                         ref={pdfRef} 
                         content={generatedData[activeTab] || ''} 
                         themeColor={accentColor.value} 
+                        profile={analysis.contactProfile}
+                        showContactHeader={activeTab === GeneratorType.ATS_RESUME}
                     />
                 </div>
 

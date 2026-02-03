@@ -1,13 +1,25 @@
 import * as React from 'react';
 import { forwardRef } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { ContactProfile } from '../types';
 
 interface PdfTemplateProps {
   content: string;
   themeColor?: string;
+  profile?: ContactProfile;
+  showContactHeader?: boolean;
 }
 
-export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ content, themeColor = '#ea580c' }, ref) => {
+export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ content, themeColor = '#ea580c', profile, showContactHeader = true }, ref) => {
+  const name = (profile?.name || '').trim();
+  const email = (profile?.email || '').trim();
+  const phone = (profile?.phone || '').trim();
+  const linkedin = (profile?.linkedin || '').trim();
+  const location = (profile?.location || '').trim();
+
+  const contactParts = [email, phone, linkedin, location].filter(Boolean);
+  const hasContactInfo = contactParts.length > 0 || !!name;
+  const contentStartsWithHeading = /^\s*#{1,6}\s+/m.test(content.trimStart());
   return (
     <div style={{ 
       position: 'fixed', 
@@ -26,7 +38,7 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
         style={{ 
           backgroundColor: '#ffffff',
           color: '#000000',
-          padding: '20mm 25mm',
+          padding: '20mm 25mm 28mm',
           width: '210mm',
           minHeight: '297mm',
           fontFamily: "'Inter', 'Helvetica', 'Arial', sans-serif",
@@ -37,6 +49,10 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
       >
         <style>{`
           .pdf-export-container { box-sizing: border-box; background: white; }
+          .pdf-contact-header { margin: 0 0 14px 0; }
+          .pdf-contact-name { font-size: 24pt; font-weight: 900; letter-spacing: -0.04em; line-height: 1.1; margin: 0 0 6px 0; color: #000000 !important; text-transform: uppercase; border-bottom: 3.5px solid ${themeColor}; padding-bottom: 8px; }
+          .pdf-contact-line { font-size: 10pt; color: #222222 !important; margin: 0; line-height: 1.35; }
+          .pdf-contact-sep { color: #9ca3af !important; padding: 0 6px; }
           .pdf-export-container h1 { 
             font-size: 28pt; 
             font-weight: 900; 
@@ -95,7 +111,23 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
           }
           .pdf-export-container p, .pdf-export-container li { overflow-wrap: anywhere; word-break: break-word; }
         `}</style>
+        {showContactHeader && hasContactInfo && (
+          <div className="pdf-contact-header">
+            {name && !contentStartsWithHeading && <div className="pdf-contact-name">{name}</div>}
+            {contactParts.length > 0 && (
+              <p className="pdf-contact-line">
+                {contactParts.map((part, idx) => (
+                  <React.Fragment key={`${part}-${idx}`}>
+                    {idx > 0 && <span className="pdf-contact-sep">•</span>}
+                    <span>{part}</span>
+                  </React.Fragment>
+                ))}
+              </p>
+            )}
+          </div>
+        )}
         <ReactMarkdown>{content}</ReactMarkdown>
+        <div style={{ height: '10mm' }} />
       </div>
     </div>
   );
