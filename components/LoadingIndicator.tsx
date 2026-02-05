@@ -15,6 +15,13 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
     const [activeDog, setActiveDog] = useState<'muffin' | 'bruno'>(() => (Math.random() > 0.5 ? 'muffin' : 'bruno'));
 
     useEffect(() => {
+        const muffin = new Image();
+        muffin.src = '/assets/muffin.png';
+        const bruno = new Image();
+        bruno.src = '/assets/bruno.png';
+    }, []);
+
+    useEffect(() => {
         if (type === 'muffin' || type === 'bruno') {
             setActiveDog(type);
             return;
@@ -26,15 +33,17 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
         if (type !== 'random') return;
         const id = window.setInterval(() => {
             setActiveDog(prev => (prev === 'muffin' ? 'bruno' : 'muffin'));
-        }, 1200);
+        }, 1400);
         return () => window.clearInterval(id);
     }, [type]);
 
     const sizeClasses = {
-        sm: 'text-3xl',
-        md: 'text-6xl',
-        lg: 'text-7xl'
+        sm: 'w-16 h-16',
+        md: 'w-28 h-28',
+        lg: 'w-32 h-32'
     };
+
+    const imageSrc = activeDog === 'muffin' ? '/assets/muffin.png' : '/assets/bruno.png';
 
     return (
         <div className="flex flex-col items-center justify-center gap-6">
@@ -53,9 +62,12 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
                     className={`relative flex items-center justify-center z-10`}
                     style={{ transformStyle: 'preserve-3d' }}
                 >
-                    <span className={`${sizeClasses[size]} leading-none select-none`} aria-label="Loading">
-                        {activeDog === 'muffin' ? '🧁' : '🐶'}
-                    </span>
+                    <img
+                        src={imageSrc}
+                        alt="Loading"
+                        draggable={false}
+                        className={`${sizeClasses[size]} select-none object-contain drop-shadow-[0_12px_30px_rgba(0,0,0,0.55)]`}
+                    />
                 </motion.div>
             </div>
 
