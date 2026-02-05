@@ -60,6 +60,7 @@ export const Editor: React.FC<EditorProps> = ({
     const [activeTab, setActiveTab] = useState<GeneratorType>(GeneratorType.ATS_RESUME);
     const [generatedData, setGeneratedData] = useState<Record<string, string>>({});
     const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
+    const [generationErrors, setGenerationErrors] = useState<Record<string, string>>({});
     const [optimizedScore, setOptimizedScore] = useState<number | null>(null);
     const [accentColor, setAccentColor] = useState(ACCENT_COLORS[0]);
     const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
@@ -72,6 +73,7 @@ export const Editor: React.FC<EditorProps> = ({
     const [isDownloading, setIsDownloading] = useState(false);
 
     const pdfRef = useRef<HTMLDivElement>(null);
+    const lastLanguageRef = useRef(appLanguage);
 
     const isMeaningfulText = (value: string) => {
         const trimmed = (value || '').trim();
@@ -244,11 +246,41 @@ export const Editor: React.FC<EditorProps> = ({
         }
     }, [resumeText, localResumeText]);
 
-    useEffect(() => {
-        if (isPaid && localResumeText) {
-            generateAllContent();
+    const generateTabContent = async (tab: GeneratorType, force = false) => {
+        if (!isPaid || !localResumeText) return;
+        if (loadingStates[tab]) return;
+        if (!force && generatedData[tab]) return;
+
+        setLoadingStates(prev => ({ ...prev, [tab]: true }));
+        setGenerationErrors(prev => ({ ...prev, [tab]: '' }));
+        try {
+            const content = await generateContent(tab, resumeFile, jobDescription, analysis, {
+                verifiedProfile: analysis.contactProfile,
+                language: appLanguage,
+                resumeText: localResumeText
+            });
+            setGeneratedData(prev => ({ ...prev, [tab]: content }));
+            if (tab === GeneratorType.ATS_RESUME) {
+                const score = await calculateImprovedScore(content, jobDescription);
+                setOptimizedScore(score);
+            }
+        } catch (err: any) {
+            const message = err?.message || 'Failed to generate content.';
+            setGenerationErrors(prev => ({ ...prev, [tab]: message }));
+        } finally {
+            setLoadingStates(prev => ({ ...prev, [tab]: false }));
         }
-    }, [isPaid, localResumeText, appLanguage]);
+    };
+
+    useEffect(() => {
+        if (!isPaid || !localResumeText) return;
+        const languageChanged = lastLanguageRef.current !== appLanguage;
+        if (languageChanged) lastLanguageRef.current = appLanguage;
+        const shouldGenerate = languageChanged || !generatedData[activeTab];
+        if (shouldGenerate) {
+            generateTabContent(activeTab, true);
+        }
+    }, [activeTab, isPaid, localResumeText, appLanguage]);
 
     useEffect(() => {
         if (isEditing) setIsCompare(false);
@@ -258,25 +290,7 @@ export const Editor: React.FC<EditorProps> = ({
         setIsCompare(false);
     }, [activeTab]);
 
-    const generateAllContent = async () => {
-        setLoadingStates(prev => ({ ...prev, [activeTab]: true }));
-        try {
-            const content = await generateContent(activeTab, resumeFile, jobDescription, analysis, {
-                verifiedProfile: analysis.contactProfile,
-                language: appLanguage,
-                resumeText: localResumeText
-            });
-            setGeneratedData(prev => ({ ...prev, [activeTab]: content }));
-            if (activeTab === GeneratorType.ATS_RESUME) {
-                const score = await calculateImprovedScore(content, jobDescription);
-                setOptimizedScore(score);
-            }
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setLoadingStates(prev => ({ ...prev, [activeTab]: false }));
-        }
-    };
+    const activeError = generationErrors[activeTab] || '';
 
     // --- ACTIONS ---
     const handleRefine = async (customPrompt?: string) => {
@@ -469,6 +483,14 @@ export const Editor: React.FC<EditorProps> = ({
                     <div className="h-5 w-px bg-white/10" />
                     
                     <div className="flex gap-1.5">
+                        <button
+                            onClick={() => generateTabContent(activeTab, true)}
+                            disabled={!isPaid || !localResumeText || loadingStates[activeTab]}
+                            className="p-1.5 text-zinc-500 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            title="Regenerate"
+                        >
+                            <Wand2 className="w-3.5 h-3.5" />
+                        </button>
                         <button onClick={handlePrint} className="p-1.5 text-zinc-500 hover:text-white transition-colors" title="Print"><Printer className="w-3.5 h-3.5" /></button>
                         <button onClick={handleCopy} className="p-1.5 text-zinc-500 hover:text-white transition-colors" title="Copy"><Copy className="w-3.5 h-3.5" /></button>
                         <button 
@@ -514,7 +536,32 @@ export const Editor: React.FC<EditorProps> = ({
                                                 ) : (
                                                     <>
                                                         {renderContactHeader()}
-                                                        {renderMarkdown(generatedData[activeTab] || '')}
+                                                        {activeError && !generatedData[activeTab] ? (
+                                                            <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-900">
+                                                                <div className="text-xs font-black uppercase tracking-widest mb-2">Generation Failed</div>
+                                                                <div className="text-sm font-medium leading-relaxed">{activeError}</div>
+                                                                <button
+                                                                    onClick={() => generateTabContent(activeTab, true)}
+                                                                    className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 text-white font-black text-xs uppercase tracking-widest rounded-sm transition-all"
+                                                                >
+                                                                    <Wand2 className="w-3 h-3" />
+                                                                    Try Again
+                                                                </button>
+                                                            </div>
+                                                        ) : !generatedData[activeTab] ? (
+                                                            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                                                                <LoadingIndicator message="Generating..." size="md" />
+                                                                <button
+                                                                    onClick={() => generateTabContent(activeTab, true)}
+                                                                    className="mt-2 inline-flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white font-black text-xs uppercase tracking-widest rounded-sm transition-all"
+                                                                >
+                                                                    <Wand2 className="w-3 h-3" />
+                                                                    Generate Now
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            renderMarkdown(generatedData[activeTab] || '')
+                                                        )}
                                                     </>
                                                 )}
                                             </>

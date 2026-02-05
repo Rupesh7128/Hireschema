@@ -13,12 +13,46 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
     type = 'random'
 }) => {
     const [activeDog, setActiveDog] = useState<'muffin' | 'bruno'>(() => (Math.random() > 0.5 ? 'muffin' : 'bruno'));
+    const [muffinReady, setMuffinReady] = useState(false);
+    const [brunoReady, setBrunoReady] = useState(false);
+    const [muffinError, setMuffinError] = useState(false);
+    const [brunoError, setBrunoError] = useState(false);
+
+    const muffinSrc = '/assets/muffin.png';
+    const brunoSrc = '/assets/bruno.png';
 
     useEffect(() => {
+        let alive = true;
+        setMuffinReady(false);
+        setBrunoReady(false);
+        setMuffinError(false);
+        setBrunoError(false);
+
         const muffin = new Image();
-        muffin.src = '/assets/muffin.png';
+        muffin.onload = () => {
+            if (!alive) return;
+            setMuffinReady(true);
+        };
+        muffin.onerror = () => {
+            if (!alive) return;
+            setMuffinError(true);
+        };
+        muffin.src = muffinSrc;
+
         const bruno = new Image();
-        bruno.src = '/assets/bruno.png';
+        bruno.onload = () => {
+            if (!alive) return;
+            setBrunoReady(true);
+        };
+        bruno.onerror = () => {
+            if (!alive) return;
+            setBrunoError(true);
+        };
+        bruno.src = brunoSrc;
+
+        return () => {
+            alive = false;
+        };
     }, []);
 
     useEffect(() => {
@@ -43,31 +77,59 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
         lg: 'w-32 h-32'
     };
 
-    const imageSrc = activeDog === 'muffin' ? '/assets/muffin.png' : '/assets/bruno.png';
+    const anyReady = muffinReady || brunoReady;
+    const canFlip = muffinReady && brunoReady;
+    const allFailed = muffinError && brunoError;
+    const effectiveDog: 'muffin' | 'bruno' = canFlip ? activeDog : (muffinReady ? 'muffin' : 'bruno');
 
     return (
         <div className="flex flex-col items-center justify-center gap-6">
-            <div className="relative flex items-center justify-center" style={{ perspective: 800 }}>
+            <div className="relative flex items-center justify-center" style={{ perspective: 900 }}>
                 <motion.div
-                    animate={{ 
-                        y: [0, -15, 0],
-                        rotateY: [0, 180, 360],
-                        scale: [1, 1.05, 1]
-                    }}
-                    transition={{ 
-                        duration: 2.8, 
-                        repeat: Infinity, 
-                        ease: "easeInOut" 
-                    }}
-                    className={`relative flex items-center justify-center z-10`}
-                    style={{ transformStyle: 'preserve-3d' }}
+                    animate={{ y: [0, -15, 0], scale: [1, 1.05, 1] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                    className="relative flex items-center justify-center z-10"
                 >
-                    <img
-                        src={imageSrc}
-                        alt="Loading"
-                        draggable={false}
-                        className={`${sizeClasses[size]} select-none object-contain drop-shadow-[0_12px_30px_rgba(0,0,0,0.55)]`}
-                    />
+                    <div className={`relative ${sizeClasses[size]}`}>
+                        {(!anyReady || allFailed) && (
+                            <div className="absolute inset-0 rounded-full bg-white/5 border border-white/10" />
+                        )}
+                        <motion.div
+                            aria-label="Loading"
+                            animate={{ rotateY: effectiveDog === 'muffin' ? 0 : 180, opacity: anyReady && !allFailed ? 1 : 0 }}
+                            transition={{ duration: 0.9, ease: "easeInOut" }}
+                            className="absolute inset-0"
+                            style={{ transformStyle: 'preserve-3d', WebkitTransformStyle: 'preserve-3d', willChange: 'transform' }}
+                        >
+                            <img
+                                src={muffinSrc}
+                                alt=""
+                                draggable={false}
+                                onLoad={() => setMuffinReady(true)}
+                                onError={() => setMuffinError(true)}
+                                className="absolute inset-0 w-full h-full select-none object-contain drop-shadow-[0_12px_30px_rgba(0,0,0,0.55)]"
+                                style={{
+                                    backfaceVisibility: 'hidden',
+                                    WebkitBackfaceVisibility: 'hidden',
+                                    display: muffinError ? 'none' : 'block'
+                                }}
+                            />
+                            <img
+                                src={brunoSrc}
+                                alt=""
+                                draggable={false}
+                                onLoad={() => setBrunoReady(true)}
+                                onError={() => setBrunoError(true)}
+                                className="absolute inset-0 w-full h-full select-none object-contain drop-shadow-[0_12px_30px_rgba(0,0,0,0.55)]"
+                                style={{
+                                    backfaceVisibility: 'hidden',
+                                    WebkitBackfaceVisibility: 'hidden',
+                                    transform: 'rotateY(180deg)',
+                                    display: brunoError ? 'none' : 'block'
+                                }}
+                            />
+                        </motion.div>
+                    </div>
                 </motion.div>
             </div>
 
