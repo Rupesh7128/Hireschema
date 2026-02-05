@@ -67,10 +67,175 @@ export const Editor: React.FC<EditorProps> = ({
     const [isRefining, setIsRefining] = useState(false);
     const [localResumeText, setLocalResumeText] = useState(resumeText);
     const [isEditing, setIsEditing] = useState(false);
+    const [isCompare, setIsCompare] = useState(false);
     const [showCopyToast, setShowCopyToast] = useState(false);
     const [isDownloading, setIsDownloading] = useState(false);
 
     const pdfRef = useRef<HTMLDivElement>(null);
+
+    const isMeaningfulText = (value: string) => {
+        const trimmed = (value || '').trim();
+        if (!trimmed) return false;
+        const lowered = trimmed.toLowerCase();
+        return !['not provided', 'n/a', 'na', 'none', 'null', 'undefined', '-'].includes(lowered);
+    };
+
+    const normalizeUrl = (value: string) => {
+        const trimmed = (value || '').trim();
+        if (!trimmed) return '';
+        if (/^https?:\/\//i.test(trimmed)) return trimmed;
+        return `https://${trimmed.replace(/^\/+/, '')}`;
+    };
+
+    const toTelHref = (value: string) => {
+        const digits = (value || '').replace(/[^\d+]/g, '');
+        return digits ? `tel:${digits}` : '';
+    };
+
+    const renderContactHeader = () => {
+        if (activeTab !== GeneratorType.ATS_RESUME) return null;
+        const profile = analysis.contactProfile || { name: '', email: '', phone: '', linkedin: '', location: '' };
+        const name = (profile.name || '').trim();
+        const email = (profile.email || '').trim();
+        const phone = (profile.phone || '').trim();
+        const linkedin = (profile.linkedin || '').trim();
+        const location = (profile.location || '').trim();
+
+        const items: Array<{ key: string; node: React.ReactNode }> = [
+            isMeaningfulText(phone) ? { key: 'phone', node: <a className="hover:underline" href={toTelHref(phone)}>{phone}</a> } : null,
+            isMeaningfulText(email) ? { key: 'email', node: <a className="hover:underline" href={`mailto:${email}`}>{email}</a> } : null,
+            isMeaningfulText(location) ? { key: 'location', node: <span>{location}</span> } : null,
+            isMeaningfulText(linkedin)
+                ? { key: 'linkedin', node: <a className="hover:underline" href={normalizeUrl(linkedin)} target="_blank" rel="noopener noreferrer">LinkedIn</a> }
+                : null
+        ].filter(Boolean) as Array<{ key: string; node: React.ReactNode }>;
+
+        if (!name && items.length === 0) return null;
+
+        return (
+            <div className="mb-6">
+                {name && (
+                    <h1 className="text-4xl font-black uppercase tracking-tight mb-2 border-b-2 pb-2 text-black" style={{ borderColor: accentColor.value }}>
+                        {name}
+                    </h1>
+                )}
+                {items.length > 0 && (
+                    <p className="text-sm text-zinc-700 font-bold">
+                        {items.map((item, idx) => (
+                            <React.Fragment key={item.key}>
+                                {idx > 0 && <span className="px-2 text-zinc-400">•</span>}
+                                {item.node}
+                            </React.Fragment>
+                        ))}
+                    </p>
+                )}
+            </div>
+        );
+    };
+
+    const markdownToPlainText = (markdown: string) => {
+        const input = (markdown || '').replace(/\r\n/g, '\n');
+        const withoutLinks = input.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1');
+        const withoutFormatting = withoutLinks
+            .replace(/[*_`>#]/g, '')
+            .replace(/^\s*[-+]\s+/gm, '')
+            .replace(/^\s*\d+\.\s+/gm, '')
+            .replace(/\s+/g, ' ')
+            .replace(/\n\s+/g, '\n')
+            .trim();
+        return withoutFormatting;
+    };
+
+    const normalizeLine = (line: string) => line.trim().toLowerCase().replace(/\s+/g, ' ');
+
+    const buildOptimizedPlainText = () => {
+        const profile = analysis.contactProfile || { name: '', email: '', phone: '', linkedin: '', location: '' };
+        const name = isMeaningfulText(profile.name) ? profile.name.trim() : '';
+        const parts = [
+            isMeaningfulText(profile.phone) ? profile.phone.trim() : '',
+            isMeaningfulText(profile.email) ? profile.email.trim() : '',
+            isMeaningfulText(profile.location) ? profile.location.trim() : '',
+            isMeaningfulText(profile.linkedin) ? `LinkedIn: ${normalizeUrl(profile.linkedin.trim())}` : ''
+        ].filter(Boolean);
+        const header = [name, parts.join(' • ')].filter(Boolean).join('\n');
+        const body = markdownToPlainText(generatedData[activeTab] || '');
+        return [header, body].filter(Boolean).join('\n');
+    };
+
+    const renderCompareView = () => {
+        const original = (localResumeText || '').trim();
+        const optimized = buildOptimizedPlainText();
+
+        const originalLines = original.split(/\r?\n/);
+        const optimizedLines = optimized.split(/\r?\n/);
+
+        const originalSet = new Set(originalLines.map(normalizeLine).filter(Boolean));
+        const optimizedSet = new Set(optimizedLines.map(normalizeLine).filter(Boolean));
+
+        const highlightKeywords = (line: string) => {
+            const keywords = (analysis.missingKeywords || []).filter(Boolean).slice(0, 30);
+            if (keywords.length === 0) return [line];
+            const escaped = keywords
+                .map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+                .filter(Boolean);
+            if (escaped.length === 0) return [line];
+            const re = new RegExp(`\\b(${escaped.join('|')})\\b`, 'gi');
+            const parts: React.ReactNode[] = [];
+            let lastIndex = 0;
+            let m: RegExpExecArray | null;
+            while ((m = re.exec(line)) !== null) {
+                const start = m.index;
+                const end = start + m[0].length;
+                if (start > lastIndex) parts.push(line.slice(lastIndex, start));
+                parts.push(
+                    <span key={`${start}-${end}`} className="bg-orange-500/20 text-white px-1 rounded-sm border border-orange-500/20">
+                        {line.slice(start, end)}
+                    </span>
+                );
+                lastIndex = end;
+            }
+            if (lastIndex < line.length) parts.push(line.slice(lastIndex));
+            return parts.length > 0 ? parts : [line];
+        };
+
+        return (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="bg-zinc-50 border border-zinc-200 rounded-sm overflow-hidden">
+                    <div className="px-3 py-2 border-b border-zinc-200 flex items-center justify-between">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Original</span>
+                        <span className="text-[10px] font-bold text-zinc-500">{originalLines.length} lines</span>
+                    </div>
+                    <div className="h-[700px] overflow-auto font-mono text-xs text-zinc-800">
+                        {originalLines.map((line, idx) => {
+                            const isRemoved = line.trim() && !optimizedSet.has(normalizeLine(line));
+                            return (
+                                <div key={idx} className={`px-3 py-0.5 whitespace-pre-wrap ${isRemoved ? 'bg-red-50 text-red-900' : ''}`}>
+                                    {line || ' '}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                <div className="bg-zinc-50 border border-zinc-200 rounded-sm overflow-hidden">
+                    <div className="px-3 py-2 border-b border-zinc-200 flex items-center justify-between">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Optimized</span>
+                        <span className="text-[10px] font-bold text-zinc-500">{optimizedLines.length} lines</span>
+                    </div>
+                    <div className="h-[700px] overflow-auto font-mono text-xs text-zinc-800">
+                        {optimizedLines.map((line, idx) => {
+                            const isAdded = line.trim() && !originalSet.has(normalizeLine(line));
+                            return (
+                                <div key={idx} className={`px-3 py-0.5 whitespace-pre-wrap ${isAdded ? 'bg-emerald-50 text-emerald-900' : ''}`}>
+                                    {highlightKeywords(line)}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            </div>
+        );
+    };
 
     // --- INITIALIZATION & AUTO-GENERATION ---
     useEffect(() => {
@@ -84,6 +249,14 @@ export const Editor: React.FC<EditorProps> = ({
             generateAllContent();
         }
     }, [isPaid, localResumeText, appLanguage]);
+
+    useEffect(() => {
+        if (isEditing) setIsCompare(false);
+    }, [isEditing]);
+
+    useEffect(() => {
+        setIsCompare(false);
+    }, [activeTab]);
 
     const generateAllContent = async () => {
         setLoadingStates(prev => ({ ...prev, [activeTab]: true }));
@@ -335,7 +508,16 @@ export const Editor: React.FC<EditorProps> = ({
                                                 className="w-full h-[700px] bg-transparent text-zinc-800 font-mono text-sm resize-none focus:outline-none"
                                             />
                                         ) : (
-                                            renderMarkdown(generatedData[activeTab] || '')
+                                            <>
+                                                {isCompare ? (
+                                                    renderCompareView()
+                                                ) : (
+                                                    <>
+                                                        {renderContactHeader()}
+                                                        {renderMarkdown(generatedData[activeTab] || '')}
+                                                    </>
+                                                )}
+                                            </>
                                         )}
                                     </>
                                 )}
@@ -438,6 +620,13 @@ export const Editor: React.FC<EditorProps> = ({
                                 className={`flex-1 py-2 rounded-sm border font-black text-xs uppercase tracking-widest transition-all ${isEditing ? 'bg-orange-600 border-orange-700 text-white' : 'bg-transparent border-white/20 text-white hover:bg-white/5'}`}
                             >
                                 {isEditing ? 'Save' : 'Manual Edit'}
+                            </button>
+                            <button 
+                                onClick={() => setIsCompare(!isCompare)}
+                                disabled={isEditing || !generatedData[activeTab] || loadingStates[activeTab]}
+                                className={`flex-1 py-2 rounded-sm border font-black text-xs uppercase tracking-widest transition-all ${isCompare ? 'bg-white/10 border-white/30 text-white' : 'bg-transparent border-white/20 text-white hover:bg-white/5'} disabled:opacity-50 disabled:cursor-not-allowed`}
+                            >
+                                Compare
                             </button>
                         </div>
                     </div>

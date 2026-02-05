@@ -38,19 +38,20 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
 
     return (
         <div className="flex flex-col items-center justify-center gap-6">
-            <div className="relative flex items-center justify-center">
+            <div className="relative flex items-center justify-center" style={{ perspective: 800 }}>
                 <motion.div
                     animate={{ 
                         y: [0, -15, 0],
-                        rotate: [0, 8, -8, 0],
+                        rotateY: [0, 180, 360],
                         scale: [1, 1.05, 1]
                     }}
                     transition={{ 
-                        duration: 3, 
+                        duration: 2.8, 
                         repeat: Infinity, 
                         ease: "easeInOut" 
                     }}
                     className={`relative flex items-center justify-center z-10`}
+                    style={{ transformStyle: 'preserve-3d' }}
                 >
                     <span className={`${sizeClasses[size]} leading-none select-none`} aria-label="Loading">
                         {activeDog === 'muffin' ? '🧁' : '🐶'}

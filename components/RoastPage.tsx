@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { LoadingIndicator } from './LoadingIndicator';
 import { Upload, AlertCircle, ArrowRight, Flame, Skull, TrendingDown, Trophy, RotateCcw, Star, Zap, Target, Award, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -24,22 +24,101 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
   const [roastScore, setRoastScore] = useState<number>(0);
   const [roastingProgress, setRoastingProgress] = useState(0);
   const [currentRoastPhase, setCurrentRoastPhase] = useState('');
+  const [roastResumeText, setRoastResumeText] = useState<string>('');
 
-  const roastData = [
-    { name: 'Formatting', value: Math.floor(Math.random() * 30) + 10, color: '#f97316' },
-    { name: 'Keywords', value: Math.floor(Math.random() * 25) + 15, color: '#fb923c' },
-    { name: 'Impact', value: Math.floor(Math.random() * 20) + 5, color: '#fdba74' },
-    { name: 'Brevity', value: Math.floor(Math.random() * 40) + 20, color: '#52525b' },
-    { name: 'Cringe Factor', value: Math.floor(Math.random() * 30) + 70, color: '#ea580c' },
-  ];
+  const metrics = useMemo(() => {
+    const text = roastResumeText || '';
+    const words = text
+      .replace(/[^\w\s+]/g, ' ')
+      .split(/\s+/)
+      .map(w => w.trim())
+      .filter(Boolean);
+    const wordCount = words.length || 1;
 
-  const roastCategories = [
-    { name: 'Unemployable', value: 35, color: '#c2410c' },
-    { name: 'Questionable', value: 25, color: '#f97316' },
-    { name: 'Mediocre', value: 20, color: '#fb923c' },
-    { name: 'Decent', value: 15, color: '#71717a' },
-    { name: 'Hireable', value: 5, color: '#a1a1aa' },
-  ];
+    const buzzwords = [
+      'synergy','synergize','results-driven','detail-oriented','hardworking','self-starter','go-getter','dynamic','team player','thought leader',
+      'innovative','strategic','leveraged','stakeholders','stakeholder management','cross-functional','end-to-end','best-in-class','world-class',
+      'visionary','proactive','passionate','fast-paced','go-to-market','disrupt','disruptive','holistic','robust','scalable','impactful',
+      'optimize','optimization','streamline','spearheaded','orchestrated','liaised'
+    ];
+
+    const lowered = text.toLowerCase();
+    let buzzwordHits = 0;
+    for (const b of buzzwords) {
+      const escaped = b.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const re = new RegExp(`\\b${escaped}\\b`, 'g');
+      const m = lowered.match(re);
+      if (m) buzzwordHits += m.length;
+    }
+
+    const numberHits = (text.match(/\b\d+(\.\d+)?%?\b/g) || []).length;
+    const bulletHits = (text.match(/^\s*[-•\u2022]/gm) || []).length;
+    const longLineHits = text.split(/\r?\n/).filter(l => l.trim().length > 120).length;
+
+    const uniqueWordCount = new Set(words.map(w => w.toLowerCase())).size;
+    const lexicalVariety = uniqueWordCount / wordCount;
+
+    const buzzwordDensity = Math.min(100, Math.round((buzzwordHits / wordCount) * 1000) / 10);
+    const impactScore = Math.max(0, Math.min(100, Math.round(numberHits * 8 + Math.min(30, bulletHits * 0.8))));
+    const brevityScore = (() => {
+      const idealMin = 350;
+      const idealMax = 800;
+      if (wordCount < idealMin) return Math.max(0, Math.round((wordCount / idealMin) * 100));
+      if (wordCount > idealMax) return Math.max(0, Math.round((idealMax / wordCount) * 100));
+      return 100;
+    })();
+    const formattingScore = Math.max(0, Math.min(100, Math.round(100 - Math.min(70, longLineHits * 6))));
+    const keywordScore = Math.max(0, Math.min(100, Math.round(lexicalVariety * 140)));
+    const cringeScore = Math.max(0, Math.min(100, Math.round(buzzwordDensity * 2)));
+
+    const hireProbability = Math.max(0, Math.min(100, Math.round(roastScore)));
+    const originality = Math.max(0, Math.min(100, Math.round(100 - buzzwordDensity)));
+
+    return {
+      wordCount,
+      buzzwordHits,
+      numberHits,
+      longLineHits,
+      buzzwordDensity,
+      cringeScore,
+      originality,
+      hireProbability,
+      formattingScore,
+      keywordScore,
+      impactScore,
+      brevityScore
+    };
+  }, [roastResumeText, roastScore]);
+
+  const roastData = useMemo(
+    () => [
+      { name: 'Formatting', value: metrics.formattingScore, color: '#f97316' },
+      { name: 'Keywords', value: metrics.keywordScore, color: '#fb923c' },
+      { name: 'Impact', value: metrics.impactScore, color: '#fdba74' },
+      { name: 'Brevity', value: metrics.brevityScore, color: '#52525b' },
+      { name: 'Cringe Factor', value: metrics.cringeScore, color: '#ea580c' }
+    ],
+    [metrics]
+  );
+
+  const roastCategories = useMemo(() => {
+    const score = metrics.hireProbability;
+    const bucket = score < 25 ? 0 : score < 40 ? 1 : score < 55 ? 2 : score < 70 ? 3 : 4;
+    const distribution = [
+      [55, 25, 12, 6, 2],
+      [35, 30, 20, 10, 5],
+      [20, 25, 30, 15, 10],
+      [10, 18, 26, 26, 20],
+      [5, 10, 20, 30, 35]
+    ][bucket];
+    return [
+      { name: 'Unemployable', value: distribution[0], color: '#c2410c' },
+      { name: 'Questionable', value: distribution[1], color: '#f97316' },
+      { name: 'Mediocre', value: distribution[2], color: '#fb923c' },
+      { name: 'Decent', value: distribution[3], color: '#71717a' },
+      { name: 'Hireable', value: distribution[4], color: '#a1a1aa' }
+    ];
+  }, [metrics.hireProbability]);
 
   const roastingPhases = [
     'Scanning for cringe...',
@@ -99,11 +178,18 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
   }, []);
 
   useEffect(() => {
-    if (roastResult) {
-        // Generate a more realistic low score for comedy effect
-        setRoastScore(Math.floor(Math.random() * 35) + 15); // 15-50 range
+    if (!roastResult) return;
+    const match = roastResult.match(/Employability Score:\s*\**\s*([0-9]{1,3})\s*\/\s*100/i);
+    if (match && match[1]) {
+      const value = Math.max(0, Math.min(100, Number(match[1])));
+      if (!Number.isNaN(value)) {
+        setRoastScore(value);
+        return;
+      }
     }
-  }, [roastResult]);
+    const estimate = Math.max(0, Math.min(100, Math.round(100 - metrics.cringeScore * 0.6 - (100 - metrics.impactScore) * 0.4)));
+    setRoastScore(estimate);
+  }, [roastResult, metrics.cringeScore, metrics.impactScore]);
 
   useEffect(() => {
     let interval: any;
@@ -168,6 +254,7 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
             throw new Error('Could not extract enough text from PDF. Please ensure the PDF contains readable text.');
         }
         
+        setRoastResumeText(text);
         console.log('Generating roast content...');
         const result = await generateContent(
             GeneratorType.ROAST,
@@ -271,15 +358,15 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
 
                 <div className="grid grid-cols-3 gap-3 text-center">
                     <div className="space-y-0.5">
-                        <div className="text-xl font-black text-orange-500">{Math.floor(Math.random() * 50) + 20}</div>
+                        <div className="text-xl font-black text-orange-500">{metrics.buzzwordHits}</div>
                         <div className="text-[8px] text-zinc-500 uppercase tracking-widest">Buzzwords</div>
                     </div>
                     <div className="space-y-0.5">
-                        <div className="text-xl font-black text-zinc-400">{Math.floor(Math.random() * 15) + 5}</div>
+                        <div className="text-xl font-black text-zinc-400">{metrics.longLineHits + Math.max(0, 3 - Math.min(3, metrics.numberHits))}</div>
                         <div className="text-[8px] text-zinc-500 uppercase tracking-widest">Red Flags</div>
                     </div>
                     <div className="space-y-0.5">
-                        <div className="text-xl font-black text-zinc-500">{Math.floor(Math.random() * 8) + 2}</div>
+                        <div className="text-xl font-black text-zinc-500">{metrics.cringeScore}</div>
                         <div className="text-[8px] text-zinc-500 uppercase tracking-widest">Cringe</div>
                     </div>
                 </div>
@@ -388,10 +475,10 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                     {/* Quick Stats */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
                         {[
-                            { label: 'Buzzword Density', value: `${Math.floor(Math.random() * 40) + 20}%`, color: 'text-orange-500' },
-                            { label: 'Cringe Factor', value: `${Math.floor(Math.random() * 30) + 70}/100`, color: 'text-zinc-400' },
-                            { label: 'Originality', value: `${Math.floor(Math.random() * 15) + 5}%`, color: 'text-orange-400' },
-                            { label: 'Hire Probability', value: `${Math.floor(Math.random() * 20) + 10}%`, color: 'text-zinc-500' },
+                            { label: 'Buzzword Density', value: `${metrics.buzzwordDensity}%`, color: 'text-orange-500' },
+                            { label: 'Cringe Factor', value: `${metrics.cringeScore}/100`, color: 'text-zinc-400' },
+                            { label: 'Originality', value: `${metrics.originality}%`, color: 'text-orange-400' },
+                            { label: 'Hire Probability', value: `${metrics.hireProbability}%`, color: 'text-zinc-500' },
                         ].map((stat, index) => (
                             <motion.div
                                 key={index}
@@ -511,4 +598,3 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
 };
 
 export default RoastPage;
-

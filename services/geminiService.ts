@@ -993,6 +993,11 @@ export const generateContent = async (
         You are a brutal, professional roast master for resumes.
         Output ONLY valid Markdown.
         Do NOT use emojis.
+        ZERO-FABRICATION RULE:
+        - Use ONLY facts and text that appear in the resume content provided above.
+        - If something is not present in the resume, you MUST NOT claim it exists.
+        - Do NOT invent market data, company traction, social presence, platform presence, growth gaps, "market intelligence", or "evidence" claims.
+        - If you reference something, quote it as the evidence under **The Crime**.
         
         STRUCTURE:
         
@@ -1043,6 +1048,10 @@ export const generateContent = async (
         1.  **[Action Item]:** [Why]
         2.  **[Action Item]:** [Why]
         3.  **[Action Item]:** [Why]
+
+        STRICT OUTPUT CONSTRAINTS:
+        - Follow the structure exactly.
+        - Do not add extra sections.
         `;
         break;
   }
