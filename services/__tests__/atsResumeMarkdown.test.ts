@@ -21,4 +21,15 @@ School`;
     expect(out).not.toMatch(/## Experices/i);
     expect(out).toMatch(/\nText line\n\n## EXPERIENCE\n/);
   });
+
+  it('fixes malformed first heading like "# NAME ## SUMMARY"', () => {
+    const input = `# CHANDINI BALAJI ## SUMMARY
+Seasoned professional
+## EXPERIENCE
+- Did work`;
+
+    const out = normalizeAtsResumeMarkdown(input);
+    expect(out).toMatch(/^## SUMMARY\n/m);
+    expect(out).not.toMatch(/CHANDINI BALAJI ## SUMMARY/);
+  });
 });

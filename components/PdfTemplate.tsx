@@ -55,7 +55,7 @@ const stripLeadingNameAndContactInfo = (raw: string, name: string) => {
   const normalizedName = (name || '').trim().toLowerCase();
 
   if (normalizedName) {
-    if (headingText && headingText.toLowerCase() === normalizedName) {
+    if (headingText && (headingText.toLowerCase() === normalizedName || headingText.toLowerCase().startsWith(`${normalizedName} `))) {
       lines.splice(firstNonEmpty, 1);
       while (firstNonEmpty < lines.length && lines[firstNonEmpty].trim() === '') lines.splice(firstNonEmpty, 1);
     } else if (!startsWithHeading && firstLine.trim().toLowerCase() === normalizedName) {
