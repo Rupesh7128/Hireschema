@@ -102,6 +102,36 @@ export async function verifyDodoPayment(paymentId: string): Promise<VerifyPaymen
   }
 }
 
+export interface RedeemPromoResult {
+  ok: boolean;
+  redeemed: boolean;
+  reason?: string;
+}
+
+export async function redeemPromoCode(code: string): Promise<RedeemPromoResult> {
+  try {
+    const trimmed = String(code || '').trim();
+    if (!trimmed) return { ok: false, redeemed: false, reason: 'Please enter a promo code.' };
+
+    const response = await fetch('/api/redeem-promo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: trimmed })
+    });
+
+    const json = await response.json().catch(() => ({}));
+    const ok = !!json?.ok;
+    const redeemed = !!json?.redeemed;
+    const reason = json?.reason;
+
+    if (!response.ok) return { ok: false, redeemed: false, reason: reason || 'Promo redemption failed.' };
+    return { ok, redeemed, reason };
+  } catch (e: any) {
+    console.error('Promo redemption error:', e);
+    return { ok: false, redeemed: false, reason: 'Network error. Please try again.' };
+  }
+}
+
 // Storage key for payment state
 const PAID_IDS_KEY = 'hireSchema_paidIds';
 

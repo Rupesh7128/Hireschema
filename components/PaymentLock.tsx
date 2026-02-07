@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Lock, ExternalLink } from 'lucide-react';
 import { logEvent } from '../services/analytics';
-import { buildCheckoutUrl, PRODUCT_ID } from '../services/paymentService';
+import { buildCheckoutUrl, PRODUCT_ID, redeemPromoCode } from '../services/paymentService';
 
 interface PaymentLockProps {
   onPaymentVerified: () => void;
@@ -12,6 +12,11 @@ interface PaymentLockProps {
 
 const PaymentLock: React.FC<PaymentLockProps> = ({ onPaymentVerified, onBeforeRedirect }) => {
   const [error, setError] = useState<string | null>(null);
+  const [isPromoOpen, setIsPromoOpen] = useState(false);
+  const [promoCode, setPromoCode] = useState('');
+  const [isApplyingPromo, setIsApplyingPromo] = useState(false);
+
+  const PROMO_PREFILL_CODE = 'kirishkagaanasunega';
 
   const handlePaymentClick = () => {
     logEvent('payment_link_clicked');
@@ -41,6 +46,26 @@ const PaymentLock: React.FC<PaymentLockProps> = ({ onPaymentVerified, onBeforeRe
     
     // Redirect to Dodo checkout
     window.location.href = checkoutUrl;
+  };
+
+  const applyPromo = async () => {
+    if (isApplyingPromo) return;
+    setIsApplyingPromo(true);
+    setError(null);
+    try {
+      const res = await redeemPromoCode(promoCode);
+      if (res.ok && res.redeemed) {
+        logEvent('promo_redeem_success');
+        onPaymentVerified();
+        return;
+      }
+      setError(res.reason || 'Invalid promo code.');
+      logEvent('promo_redeem_failed', { reason: res.reason || 'unknown' });
+    } catch (e: any) {
+      setError(e?.message || 'Promo redemption failed.');
+    } finally {
+      setIsApplyingPromo(false);
+    }
   };
 
   return (
@@ -87,6 +112,42 @@ const PaymentLock: React.FC<PaymentLockProps> = ({ onPaymentVerified, onBeforeRe
                 <span>Pay $1 & Unlock</span>
                 <ExternalLink className="w-3 h-3" />
               </button>
+              <button
+                type="button"
+                onClick={() => setIsPromoOpen(v => !v)}
+                className="w-full text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-zinc-300 transition-colors"
+              >
+                Have a promo code?
+              </button>
+              {isPromoOpen && (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={promoCode}
+                      onChange={(e) => setPromoCode(e.target.value)}
+                      placeholder="Enter promo code"
+                      className="flex-1 bg-zinc-900 border border-zinc-700 focus:border-orange-500/60 rounded-md px-3 py-2 text-[11px] text-white font-mono outline-none"
+                      disabled={isApplyingPromo}
+                    />
+                    <button
+                      type="button"
+                      onClick={applyPromo}
+                      disabled={isApplyingPromo || !promoCode.trim()}
+                      className="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-white font-mono font-black text-[10px] uppercase tracking-widest rounded-md border border-zinc-700"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setPromoCode(PROMO_PREFILL_CODE)}
+                    className="text-[10px] font-black uppercase tracking-widest text-orange-500/90 hover:text-orange-400 transition-colors"
+                  >
+                    Click to auto-fill promo code
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
