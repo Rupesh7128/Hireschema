@@ -585,6 +585,22 @@ export const calculateImprovedScore = async (
     }
 }
 
+const sanitizeAiOutput = (raw: string): string => {
+  let out = String(raw || '');
+
+  out = out.replace(/\bby\s*\[\s*quantifiable\s*%?\s*\]/gi, '');
+  out = out.replace(/\bof\s*\[\s*quantifiable\s*%?\s*\]/gi, '');
+  out = out.replace(/\[\s*quantifiable\s*%?\s*\]/gi, '');
+  out = out.replace(/\bquantifiable\s*%/gi, '');
+
+  out = out.replace(/\s{2,}/g, ' ');
+  out = out.replace(/\s+([,.;:])/g, '$1');
+  out = out.replace(/([(\[{])\s+/g, '$1');
+  out = out.replace(/\s+([)\]}])/g, '$1');
+
+  return out.trim();
+};
+
 export const refineContent = async (
     currentContent: string,
     instruction: string,
@@ -595,12 +611,15 @@ export const refineContent = async (
     CURRENT CONTENT: ${currentContent}
     USER INSTRUCTION: "${instruction}"
     CONTEXT: ${context.substring(0, 1000)}...
+    Rules:
+    - Do NOT output placeholders like [Quantifiable %] or any bracketed placeholders for numbers.
+    - If a metric is unknown, rewrite the sentence without a number (never insert a placeholder).
     Task: Rewrite content to satisfy user instruction. Output ONLY the updated document.
     `;
 
     try {
         const response = await generateWithFallback(MODEL_PRIMARY, prompt);
-        return cleanMarkdownOutput(response.response.text() || currentContent);
+        return sanitizeAiOutput(cleanMarkdownOutput(response.response.text() || currentContent));
     } catch (error: any) {
          console.error("Refine content failed:", error);
          throw new Error(getActionableError(error) || "Unable to refine content.");
@@ -619,12 +638,15 @@ export const regenerateSection = async (
     RESUME: ${currentContent}
     INSTRUCTION: "${instruction}"
     JD: ${jobDescription.substring(0, 1000)}...
+    Rules:
+    - Do NOT output placeholders like [Quantifiable %] or any bracketed placeholders for numbers.
+    - If a metric is unknown, rewrite without a number.
     Output the FULL updated resume markdown.
     `;
     
     try {
         const response = await generateWithFallback(MODEL_PRIMARY, prompt);
-        return cleanMarkdownOutput(response.response.text() || currentContent);
+        return sanitizeAiOutput(cleanMarkdownOutput(response.response.text() || currentContent));
     } catch (error: any) {
         console.error("Regenerate section failed:", error);
         throw new Error(getActionableError(error) || "Unable to regenerate section.");
@@ -998,6 +1020,8 @@ export const generateContent = async (
       - Single column layout, NO tables
       - Include: Summary, Experience, Education, Skills
       - Do NOT include Contact Info (it will be added separately)
+      - Do NOT use placeholders like [Quantifiable %] or any bracketed placeholders for metrics
+      - If a number is unknown, rewrite without numbers (never insert placeholders)
       
       **LANGUAGE:** ${langInstruction}
       
@@ -1209,7 +1233,7 @@ ${userPrompt}
     if (useJson) {
         return cleanJsonOutput(text);
     }
-    return cleanMarkdownOutput(text);
+    return sanitizeAiOutput(cleanMarkdownOutput(text));
 
   } catch (error: any) {
       console.error("Generation failed:", error);
