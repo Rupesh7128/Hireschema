@@ -43,7 +43,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const env = process.env || {};
-    const enabled = String(env.PROMO_BYPASS_ENABLED || '').toLowerCase() === 'true';
+    const vercelEnv = String(env.VERCEL_ENV || '').toLowerCase();
+    const nodeEnv = String(env.NODE_ENV || '').toLowerCase();
+    const isProduction = vercelEnv === 'production' || nodeEnv === 'production';
+    const enabled = String(env.PROMO_BYPASS_ENABLED || '').toLowerCase() === 'true' || !isProduction;
     if (!enabled) {
       res.status(200).json({ ok: true, redeemed: false, reason: 'Promo codes are currently disabled.' });
       return;
@@ -71,4 +74,3 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(500).json({ ok: false, redeemed: false, reason: 'Server error' });
   }
 }
-
