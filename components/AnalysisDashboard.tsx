@@ -18,6 +18,33 @@ interface AnalysisDashboardProps {
   onReScan?: () => void;
 }
 
+const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const dedupeCommaSegments = (value: string): string => {
+  const raw = (value || '').trim();
+  if (!raw) return raw;
+  if (!raw.includes(',')) return raw.replace(/\s+/g, ' ').trim();
+  const parts = raw.split(',').map(p => p.trim()).filter(Boolean);
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const part of parts) {
+    const key = part.toLowerCase().replace(/\s+/g, ' ').trim();
+    if (!key) continue;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(part);
+  }
+  return out.join(', ');
+};
+
+const formatOpportunityTitle = (jobTitle: string | undefined, company: string | undefined) => {
+  const base = dedupeCommaSegments(jobTitle || '');
+  if (!company) return base || 'Target Role';
+  const companyEsc = escapeRegExp(company.trim());
+  const cleaned = base.replace(new RegExp(`\\s*[\\/|\\-–—]\\s*${companyEsc}\\s*$`, 'i'), '').trim();
+  return cleaned || 'Target Role';
+};
+
 const ScoreRing = ({ value, label, icon: Icon, color = "orange", subtext }: { value: number, label: string, icon: any, color?: string, subtext?: string }) => {
   const radius = 28;
   const circumference = 2 * Math.PI * radius;
@@ -226,7 +253,7 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
               <span className="text-xs font-black text-zinc-500 uppercase tracking-[0.2em]">Target Opportunity</span>
             </div>
             <h1 className="text-2xl font-black text-white tracking-tight flex flex-wrap items-center gap-x-2">
-              {result.jobTitle || "Target Role"}
+              {formatOpportunityTitle(result.jobTitle, result.company)}
               {result.company && (
                 <>
                   <span className="text-zinc-700 mx-1">/</span>
