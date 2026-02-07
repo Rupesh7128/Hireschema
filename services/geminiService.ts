@@ -141,9 +141,9 @@ const resolveModelName = async (preferred: string[]): Promise<string> => {
 
 const NON_RESUME_MESSAGE = "That file screams 'not a resume.' Upload a real resume (PDF) and we’ll work our magic.";
 
-const isProbablyResume = (text: string): boolean => {
-    const t = (text || "").toLowerCase();
-    const lenOk = t.replace(/\s+/g, " ").length > 400;
+const getResumeSignals = (text: string) => {
+    const t = (text || '').toLowerCase();
+    const compactLen = t.replace(/\s+/g, ' ').trim().length;
     let hits = 0;
     if (/(experience|work history|employment)/i.test(t)) hits++;
     if (/(education|degree|b\. ?tech|bachelor|master)/i.test(t)) hits++;
@@ -152,7 +152,14 @@ const isProbablyResume = (text: string): boolean => {
     if (/[\w.-]+@[\w.-]+\.[a-z]{2,}/i.test(t)) hits++;
     if (/(linkedin\.com\/in\/)/i.test(t)) hits++;
     if (/(\+?\d[\d\-\s()]{7,}\d)/.test(t)) hits++;
-    return lenOk && hits >= 2;
+    return { hits, compactLen, lower: t };
+};
+
+const isDefinitelyNotResume = (text: string): boolean => {
+    const { hits, compactLen, lower } = getResumeSignals(text);
+    if (compactLen < 800) return false;
+    if (hits > 0) return false;
+    return /(invoice|receipt|statement|bank statement|terms of service|privacy policy|license agreement|user agreement|chapter|table of contents)/i.test(lower);
 };
 
 const getOpenAIKey = (): string => {
@@ -249,6 +256,7 @@ const generateWithFallback = async (
     const resolvedPrimary = await resolveModelName([primaryModelName, MODEL_PRIMARY, "gemini-1.5-pro", "gemini-1.5-flash"]);
     const jsonWanted = config?.generationConfig?.responseMimeType === 'application/json';
     const strPrompt = Array.isArray(prompt) ? JSON.stringify(prompt) : String(prompt);
+    const isMultimodalPrompt = Array.isArray(prompt);
     
     // Merge deterministic config with any provided config and safety settings
     const mergedConfig = {
@@ -261,7 +269,7 @@ const generateWithFallback = async (
     };
     
     const orKey = getOpenRouterKey();
-    if (orKey) {
+    if (orKey && !isMultimodalPrompt) {
         try {
             return await openrouterGenerateContent(strPrompt, jsonWanted);
         } catch (e) {
@@ -300,7 +308,7 @@ const generateWithFallback = async (
         }
         
         const openaiKey = getOpenAIKey();
-        if (openaiKey) {
+        if (openaiKey && !isMultimodalPrompt) {
             try {
                 console.log("[Gemini Service] Attempting fallback to OpenAI...");
                 return await openaiGenerateContent(strPrompt, jsonWanted);
@@ -409,22 +417,17 @@ export async function fetchJobDescriptionContent(url: string): Promise<string> {
 
 export async function extractTextFromPdf(base64Data: string): Promise<string> {
   try {
-    // Wait for PDF.js to be available
     let attempts = 0;
-    while (typeof (window as any).pdfjsLib === 'undefined' && attempts < 10) {
-      console.log('Waiting for PDF.js to load...');
+    while (typeof (window as any).pdfjsLib === 'undefined' && attempts < 80) {
       await new Promise(resolve => setTimeout(resolve, 100));
       attempts++;
     }
-    
+
     // @ts-ignore
     if (typeof window.pdfjsLib === 'undefined') {
-      console.error("PDF.js not loaded after waiting.");
-      throw new Error("PDF Parser not loaded. Please refresh the page and try again.");
+      throw new Error('PDF Parser not loaded. Please refresh the page and try again.');
     }
 
-    console.log('PDF.js is ready, extracting text...');
-    
     const binaryString = atob(base64Data);
     const len = binaryString.length;
     const bytes = new Uint8Array(len);
@@ -434,46 +437,120 @@ export async function extractTextFromPdf(base64Data: string): Promise<string> {
 
     // @ts-ignore
     const loadingTask = window.pdfjsLib.getDocument({ data: bytes });
-    
-    // Handle password protected files
-    loadingTask.onPassword = (updatePassword: any, reason: any) => {
-        throw new Error("PasswordException: PDF is encrypted");
-    };
-
     const pdf = await loadingTask.promise;
+    const maxPages = Math.min(pdf.numPages || 0, 50);
     let fullText = '';
-    const maxPages = Math.min(pdf.numPages, 15);
-    
-    console.log(`Extracting text from ${maxPages} pages...`);
-    
+
     for (let i = 1; i <= maxPages; i++) {
       const page = await pdf.getPage(i);
-      const textContent = await page.getTextContent();
-      
+
       // @ts-ignore
-      const pageText = textContent.items.map(item => item.str).join(' ');
-      
-      // Improved Regex to catch LinkedIn URLs specifically
+      const textContent = await page.getTextContent({ normalizeWhitespace: true });
+      // @ts-ignore
+      const items = (textContent.items || []) as Array<{ str?: string; hasEOL?: boolean }>;
+
+      const buf: string[] = [];
+      for (const item of items) {
+        const s = String(item?.str || '');
+        if (!s) continue;
+        buf.push(s);
+        buf.push(item?.hasEOL ? '\n' : ' ');
+      }
+
+      const pageTextRaw = buf.join('');
+      const pageText = pageTextRaw
+        .replace(/[ \t]+\n/g, '\n')
+        .replace(/\n{3,}/g, '\n\n')
+        .replace(/[ \t]{2,}/g, ' ')
+        .trim();
+
       const linkedinRegex = /linkedin\.com\/in\/[a-zA-Z0-9_-]+/gi;
       const links = pageText.match(linkedinRegex) || [];
       const uniqueLinks = [...new Set(links)];
-      
-      // Append links explicitly
       const linksText = uniqueLinks.length > 0 ? `\n\n[Metadata: ${uniqueLinks.join(', ')}]\n` : '';
 
-      fullText += pageText + linksText + '\n';
+      if (pageText) {
+        fullText += pageText + linksText + '\n';
+      }
     }
 
-    console.log(`Extracted ${fullText.length} characters from PDF`);
-    return fullText;
+    return fullText.trim();
   } catch (e: any) {
-    console.error("PDF Extraction Failed:", e);
-    if (e.name === 'PasswordException' || e.message.includes('Password')) {
-        return "Error: The PDF is password protected. Please remove the password and upload again.";
+    if (e?.name === 'PasswordException' || String(e?.message || '').toLowerCase().includes('password')) {
+      throw new Error('The PDF is password protected. Please remove the password and upload again.');
     }
-    return "Error parsing PDF. Please ensure the file is a standard text-based PDF.";
+    throw new Error('Error parsing PDF. Please ensure the file is a standard, text-based PDF.');
   }
 }
+
+const renderPdfPagesToPngBase64 = async (base64Data: string, pageLimit: number): Promise<string[]> => {
+  let attempts = 0;
+  while (typeof (window as any).pdfjsLib === 'undefined' && attempts < 80) {
+    await new Promise(resolve => setTimeout(resolve, 100));
+    attempts++;
+  }
+
+  // @ts-ignore
+  if (typeof window.pdfjsLib === 'undefined') {
+    throw new Error('PDF Parser not loaded. Please refresh the page and try again.');
+  }
+
+  const binaryString = atob(base64Data);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+
+  // @ts-ignore
+  const loadingTask = window.pdfjsLib.getDocument({ data: bytes });
+  const pdf = await loadingTask.promise;
+  const maxPages = Math.min(pdf.numPages || 0, Math.max(1, pageLimit));
+
+  const images: string[] = [];
+  for (let i = 1; i <= maxPages; i++) {
+    const page = await pdf.getPage(i);
+    // @ts-ignore
+    const viewport = page.getViewport({ scale: 2 });
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) continue;
+    canvas.width = Math.floor(viewport.width);
+    canvas.height = Math.floor(viewport.height);
+
+    // @ts-ignore
+    const renderTask = page.render({ canvasContext: ctx, viewport });
+    await renderTask.promise;
+
+    const dataUrl = canvas.toDataURL('image/png');
+    const base64 = (dataUrl.split(',')[1] || '').trim();
+    if (base64) images.push(base64);
+
+    canvas.width = 0;
+    canvas.height = 0;
+  }
+
+  return images;
+};
+
+const extractTextFromPdfWithVision = async (base64Data: string, pageLimit: number = 5): Promise<string> => {
+  const images = await renderPdfPagesToPngBase64(base64Data, pageLimit);
+  if (images.length === 0) return '';
+
+  const promptParts: any[] = [
+    {
+      text:
+        "Extract ALL resume text from these images. Preserve section headings and bullet points with newlines. Return plain text only (no JSON, no markdown)."
+    }
+  ];
+
+  for (const data of images) {
+    promptParts.push({ inlineData: { mimeType: 'image/png', data } });
+  }
+
+  const response = await generateWithFallback(MODEL_PRIMARY, promptParts, {});
+  return String(response?.response?.text?.() || '').trim();
+};
 
 export const calculateImprovedScore = async (
     generatedResumeText: string,
@@ -686,16 +763,33 @@ export const analyzeResume = async (
   }
 
   let resumeText = '';
-  try {
-    if ((resumeFile.type || '').includes('pdf')) {
+  if ((resumeFile.type || '').includes('pdf')) {
+    try {
       resumeText = await extractTextFromPdf(resumeFile.base64);
+    } catch (e: any) {
+      throw new Error(e?.message || 'Failed to read PDF.');
     }
-  } catch {}
+  }
   if ((resumeFile.type || '').startsWith('image/')) {
     throw new Error(NON_RESUME_MESSAGE);
   }
-  if (resumeText && !isProbablyResume(resumeText)) {
+  if (resumeText && isDefinitelyNotResume(resumeText)) {
     throw new Error(NON_RESUME_MESSAGE);
+  }
+
+  const { compactLen, hits } = getResumeSignals(resumeText);
+  if ((resumeFile.type || '').includes('pdf') && compactLen < 120) {
+    const visionText = await extractTextFromPdfWithVision(resumeFile.base64, 5);
+    if (visionText) {
+      resumeText = visionText;
+    } else {
+      throw new Error('Could not extract readable text from this PDF. If it is scanned, please export a text-based PDF and upload again.');
+    }
+  } else if (resumeText && compactLen < 250 && hits === 0) {
+    const visionText = await extractTextFromPdfWithVision(resumeFile.base64, 3);
+    if (visionText) {
+      resumeText = visionText;
+    }
   }
   
   const normalizeLanguageToken = (value: string) => {

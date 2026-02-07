@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Lock, ExternalLink, KeyRound, AlertTriangle, Loader2, XCircle, HelpCircle, RefreshCw } from 'lucide-react';
+import { Lock, ExternalLink } from 'lucide-react';
 import { logEvent } from '../services/analytics';
-import { verifyDodoPayment, buildCheckoutUrl, PRODUCT_ID } from '../services/paymentService';
+import { buildCheckoutUrl, PRODUCT_ID } from '../services/paymentService';
 
 interface PaymentLockProps {
   onPaymentVerified: () => void;
@@ -11,11 +11,7 @@ interface PaymentLockProps {
 }
 
 const PaymentLock: React.FC<PaymentLockProps> = ({ onPaymentVerified, onBeforeRedirect }) => {
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [licenseKey, setLicenseKey] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [attempts, setAttempts] = useState(0);
-  const [isLocked, setIsLocked] = useState(false);
 
   const handlePaymentClick = () => {
     logEvent('payment_link_clicked');
@@ -45,63 +41,6 @@ const PaymentLock: React.FC<PaymentLockProps> = ({ onPaymentVerified, onBeforeRe
     
     // Redirect to Dodo checkout
     window.location.href = checkoutUrl;
-  };
-
-  const handleVerify = async () => {
-    if (isLocked) return;
-
-    const cleanKey = licenseKey.trim();
-
-    // Bypass code check
-    if (cleanKey.toLowerCase() === 'getthejob') {
-      logEvent('payment_verify_success', { method: 'bypass_code' });
-      onPaymentVerified();
-      return;
-    }
-
-    if (attempts >= 5) {
-      setIsLocked(true);
-      setError('Too many failed attempts. Please refresh the page to try again.');
-      return;
-    }
-
-    setIsVerifying(true);
-    setError(null);
-    
-    try {
-      if (!cleanKey) {
-        throw new Error('Please enter your Payment ID.');
-      }
-
-      const res = await verifyDodoPayment(cleanKey);
-
-      if (res.ok && res.isPaid) {
-        logEvent('payment_verify_success', { method: 'manual' });
-        onPaymentVerified();
-      } else {
-        // Use the descriptive reason from the API
-        throw new Error(res.reason || 'Invalid Payment ID or payment not completed.');
-      }
-
-    } catch (e: any) {
-      setAttempts(prev => prev + 1);
-      setError(e.message || 'Verification failed. Please try again.');
-      logEvent('payment_verify_failed', { error: e.message, attempts: attempts + 1 });
-    } finally {
-      setIsVerifying(false);
-    }
-  };
-
-  const handleRetry = () => {
-    setError(null);
-    setLicenseKey('');
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && licenseKey && !isVerifying && !isLocked) {
-      e.preventDefault();
-      handleVerify();
-    }
   };
 
   return (
@@ -149,41 +88,13 @@ const PaymentLock: React.FC<PaymentLockProps> = ({ onPaymentVerified, onBeforeRe
                 <ExternalLink className="w-3 h-3" />
               </button>
             </div>
+          </div>
 
-            <div className="bg-zinc-950/50 p-3 rounded-lg border border-zinc-800/50 space-y-2 relative">
-              <div className="relative group">
-                <KeyRound className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-600 group-focus-within:text-orange-500 transition-colors" />
-                <input 
-                  type="text" 
-                  value={licenseKey}
-                  onChange={(e) => setLicenseKey(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Payment ID"
-                  disabled={isVerifying || isLocked}
-                  className={`w-full bg-zinc-900 border ${error ? 'border-red-500/50 focus:border-red-500' : 'border-zinc-700 focus:border-orange-500'} rounded-lg py-2 pl-9 pr-20 text-[11px] text-white focus:outline-none transition-all placeholder:text-zinc-700 font-mono disabled:opacity-50 touch-target`}
-                />
-                <button 
-                  onClick={handleVerify}
-                  disabled={isVerifying || !licenseKey || isLocked}
-                  className="absolute right-1 top-1 bottom-1 px-3 bg-zinc-800 hover:bg-zinc-700 active:bg-zinc-600 text-white font-mono font-bold text-[9px] uppercase tracking-widest transition-all rounded-sm disabled:opacity-50 border border-zinc-700"
-                >
-                  {isVerifying ? <Loader2 className="w-3 h-3 animate-spin" /> : 'VERIFY'}
-                </button>
-              </div>
-
-              {error && (
-                <div className="flex items-start gap-2 text-[10px] text-red-400 bg-red-950/20 p-2 rounded border border-red-900/30">
-                  <span className="leading-tight flex-1">{error}</span>
-                </div>
-              )}
+          {error && (
+            <div className="mt-4 flex items-start gap-2 text-[10px] text-red-400 bg-red-950/20 p-2 rounded border border-red-900/30">
+              <span className="leading-tight flex-1">{error}</span>
             </div>
-          </div>
-          
-          <div className="mt-4 text-center">
-            <p className="text-[9px] text-zinc-600">
-              Payment ID is in your Dodo Payments email receipt.
-            </p>
-          </div>
+          )}
         </div>
       </motion.div>
     </div>

@@ -14,8 +14,8 @@ import {
   buildCheckoutUrl,
   verifyDodoPayment,
   savePaymentState,
-  readPaymentState,
-  clearPaymentState,
+  isIdPaid,
+  clearAllPayments,
   PRODUCT_ID
 } from '../paymentService';
 
@@ -62,28 +62,30 @@ describe('End-to-End Payment Flow', () => {
       // In real flow, user would be redirected back with payment_id
       
       // Step 3: Verify payment state management
-      expect(readPaymentState()).toBe(false); // Initially not paid
+      const analysisId = 'analysis_123';
+      expect(isIdPaid(analysisId)).toBe(false); // Initially not paid
       
-      savePaymentState(true);
-      expect(readPaymentState()).toBe(true); // Now paid
+      savePaymentState(analysisId);
+      expect(isIdPaid(analysisId)).toBe(true); // Now paid
       
-      clearPaymentState();
-      expect(readPaymentState()).toBe(false); // Cleared
+      clearAllPayments();
+      expect(isIdPaid(analysisId)).toBe(false); // Cleared
     });
 
     it('handles payment state persistence across "sessions"', () => {
       // Simulate first session - user pays
-      savePaymentState(true);
-      expect(readPaymentState()).toBe(true);
+      const analysisId = 'analysis_456';
+      savePaymentState(analysisId);
+      expect(isIdPaid(analysisId)).toBe(true);
       
       // Simulate "new session" by reading state again
       // (localStorage persists)
-      const newSessionState = readPaymentState();
+      const newSessionState = isIdPaid(analysisId);
       expect(newSessionState).toBe(true);
       
       // User clears payment (e.g., for testing)
-      clearPaymentState();
-      expect(readPaymentState()).toBe(false);
+      clearAllPayments();
+      expect(isIdPaid(analysisId)).toBe(false);
     });
   });
 
@@ -108,18 +110,18 @@ describe('End-to-End Payment Flow', () => {
     it('multiple saves of same state have no additional effect', () => {
       fc.assert(
         fc.property(
-          fc.boolean(),
+          fc.string({ minLength: 1, maxLength: 64 }),
           fc.integer({ min: 1, max: 10 }),
-          (isPaid, repeatCount) => {
+          (analysisId, repeatCount) => {
             localStorageMock.clear();
             
             // Save the same state multiple times
             for (let i = 0; i < repeatCount; i++) {
-              savePaymentState(isPaid);
+              savePaymentState(analysisId);
             }
             
             // State should match what was saved
-            return readPaymentState() === isPaid;
+            return isIdPaid(analysisId) === true;
           }
         ),
         { numRuns: 50 }
@@ -131,18 +133,18 @@ describe('End-to-End Payment Flow', () => {
     it('clearing payment state always results in unpaid', () => {
       fc.assert(
         fc.property(
-          fc.boolean(),
-          (initialState) => {
+          fc.string({ minLength: 1, maxLength: 64 }),
+          (analysisId) => {
             localStorageMock.clear();
             
             // Set initial state
-            savePaymentState(initialState);
+            savePaymentState(analysisId);
             
             // Clear
-            clearPaymentState();
+            clearAllPayments();
             
             // Should always be false after clear
-            return readPaymentState() === false;
+            return isIdPaid(analysisId) === false;
           }
         ),
         { numRuns: 50 }

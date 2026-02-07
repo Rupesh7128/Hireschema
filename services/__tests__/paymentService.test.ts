@@ -2,9 +2,9 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import * as fc from 'fast-check'
 import { 
   buildCheckoutUrl, 
-  savePaymentState, 
-  readPaymentState, 
-  clearPaymentState 
+  savePaymentState,
+  isIdPaid,
+  clearAllPayments
 } from '../paymentService'
 
 // Mock localStorage for testing
@@ -128,42 +128,42 @@ describe('Payment Service', () => {
    * **Validates: Requirements 5.1, 5.3**
    */
   describe('Property 7: Payment state persistence round-trip', () => {
-    it('saving true and reading returns true', () => {
+    it('saving an id and reading returns true for that id', () => {
       fc.assert(
         fc.property(
-          fc.constant(true),
-          (isPaid) => {
-            savePaymentState(isPaid)
-            const result = readPaymentState()
-            expect(result).toBe(true)
+          fc.string({ minLength: 1, maxLength: 64 }),
+          (analysisId) => {
+            savePaymentState(analysisId)
+            expect(isIdPaid(analysisId)).toBe(true)
           }
         ),
         { numRuns: 100 }
       )
     })
 
-    it('saving false and reading returns false', () => {
+    it('does not mark different ids as paid', () => {
       fc.assert(
         fc.property(
-          fc.constant(false),
-          (isPaid) => {
-            savePaymentState(isPaid)
-            const result = readPaymentState()
-            expect(result).toBe(false)
+          fc.string({ minLength: 1, maxLength: 64 }),
+          fc.string({ minLength: 1, maxLength: 64 }),
+          (paidId, otherId) => {
+            fc.pre(paidId !== otherId)
+            localStorageMock.clear()
+            savePaymentState(paidId)
+            expect(isIdPaid(otherId)).toBe(false)
           }
         ),
         { numRuns: 100 }
       )
     })
 
-    it('round-trip preserves payment state', () => {
+    it('round-trip preserves paid status for id', () => {
       fc.assert(
         fc.property(
-          fc.boolean(),
-          (isPaid) => {
-            savePaymentState(isPaid)
-            const result = readPaymentState()
-            expect(result).toBe(isPaid)
+          fc.string({ minLength: 1, maxLength: 64 }),
+          (analysisId) => {
+            savePaymentState(analysisId)
+            expect(isIdPaid(analysisId)).toBe(true)
           }
         ),
         { numRuns: 100 }
@@ -173,12 +173,11 @@ describe('Payment Service', () => {
     it('clearing state resets to false', () => {
       fc.assert(
         fc.property(
-          fc.boolean(),
-          (isPaid) => {
-            savePaymentState(isPaid)
-            clearPaymentState()
-            const result = readPaymentState()
-            expect(result).toBe(false)
+          fc.string({ minLength: 1, maxLength: 64 }),
+          (analysisId) => {
+            savePaymentState(analysisId)
+            clearAllPayments()
+            expect(isIdPaid(analysisId)).toBe(false)
           }
         ),
         { numRuns: 100 }
@@ -187,8 +186,7 @@ describe('Payment Service', () => {
 
     it('default state is false when nothing saved', () => {
       localStorageMock.clear()
-      const result = readPaymentState()
-      expect(result).toBe(false)
+      expect(isIdPaid('any-id')).toBe(false)
     })
   })
 })

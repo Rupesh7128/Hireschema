@@ -409,7 +409,7 @@ export default function App() {
                     }
                 } else {
                     const msg = res.reason || 'Payment verification failed.';
-                    setError(`${msg} If you paid, please enter the Payment ID manually.`);
+                    setError(`${msg} If you paid, please wait a moment and check your email for the receipt.`);
                 }
             } catch (e) {
                 console.error('Payment verification error:', e);
