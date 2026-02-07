@@ -508,14 +508,14 @@ export const Editor: React.FC<EditorProps> = ({
             <div className="flex-1 flex overflow-hidden">
                 {/* --- MAIN PREVIEW AREA --- */}
                 <div className="flex-1 overflow-y-auto custom-scrollbar p-4 bg-black relative">
-                    <div className="max-w-[700px] mx-auto">
+                    <div className={`${activeTab === GeneratorType.ATS_RESUME ? 'max-w-[900px]' : 'max-w-[700px]'} mx-auto`}>
                         <AnimatePresence mode="wait">
                             <motion.div
                                 key={activeTab + (loadingStates[activeTab] ? 'loading' : 'content')}
                                 initial={{ opacity: 0, y: 15 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -15 }}
-                                className="bg-white border border-zinc-200 p-6 sm:p-12 rounded-sm shadow-2xl relative overflow-hidden min-h-[900px]"
+                                className={`relative overflow-hidden ${activeTab === GeneratorType.ATS_RESUME && !loadingStates[activeTab] && !isEditing && !isCompare && !!generatedData[activeTab] ? 'bg-transparent border-0 p-0 shadow-none min-h-[1123px]' : 'bg-white border border-zinc-200 p-6 sm:p-12 rounded-sm shadow-2xl min-h-[900px]'}`}
                             >
                                 {loadingStates[activeTab] ? (
                                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
@@ -535,7 +535,6 @@ export const Editor: React.FC<EditorProps> = ({
                                                     renderCompareView()
                                                 ) : (
                                                     <>
-                                                        {renderContactHeader()}
                                                         {activeError && !generatedData[activeTab] ? (
                                                             <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-900">
                                                                 <div className="text-xs font-black uppercase tracking-widest mb-2">Generation Failed</div>
@@ -560,7 +559,18 @@ export const Editor: React.FC<EditorProps> = ({
                                                                 </button>
                                                             </div>
                                                         ) : (
-                                                            renderMarkdown(generatedData[activeTab] || '')
+                                                            activeTab === GeneratorType.ATS_RESUME ? (
+                                                                <PdfTemplate
+                                                                    ref={pdfRef}
+                                                                    mode="preview"
+                                                                    content={generatedData[activeTab] || ''}
+                                                                    themeColor={accentColor.value}
+                                                                    profile={analysis.contactProfile}
+                                                                    showContactHeader
+                                                                />
+                                                            ) : (
+                                                                renderMarkdown(generatedData[activeTab] || '')
+                                                            )
                                                         )}
                                                     </>
                                                 )}
@@ -572,14 +582,15 @@ export const Editor: React.FC<EditorProps> = ({
                         </AnimatePresence>
                     </div>
 
-                    {/* Hidden PDF Template */}
-                    <PdfTemplate 
-                        ref={pdfRef} 
-                        content={generatedData[activeTab] || ''} 
-                        themeColor={accentColor.value} 
-                        profile={analysis.contactProfile}
-                        showContactHeader={activeTab === GeneratorType.ATS_RESUME}
-                    />
+                    {activeTab !== GeneratorType.ATS_RESUME && (
+                        <PdfTemplate
+                            ref={pdfRef}
+                            content={generatedData[activeTab] || ''}
+                            themeColor={accentColor.value}
+                            profile={analysis.contactProfile}
+                            showContactHeader={activeTab === GeneratorType.ATS_RESUME}
+                        />
+                    )}
                 </div>
 
                 {/* --- RIGHT CONTROL PANEL --- */}

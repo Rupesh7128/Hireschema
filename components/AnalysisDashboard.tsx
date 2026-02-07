@@ -320,6 +320,30 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
                     className="w-full bg-zinc-950 border border-zinc-700 rounded-md px-2 py-1 text-sm text-white font-bold focus:border-orange-500/50 outline-none"
                     placeholder="Full Name"
                   />
+                  <input
+                    value={editProfileData.email}
+                    onChange={e => setEditProfileData({ ...editProfileData, email: e.target.value })}
+                    className="w-full bg-zinc-950 border border-zinc-700 rounded-md px-2 py-1 text-sm text-white font-bold focus:border-orange-500/50 outline-none"
+                    placeholder="Email"
+                  />
+                  <input
+                    value={editProfileData.phone}
+                    onChange={e => setEditProfileData({ ...editProfileData, phone: e.target.value })}
+                    className="w-full bg-zinc-950 border border-zinc-700 rounded-md px-2 py-1 text-sm text-white font-bold focus:border-orange-500/50 outline-none"
+                    placeholder="Phone"
+                  />
+                  <input
+                    value={editProfileData.linkedin}
+                    onChange={e => setEditProfileData({ ...editProfileData, linkedin: e.target.value })}
+                    className="w-full bg-zinc-950 border border-zinc-700 rounded-md px-2 py-1 text-sm text-white font-bold focus:border-orange-500/50 outline-none"
+                    placeholder="LinkedIn URL"
+                  />
+                  <input
+                    value={editProfileData.location}
+                    onChange={e => setEditProfileData({ ...editProfileData, location: e.target.value })}
+                    className="w-full bg-zinc-950 border border-zinc-700 rounded-md px-2 py-1 text-sm text-white font-bold focus:border-orange-500/50 outline-none"
+                    placeholder="Location"
+                  />
                 </div>
               ) : (
                 <div className="space-y-0.5">
@@ -334,6 +358,24 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
                       <div className="flex items-center gap-1.5 text-sm text-zinc-500 font-bold">
                         <Mail className="w-2.5 h-2.5 text-zinc-700" />
                         {result.contactProfile.email}
+                      </div>
+                    )}
+                    {result.contactProfile.phone && (
+                      <div className="flex items-center gap-1.5 text-sm text-zinc-500 font-bold">
+                        <Phone className="w-2.5 h-2.5 text-zinc-700" />
+                        {result.contactProfile.phone}
+                      </div>
+                    )}
+                    {result.contactProfile.linkedin && (
+                      <div className="flex items-center gap-1.5 text-sm text-zinc-500 font-bold">
+                        <Linkedin className="w-2.5 h-2.5 text-zinc-700" />
+                        {result.contactProfile.linkedin}
+                      </div>
+                    )}
+                    {result.contactProfile.location && (
+                      <div className="flex items-center gap-1.5 text-sm text-zinc-500 font-bold">
+                        <MapPin className="w-2.5 h-2.5 text-zinc-700" />
+                        {result.contactProfile.location}
                       </div>
                     )}
                   </div>

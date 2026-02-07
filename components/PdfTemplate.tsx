@@ -8,6 +8,7 @@ interface PdfTemplateProps {
   themeColor?: string;
   profile?: ContactProfile;
   showContactHeader?: boolean;
+  mode?: 'export' | 'preview';
 }
 
 const isMeaningfulText = (value: string) => {
@@ -43,14 +44,30 @@ const looksLikeContactLine = (line: string) => {
   return hasSeparator || (hasEmail && hasPhone) || (hasLinkedIn && (hasEmail || hasPhone));
 };
 
-const stripLeadingContactInfo = (raw: string) => {
+const stripLeadingNameAndContactInfo = (raw: string, name: string) => {
   const lines = raw.split(/\r?\n/);
   let firstNonEmpty = 0;
   while (firstNonEmpty < lines.length && lines[firstNonEmpty].trim() === '') firstNonEmpty += 1;
 
   const firstLine = lines[firstNonEmpty] ?? '';
   const startsWithHeading = /^\s*#{1,6}\s+/.test(firstLine);
-  const candidateIndex = startsWithHeading ? firstNonEmpty + 1 : firstNonEmpty;
+  const headingText = startsWithHeading ? firstLine.replace(/^\s*#{1,6}\s+/, '').trim() : '';
+  const normalizedName = (name || '').trim().toLowerCase();
+
+  if (normalizedName) {
+    if (headingText && headingText.toLowerCase() === normalizedName) {
+      lines.splice(firstNonEmpty, 1);
+      while (firstNonEmpty < lines.length && lines[firstNonEmpty].trim() === '') lines.splice(firstNonEmpty, 1);
+    } else if (!startsWithHeading && firstLine.trim().toLowerCase() === normalizedName) {
+      lines.splice(firstNonEmpty, 1);
+      while (firstNonEmpty < lines.length && lines[firstNonEmpty].trim() === '') lines.splice(firstNonEmpty, 1);
+    }
+  }
+
+  while (firstNonEmpty < lines.length && lines[firstNonEmpty].trim() === '') firstNonEmpty += 1;
+  const nextLine = lines[firstNonEmpty] ?? '';
+  const nextStartsWithHeading = /^\s*#{1,6}\s+/.test(nextLine);
+  const candidateIndex = nextStartsWithHeading ? firstNonEmpty + 1 : firstNonEmpty;
   const candidateLine = lines[candidateIndex] ?? '';
 
   if (looksLikeContactLine(candidateLine)) {
@@ -61,17 +78,19 @@ const stripLeadingContactInfo = (raw: string) => {
   return lines.join('\n');
 };
 
-export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ content, themeColor = '#ea580c', profile, showContactHeader = true }, ref) => {
+export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ content, themeColor = '#ea580c', profile, showContactHeader = true, mode = 'export' }, ref) => {
   const name = (profile?.name || '').trim();
   const email = (profile?.email || '').trim();
   const phone = (profile?.phone || '').trim();
   const linkedin = (profile?.linkedin || '').trim();
   const location = (profile?.location || '').trim();
+  const photo = (profile?.photo || '').trim();
 
   const hasEmail = isMeaningfulText(email);
   const hasPhone = isMeaningfulText(phone);
   const hasLocation = isMeaningfulText(location);
   const hasLinkedin = isMeaningfulText(linkedin);
+  const hasPhoto = isMeaningfulText(photo);
 
   const contactItems: Array<{ key: string; node: React.ReactNode }> = [
     hasPhone
@@ -94,42 +113,81 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
   ].filter(Boolean) as Array<{ key: string; node: React.ReactNode }>;
 
   const hasContactInfo = contactItems.length > 0 || !!name;
-  const contentToRender = showContactHeader && hasContactInfo ? stripLeadingContactInfo(content) : content;
-  const contentStartsWithHeading = /^\s*#{1,6}\s+/m.test(content.trimStart());
+  const contentToRender = showContactHeader && hasContactInfo ? stripLeadingNameAndContactInfo(content, name) : content;
+
+  const pageRef = React.useRef<HTMLDivElement | null>(null);
+  const contentBlockRef = React.useRef<HTMLDivElement | null>(null);
+  const [scale, setScale] = React.useState(1);
+
+  const setCombinedRef = React.useCallback((node: HTMLDivElement | null) => {
+    pageRef.current = node;
+    if (typeof ref === 'function') ref(node);
+    else if (ref) (ref as any).current = node;
+  }, [ref]);
+
+  React.useLayoutEffect(() => {
+    setScale(1);
+    const id = requestAnimationFrame(() => {
+      const page = pageRef.current;
+      const block = contentBlockRef.current;
+      if (!page || !block) return;
+      const available = page.clientHeight;
+      const needed = block.scrollHeight;
+      if (!available || !needed) return;
+      if (needed <= available) return;
+      const next = Math.max(0.6, Math.min(1, available / needed));
+      setScale(next);
+    });
+    return () => cancelAnimationFrame(id);
+  }, [contentToRender, name, email, phone, linkedin, location, photo, showContactHeader, themeColor, mode]);
+
+  const outerStyle =
+    mode === 'export'
+      ? {
+          position: 'fixed' as const,
+          top: '0',
+          left: '0',
+          transform: 'translateX(-10000px)',
+          width: '210mm',
+          height: 'auto',
+          overflow: 'visible',
+          zIndex: -100,
+          pointerEvents: 'none' as const
+        }
+      : {
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'center'
+        };
+
   return (
-    <div style={{ 
-      position: 'fixed', 
-      top: '0', 
-      left: '0', 
-      transform: 'translateX(-10000px)',
-      width: '210mm', 
-      height: 'auto',
-      overflow: 'visible',
-      zIndex: -100,
-      pointerEvents: 'none'
-    }}>
+    <div style={outerStyle}>
       <div 
-        ref={ref} 
+        ref={setCombinedRef} 
         className="pdf-export-container" 
         style={{ 
           backgroundColor: '#ffffff',
           color: '#000000',
-          padding: '20mm 25mm 28mm',
+          padding: '18mm 18mm 18mm',
           width: '210mm',
-          minHeight: '297mm',
+          height: '297mm',
           fontFamily: "'Inter', 'Helvetica', 'Arial', sans-serif",
           fontSize: '10.5pt',
           lineHeight: '1.5',
-          boxSizing: 'border-box'
+          boxSizing: 'border-box',
+          overflow: 'hidden'
         }}
       >
         <style>{`
           .pdf-export-container { box-sizing: border-box; background: white; }
-          .pdf-contact-header { margin: 0 0 14px 0; }
+          .pdf-content-block { transform-origin: top left; }
+          .pdf-contact-header { margin: 0 0 14px 0; display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; }
+          .pdf-contact-meta { min-width: 0; flex: 1; }
           .pdf-contact-name { font-size: 24pt; font-weight: 900; letter-spacing: -0.04em; line-height: 1.1; margin: 0 0 6px 0; color: #000000 !important; text-transform: uppercase; border-bottom: 3.5px solid ${themeColor}; padding-bottom: 8px; }
           .pdf-contact-line { font-size: 10pt; color: #222222 !important; margin: 0; line-height: 1.35; }
           .pdf-contact-sep { color: #9ca3af !important; padding: 0 6px; }
           .pdf-contact-line a { color: #111111 !important; text-decoration: none; }
+          .pdf-contact-photo { width: 52px; height: 52px; border-radius: 10px; object-fit: cover; border: 1px solid #e5e7eb; flex: 0 0 auto; }
           .pdf-export-container h1 { 
             font-size: 28pt; 
             font-weight: 900; 
@@ -188,23 +246,35 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
           }
           .pdf-export-container p, .pdf-export-container li { overflow-wrap: anywhere; word-break: break-word; }
         `}</style>
-        {showContactHeader && hasContactInfo && (
-          <div className="pdf-contact-header">
-            {name && !contentStartsWithHeading && <div className="pdf-contact-name">{name}</div>}
-            {contactItems.length > 0 && (
-              <p className="pdf-contact-line">
-                {contactItems.map((item, idx) => (
-                  <React.Fragment key={item.key}>
-                    {idx > 0 && <span className="pdf-contact-sep">•</span>}
-                    {item.node}
-                  </React.Fragment>
-                ))}
-              </p>
-            )}
-          </div>
-        )}
-        <ReactMarkdown>{contentToRender}</ReactMarkdown>
-        <div style={{ height: '10mm' }} />
+        <div
+          ref={contentBlockRef}
+          className="pdf-content-block"
+          style={{
+            transform: scale < 1 ? `scale(${scale})` : undefined,
+            width: scale < 1 ? `${(100 / scale).toFixed(6)}%` : '100%'
+          }}
+        >
+          {showContactHeader && hasContactInfo && (
+            <div className="pdf-contact-header">
+              <div className="pdf-contact-meta">
+                {name && <div className="pdf-contact-name">{name}</div>}
+                {contactItems.length > 0 && (
+                  <p className="pdf-contact-line">
+                    {contactItems.map((item, idx) => (
+                      <React.Fragment key={item.key}>
+                        {idx > 0 && <span className="pdf-contact-sep">•</span>}
+                        {item.node}
+                      </React.Fragment>
+                    ))}
+                  </p>
+                )}
+              </div>
+              {hasPhoto && <img className="pdf-contact-photo" src={photo} alt="Profile" />}
+            </div>
+          )}
+          <ReactMarkdown>{contentToRender}</ReactMarkdown>
+          <div style={{ height: '12mm' }} />
+        </div>
       </div>
     </div>
   );
