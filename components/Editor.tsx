@@ -66,8 +66,7 @@ export const Editor: React.FC<EditorProps> = ({
     const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
     const [chatInput, setChatInput] = useState("");
     const [isRefining, setIsRefining] = useState(false);
-    const [refineOverlayLabel, setRefineOverlayLabel] = useState<string | null>(null);
-    const [refineOverlaySource, setRefineOverlaySource] = useState<'tool' | 'chat' | null>(null);
+    const [refineLabel, setRefineLabel] = useState<string>("");
     const [localResumeText, setLocalResumeText] = useState(resumeText);
     const [isEditing, setIsEditing] = useState(false);
     const [isCompare, setIsCompare] = useState(false);
@@ -285,6 +284,11 @@ export const Editor: React.FC<EditorProps> = ({
     }, [activeTab, isPaid, localResumeText, appLanguage]);
 
     useEffect(() => {
+        if (!isPaid) return;
+        setActiveTab(GeneratorType.ATS_RESUME);
+    }, [isPaid]);
+
+    useEffect(() => {
         if (isEditing) setIsCompare(false);
     }, [isEditing]);
 
@@ -295,7 +299,7 @@ export const Editor: React.FC<EditorProps> = ({
     const activeError = generationErrors[activeTab] || '';
 
     // --- ACTIONS ---
-    const handleRefine = async (customPrompt?: string, meta?: { source?: 'tool' | 'chat'; label?: string }) => {
+    const handleRefine = async (customPrompt?: string, label?: string) => {
         const prompt = customPrompt || chatInput;
         console.log('[Editor] handleRefine called with prompt:', prompt);
         console.log('[Editor] Current activeTab:', activeTab);
@@ -306,10 +310,8 @@ export const Editor: React.FC<EditorProps> = ({
             return;
         }
 
-        const source = meta?.source || (customPrompt ? 'tool' : 'chat');
-        setRefineOverlaySource(source);
-        setRefineOverlayLabel(meta?.label || (source === 'tool' ? 'Optimizing' : 'Refining'));
         setIsRefining(true);
+        setRefineLabel(label || 'Optimizing');
         try {
             console.log('[Editor] Calling refineContent...');
             const newContent = await refineContent(generatedData[activeTab], prompt, jobDescription);
@@ -324,8 +326,7 @@ export const Editor: React.FC<EditorProps> = ({
             console.error('[Editor] handleRefine failed:', err);
         } finally {
             setIsRefining(false);
-            setRefineOverlayLabel(null);
-            setRefineOverlaySource(null);
+            setRefineLabel("");
         }
     };
 
@@ -524,46 +525,28 @@ export const Editor: React.FC<EditorProps> = ({
                                 exit={{ opacity: 0, y: -15 }}
                                 className={`relative overflow-hidden ${activeTab === GeneratorType.ATS_RESUME && !loadingStates[activeTab] && !isEditing && !isCompare && !!generatedData[activeTab] ? 'bg-transparent border-0 p-0 shadow-none min-h-[1123px]' : 'bg-white border border-zinc-200 p-6 sm:p-12 rounded-sm shadow-2xl min-h-[900px]'}`}
                             >
-                                {isRefining && refineOverlaySource === 'tool' && (
-                                    <motion.div
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        className="absolute inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center"
-                                    >
-                                        <div className="relative w-full max-w-md mx-6">
-                                            <div className="absolute inset-0 rounded-2xl bg-orange-500/10 blur-2xl" />
-                                            <div className="relative bg-zinc-950/80 border border-orange-500/20 rounded-2xl p-6 overflow-hidden">
-                                                <motion.div
-                                                    className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-orange-500 to-transparent"
-                                                    initial={{ top: 0, opacity: 0.9 }}
-                                                    animate={{ top: ['0%', '100%'], opacity: [0.3, 0.9, 0.3] }}
-                                                    transition={{ duration: 1.4, repeat: Infinity, ease: 'linear' }}
-                                                />
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
-                                                        <Sparkles className="w-4 h-4 text-orange-500" />
-                                                    </div>
-                                                    <div className="min-w-0">
-                                                        <div className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">AI</div>
-                                                        <div className="text-sm font-black text-white tracking-tight">{refineOverlayLabel || 'Optimizing'}</div>
-                                                    </div>
-                                                    <div className="ml-auto flex items-center gap-2 text-zinc-400">
-                                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                                        <span className="text-[10px] font-black uppercase tracking-widest">Scanning</span>
-                                                    </div>
+                                {isRefining && (
+                                    <div className="absolute inset-0 z-[60] bg-white/90 backdrop-blur-sm flex items-center justify-center p-6">
+                                        <div className="w-full max-w-sm">
+                                            <div className="bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden shadow-2xl">
+                                                <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
+                                                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">AI Processing</div>
+                                                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500">{refineLabel || 'Optimizing'}</div>
                                                 </div>
-                                                <div className="mt-4 h-2 bg-white/5 rounded-full overflow-hidden">
-                                                    <motion.div
-                                                        className="h-full bg-gradient-to-r from-orange-500/30 via-orange-500 to-orange-500/30"
-                                                        initial={{ x: '-60%' }}
-                                                        animate={{ x: ['-60%', '60%'] }}
-                                                        transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
-                                                    />
+                                                <div className="relative h-28">
+                                                    <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-transparent" />
+                                                    <div className="absolute top-0 left-0 w-full h-1 bg-orange-500/50 shadow-[0_0_10px_rgba(249,115,22,0.5)] animate-[scan_2s_ease-in-out_infinite]" />
+                                                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+                                                        <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
+                                                            <Loader2 className="w-5 h-5 text-orange-500 animate-spin" />
+                                                        </div>
+                                                        <div className="text-xs font-black uppercase tracking-widest text-white">{refineLabel || 'Optimizing'}</div>
+                                                        <div className="text-[10px] text-zinc-500 font-mono">Scanning & rewriting…</div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </motion.div>
+                                    </div>
                                 )}
                                 {loadingStates[activeTab] ? (
                                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
@@ -636,7 +619,7 @@ export const Editor: React.FC<EditorProps> = ({
                             content={generatedData[activeTab] || ''}
                             themeColor={accentColor.value}
                             profile={analysis.contactProfile}
-                            showContactHeader={activeTab === GeneratorType.ATS_RESUME}
+                            showContactHeader={false}
                         />
                     )}
                 </div>
@@ -650,7 +633,7 @@ export const Editor: React.FC<EditorProps> = ({
                             {QUICK_ACTIONS.map(action => (
                                 <button
                                     key={action.id}
-                                    onClick={() => handleRefine(action.prompt, { source: 'tool', label: action.label })}
+                                    onClick={() => handleRefine(action.prompt, action.label)}
                                     disabled={isRefining || loadingStates[activeTab] || !generatedData[activeTab]}
                                     className="w-full group flex items-center gap-2.5 p-2.5 bg-zinc-900/50 border border-white/5 rounded-lg hover:border-orange-500/50 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
@@ -700,7 +683,7 @@ export const Editor: React.FC<EditorProps> = ({
                                 className="w-full bg-zinc-900/50 border border-white/5 rounded-lg p-2.5 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-orange-500/50 resize-none h-20 transition-all"
                             />
                             <button
-                                onClick={() => handleRefine(undefined, { source: 'chat', label: 'Refining' })}
+                                onClick={() => handleRefine(undefined, 'Custom')}
                                 disabled={isRefining || !chatInput.trim()}
                                 className="absolute bottom-2 right-2 p-1 bg-orange-600 rounded-md text-white hover:bg-orange-500 disabled:opacity-50 transition-all"
                             >

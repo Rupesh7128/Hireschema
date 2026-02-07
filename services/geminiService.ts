@@ -356,12 +356,23 @@ const safeJson = (text: string): any => {
 
 // Helper to remove conversational filler
 const cleanMarkdownOutput = (text: string): string => {
+    const removeQuantifiablePlaceholders = (value: string) => {
+        const cleaned = String(value || '')
+            .replace(/\[\s*quantifiable\s*%?\s*\]/gi, '')
+            .replace(/\[\s*quantifiable[^\]]*\]/gi, '')
+            .replace(/\(\s*\)/g, '')
+            .replace(/\s{2,}/g, ' ')
+            .replace(/\s+([,.;:])/g, '$1')
+            .replace(/([,.;:])([A-Za-z])/g, '$1 $2');
+        return cleaned;
+    };
+
     // If text starts with "Here is...", remove it until the first header or bold
     const firstHeader = text.search(/^(#{1,3}\s|\*\*|<div)/m);
     if (firstHeader !== -1) {
-        return text.substring(firstHeader);
+        return removeQuantifiablePlaceholders(text.substring(firstHeader));
     }
-    return text;
+    return removeQuantifiablePlaceholders(text);
 };
 
 const getActionableError = (error: any): string => {
@@ -585,22 +596,6 @@ export const calculateImprovedScore = async (
     }
 }
 
-const sanitizeAiOutput = (raw: string): string => {
-  let out = String(raw || '');
-
-  out = out.replace(/\bby\s*\[\s*quantifiable\s*%?\s*\]/gi, '');
-  out = out.replace(/\bof\s*\[\s*quantifiable\s*%?\s*\]/gi, '');
-  out = out.replace(/\[\s*quantifiable\s*%?\s*\]/gi, '');
-  out = out.replace(/\bquantifiable\s*%/gi, '');
-
-  out = out.replace(/\s{2,}/g, ' ');
-  out = out.replace(/\s+([,.;:])/g, '$1');
-  out = out.replace(/([(\[{])\s+/g, '$1');
-  out = out.replace(/\s+([)\]}])/g, '$1');
-
-  return out.trim();
-};
-
 export const refineContent = async (
     currentContent: string,
     instruction: string,
@@ -611,15 +606,15 @@ export const refineContent = async (
     CURRENT CONTENT: ${currentContent}
     USER INSTRUCTION: "${instruction}"
     CONTEXT: ${context.substring(0, 1000)}...
-    Rules:
-    - Do NOT output placeholders like [Quantifiable %] or any bracketed placeholders for numbers.
-    - If a metric is unknown, rewrite the sentence without a number (never insert a placeholder).
+    CONSTRAINTS:
+    - Do NOT use placeholders like [Quantifiable %], [Insert], [TBD], or bracket placeholders.
+    - If a metric is unknown, omit it instead of inserting a placeholder.
     Task: Rewrite content to satisfy user instruction. Output ONLY the updated document.
     `;
 
     try {
         const response = await generateWithFallback(MODEL_PRIMARY, prompt);
-        return sanitizeAiOutput(cleanMarkdownOutput(response.response.text() || currentContent));
+        return cleanMarkdownOutput(response.response.text() || currentContent);
     } catch (error: any) {
          console.error("Refine content failed:", error);
          throw new Error(getActionableError(error) || "Unable to refine content.");
@@ -638,15 +633,15 @@ export const regenerateSection = async (
     RESUME: ${currentContent}
     INSTRUCTION: "${instruction}"
     JD: ${jobDescription.substring(0, 1000)}...
-    Rules:
-    - Do NOT output placeholders like [Quantifiable %] or any bracketed placeholders for numbers.
-    - If a metric is unknown, rewrite without a number.
+    CONSTRAINTS:
+    - Do NOT use placeholders like [Quantifiable %], [Insert], [TBD], or bracket placeholders.
+    - If a metric is unknown, omit it instead of inserting a placeholder.
     Output the FULL updated resume markdown.
     `;
     
     try {
         const response = await generateWithFallback(MODEL_PRIMARY, prompt);
-        return sanitizeAiOutput(cleanMarkdownOutput(response.response.text() || currentContent));
+        return cleanMarkdownOutput(response.response.text() || currentContent);
     } catch (error: any) {
         console.error("Regenerate section failed:", error);
         throw new Error(getActionableError(error) || "Unable to regenerate section.");
@@ -997,6 +992,7 @@ export const generateContent = async (
       • Add ANY skills not mentioned in the original resume
       • Add ANY metrics/numbers not in the original resume
       • Add ANY certifications not in the original resume
+      • Output placeholders like [Quantifiable %], [Insert X], [TBD], or any bracket placeholders
       
       YOU MUST:
       • Copy the candidate's NAME exactly as shown
@@ -1020,8 +1016,7 @@ export const generateContent = async (
       - Single column layout, NO tables
       - Include: Summary, Experience, Education, Skills
       - Do NOT include Contact Info (it will be added separately)
-      - Do NOT use placeholders like [Quantifiable %] or any bracketed placeholders for metrics
-      - If a number is unknown, rewrite without numbers (never insert placeholders)
+      - If you cannot quantify something, OMIT the metric (do not use placeholders).
       
       **LANGUAGE:** ${langInstruction}
       
@@ -1208,7 +1203,7 @@ Using limited profile data from analysis:
 - Contact: ${JSON.stringify(analysis.contactProfile || {})}
 
 Since original resume is unavailable, create a TEMPLATE with placeholders.
-Use [Company Name], [Job Title], [School Name] as placeholders.
+Use <Company Name>, <Job Title>, <School Name> as placeholders.
 --------------------------------------------------------------------------------
 `;
 
@@ -1233,7 +1228,7 @@ ${userPrompt}
     if (useJson) {
         return cleanJsonOutput(text);
     }
-    return sanitizeAiOutput(cleanMarkdownOutput(text));
+    return cleanMarkdownOutput(text);
 
   } catch (error: any) {
       console.error("Generation failed:", error);
