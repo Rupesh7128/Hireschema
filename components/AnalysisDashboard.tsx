@@ -27,12 +27,22 @@ const dedupeCommaSegments = (value: string): string => {
   const parts = raw.split(',').map(p => p.trim()).filter(Boolean);
   const seen = new Set<string>();
   const out: string[] = [];
+  const keptNorm: string[] = [];
+  const endsWithWholeSegment = (container: string, segment: string) => {
+    if (!container || !segment) return false;
+    if (!container.endsWith(segment)) return false;
+    if (container.length === segment.length) return true;
+    const boundaryChar = container[container.length - segment.length - 1] || '';
+    return !/[a-z0-9]/i.test(boundaryChar);
+  };
   for (const part of parts) {
     const key = part.toLowerCase().replace(/\s+/g, ' ').trim();
     if (!key) continue;
     if (seen.has(key)) continue;
+    if (keptNorm.some(prev => endsWithWholeSegment(prev, key))) continue;
     seen.add(key);
     out.push(part);
+    keptNorm.push(key);
   }
   return out.join(', ');
 };
