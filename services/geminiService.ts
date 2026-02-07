@@ -1012,7 +1012,7 @@ export const generateContent = async (
       
       **OUTPUT FORMAT (Rich Text 2.0, ATS-Optimized, One Page):**
       - Output ONLY valid Markdown (no HTML).
-      - Use: ## for section headers, ### for role entries, - for bullets.
+      - Use: ## for section headers, ### for role/education entries, - for bullets.
       - Single column layout. NO tables. NO multi-column formatting. NO icons. NO images.
       - Sections MUST be clearly separated by a blank line and a ## header.
       - Required section order (use these exact headers):
@@ -1020,13 +1020,27 @@ export const generateContent = async (
         2) ## EXPERIENCE
         3) ## SKILLS
         4) ## EDUCATION
+      
+      **CRITICAL - FORMATTING RULES:**
+      1. **EXPERIENCE ENTRIES**: Must use this EXACT format with pipes (|):
+         ### Job Title | Company Name | Date Range | Location
+         (Example: ### Senior Engineer | Google | 2020-Present | New York, NY)
+      
+      2. **EDUCATION ENTRIES**: Must use this EXACT format with pipes (|):
+         ### Degree Name | School Name | Date Range | Location
+         (Example: ### BS Computer Science | University of Wisconsin | 2014-2018 | Madison, WI)
+      
+      3. **SKILLS**:
+         - Use "## SKILLS" header.
+         - Group skills by category if possible (e.g., "**Leadership:** Speaking, Fundraising...").
+         - Keep it compact.
+
       - CRITICAL: Do NOT include the candidate NAME in the Markdown (it will be rendered separately).
       - Contact info will be rendered separately; DO NOT include phone/email/location/links in the Markdown.
       - The first non-empty line MUST be: ## SUMMARY
       - Keep it strictly ONE PAGE:
         - SUMMARY: 2-3 lines max (no bullets)
         - EXPERIENCE: include the most relevant roles; max 3 roles; max 3 bullets per role; keep bullets 1 line when possible
-        - SKILLS: compact (comma-separated or short grouped lines), no long paragraphs
         - EDUCATION: 1-2 lines per entry, no bullets unless essential
       - If you cannot quantify something, OMIT the metric (do not use placeholders).
       

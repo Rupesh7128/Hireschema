@@ -78,34 +78,60 @@ const stripLeadingNameAndContactInfo = (raw: string, name: string) => {
   return lines.join('\n');
 };
 
-export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ content, themeColor = '#ea580c', profile, showContactHeader = true, mode = 'export' }, ref) => {
+const CustomH3 = ({ children }: { children: React.ReactNode }) => {
+  // If children is a string containing pipes, parse it
+  const text = typeof children === 'string' ? children : '';
+  if (text && text.includes('|')) {
+    const parts = text.split('|').map(p => p.trim());
+    
+    // Format: Job Title | Company | Date | Location
+    if (parts.length >= 3) {
+      const title = parts[0];
+      const company = parts[1];
+      const date = parts[2];
+      const location = parts[3] || '';
+
+      return (
+        <div className="pdf-job-header">
+          <div className="pdf-job-row">
+            <span className="pdf-job-title">{title}</span>
+            <span className="pdf-job-date">{date}{location ? `, ${location}` : ''}</span>
+          </div>
+          <div className="pdf-job-company">{company}</div>
+        </div>
+      );
+    }
+  }
+  return <h3>{children}</h3>;
+};
+
+export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ content, themeColor = '#374151', profile, showContactHeader = true, mode = 'export' }, ref) => {
   const name = (profile?.name || '').trim();
   const email = (profile?.email || '').trim();
   const phone = (profile?.phone || '').trim();
   const linkedin = (profile?.linkedin || '').trim();
   const location = (profile?.location || '').trim();
-  const photo = (profile?.photo || '').trim();
-
+  // We generally hide photo for this specific professional template style as per image, but keeping logic if needed
+  
   const hasEmail = isMeaningfulText(email);
   const hasPhone = isMeaningfulText(phone);
   const hasLocation = isMeaningfulText(location);
   const hasLinkedin = isMeaningfulText(linkedin);
-  const hasPhoto = isMeaningfulText(photo);
 
   const contactItems: Array<{ key: string; node: React.ReactNode }> = [
-    hasPhone
-      ? { key: 'phone', node: <a href={toTelHref(phone)}>{phone}</a> }
-      : null,
+    hasLocation ? { key: 'location', node: <span>{location}</span> } : null,
     hasEmail
       ? { key: 'email', node: <a href={`mailto:${email}`}>{email}</a> }
       : null,
-    hasLocation ? { key: 'location', node: <span>{location}</span> } : null,
+    hasPhone
+      ? { key: 'phone', node: <a href={toTelHref(phone)}>{phone}</a> }
+      : null,
     hasLinkedin
       ? {
           key: 'linkedin',
           node: (
             <a href={normalizeUrl(linkedin)} target="_blank" rel="noopener noreferrer">
-              LinkedIn
+              {linkedin.replace(/^https?:\/\/(www\.)?/, '')}
             </a>
           )
         }
@@ -139,7 +165,7 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
       setScale(next);
     });
     return () => cancelAnimationFrame(id);
-  }, [contentToRender, name, email, phone, linkedin, location, photo, showContactHeader, themeColor, mode]);
+  }, [contentToRender, name, email, phone, linkedin, location, showContactHeader, themeColor, mode]);
 
   const outerStyle =
     mode === 'export'
@@ -168,12 +194,12 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
         style={{ 
           backgroundColor: '#ffffff',
           color: '#000000',
-          padding: '14mm 14mm 14mm',
+          padding: '14mm 16mm',
           width: '210mm',
           height: '297mm',
           fontFamily: "'Inter', 'Helvetica', 'Arial', sans-serif",
-          fontSize: '10.75pt',
-          lineHeight: '1.38',
+          fontSize: '10pt',
+          lineHeight: '1.4',
           boxSizing: 'border-box',
           overflow: 'hidden'
         }}
@@ -181,65 +207,90 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
         <style>{`
           .pdf-export-container { box-sizing: border-box; background: white; }
           .pdf-content-block { transform-origin: top left; }
-          .pdf-contact-header { margin: 0 0 14px 0; display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; }
-          .pdf-contact-meta { min-width: 0; flex: 1; }
-          .pdf-contact-name { font-size: 24pt; font-weight: 900; letter-spacing: -0.04em; line-height: 1.1; margin: 0 0 6px 0; color: #000000 !important; text-transform: uppercase; border-bottom: 3.5px solid ${themeColor}; padding-bottom: 8px; }
-          .pdf-contact-label { font-size: 8.5pt; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; color: #6b7280 !important; margin: 0 0 4px 0; }
-          .pdf-contact-line { font-size: 10pt; color: #222222 !important; margin: 0; line-height: 1.35; }
-          .pdf-contact-sep { color: #9ca3af !important; padding: 0 6px; }
-          .pdf-contact-line a { color: #111111 !important; text-decoration: none; }
-          .pdf-contact-photo { width: 52px; height: 52px; border-radius: 10px; object-fit: cover; border: 1px solid #e5e7eb; flex: 0 0 auto; }
+          
+          /* Header */
+          .pdf-contact-header { margin: 0 0 16px 0; display: flex; flex-direction: column; align-items: center; text-align: center; }
+          .pdf-contact-name { 
+            font-size: 24pt; 
+            font-weight: 800; 
+            letter-spacing: -0.02em; 
+            line-height: 1.1; 
+            margin: 0 0 6px 0; 
+            color: #374151 !important; 
+            text-transform: capitalize;
+          }
+          .pdf-contact-line { 
+            font-size: 9pt; 
+            color: #4b5563 !important; 
+            margin: 0; 
+            line-height: 1.4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0;
+          }
+          .pdf-contact-sep { color: #9ca3af !important; padding: 0 8px; font-size: 8pt; }
+          .pdf-contact-line a { color: #4b5563 !important; text-decoration: none; }
+          
+          /* Section Headers */
           .pdf-export-container h1 { 
-            font-size: 28pt; 
-            font-weight: 900; 
-            margin: 0 0 10px 0; 
-            color: #000000 !important; 
-            text-transform: uppercase; 
-            border-bottom: 3.5px solid ${themeColor}; 
-            padding-bottom: 8px; 
-            letter-spacing: -0.04em;
-            line-height: 1.1;
+            display: none; /* We handle name separately */
           }
           .pdf-export-container h2 { 
-            font-size: 13pt; 
+            font-size: 11pt; 
             font-weight: 800; 
-            margin: 16px 0 8px 0; 
-            color: ${themeColor} !important; 
+            margin: 18px 0 8px 0; 
+            color: #374151 !important; 
             text-transform: uppercase; 
-            letter-spacing: 0.08em;
-            border-bottom: 1px solid #e5e7eb;
+            letter-spacing: 0.05em;
+            border-bottom: 1.5px solid #374151;
             padding-bottom: 4px;
             line-height: 1.2;
           }
+          
+          /* Job Headers (Custom H3) */
+          .pdf-job-header { margin: 12px 0 4px 0; }
+          .pdf-job-row { display: flex; justify-content: space-between; align-items: baseline; }
+          .pdf-job-title { font-size: 10.5pt; font-weight: 800; color: #111827; }
+          .pdf-job-date { font-size: 10pt; font-weight: 700; color: #111827; text-align: right; }
+          .pdf-job-company { font-size: 10pt; font-weight: 600; color: #374151; margin-top: 1px; }
+          
+          /* Fallback H3 */
           .pdf-export-container h3 { 
-            font-size: 11pt; 
+            font-size: 10.5pt; 
             font-weight: 700; 
-            margin: 10px 0 4px 0; 
-            color: #111111 !important; 
+            margin: 12px 0 4px 0; 
+            color: #111827 !important; 
           }
+
+          /* Body Text */
           .pdf-export-container p { 
             margin: 0 0 6px 0; 
-            color: #222222 !important; 
+            color: #374151 !important; 
             text-align: left;
-            line-height: 1.38;
+            line-height: 1.45;
+            font-weight: 400;
           }
           .pdf-export-container ul { 
             margin: 0 0 10px 0; 
-            padding-left: 20px; 
+            padding-left: 16px; 
             list-style-type: disc; 
           }
           .pdf-export-container li { 
             margin-bottom: 3px; 
-            color: #333333 !important; 
-            line-height: 1.38;
+            color: #374151 !important; 
+            line-height: 1.45;
+            padding-left: 2px;
           }
           .pdf-export-container strong { 
             font-weight: 700; 
-            color: #000000 !important; 
+            color: #111827 !important; 
           }
           .pdf-export-container hr { border: none; border-top: 1px solid #e5e7eb; margin: 10px 0; }
-          /* Page breaking safety */
-          .pdf-export-container h1, .pdf-export-container h2, .pdf-export-container h3 { 
+          
+          /* Print Safety */
+          .pdf-export-container h1, .pdf-export-container h2, .pdf-job-header { 
             page-break-after: avoid;
             break-after: avoid;
           }
@@ -247,7 +298,6 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
             page-break-inside: auto;
             break-inside: auto;
           }
-          .pdf-export-container p, .pdf-export-container li { overflow-wrap: anywhere; word-break: break-word; }
         `}</style>
         <div
           ref={contentBlockRef}
@@ -259,26 +309,28 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
         >
           {showContactHeader && hasContactInfo && (
             <div className="pdf-contact-header">
-              <div className="pdf-contact-meta">
-                {name && <div className="pdf-contact-name">{name}</div>}
-                {contactItems.length > 0 && (
-                  <>
-                    <div className="pdf-contact-label">Contact Information</div>
-                    <p className="pdf-contact-line">
-                      {contactItems.map((item, idx) => (
-                        <React.Fragment key={item.key}>
-                          {idx > 0 && <span className="pdf-contact-sep">•</span>}
-                          {item.node}
-                        </React.Fragment>
-                      ))}
-                    </p>
-                  </>
-                )}
-              </div>
-              {hasPhoto && <img className="pdf-contact-photo" src={photo} alt="Profile" />}
+              {name && <div className="pdf-contact-name">{name}</div>}
+              {contactItems.length > 0 && (
+                <div className="pdf-contact-line">
+                  {contactItems.map((item, idx) => (
+                    <React.Fragment key={item.key}>
+                      {idx > 0 && <span className="pdf-contact-sep">•</span>}
+                      {item.node}
+                    </React.Fragment>
+                  ))}
+                </div>
+              )}
             </div>
           )}
-          <ReactMarkdown>{contentToRender}</ReactMarkdown>
+          
+          <ReactMarkdown
+            components={{
+              h3: CustomH3
+            }}
+          >
+            {contentToRender}
+          </ReactMarkdown>
+          
           <div style={{ height: '12mm' }} />
         </div>
       </div>
