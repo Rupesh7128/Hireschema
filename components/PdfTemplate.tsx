@@ -135,7 +135,7 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
       const needed = block.scrollHeight;
       if (!available || !needed) return;
       if (needed <= available) return;
-      const next = Math.max(0.6, Math.min(1, available / needed));
+      const next = Math.max(0.65, Math.min(1, available / needed));
       setScale(next);
     });
     return () => cancelAnimationFrame(id);
@@ -168,12 +168,12 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
         style={{ 
           backgroundColor: '#ffffff',
           color: '#000000',
-          padding: '18mm 18mm 18mm',
+          padding: '14mm 14mm 14mm',
           width: '210mm',
           height: '297mm',
           fontFamily: "'Inter', 'Helvetica', 'Arial', sans-serif",
-          fontSize: '10.5pt',
-          lineHeight: '1.5',
+          fontSize: '10.75pt',
+          lineHeight: '1.38',
           boxSizing: 'border-box',
           overflow: 'hidden'
         }}
@@ -184,6 +184,7 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
           .pdf-contact-header { margin: 0 0 14px 0; display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; }
           .pdf-contact-meta { min-width: 0; flex: 1; }
           .pdf-contact-name { font-size: 24pt; font-weight: 900; letter-spacing: -0.04em; line-height: 1.1; margin: 0 0 6px 0; color: #000000 !important; text-transform: uppercase; border-bottom: 3.5px solid ${themeColor}; padding-bottom: 8px; }
+          .pdf-contact-label { font-size: 8.5pt; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; color: #6b7280 !important; margin: 0 0 4px 0; }
           .pdf-contact-line { font-size: 10pt; color: #222222 !important; margin: 0; line-height: 1.35; }
           .pdf-contact-sep { color: #9ca3af !important; padding: 0 6px; }
           .pdf-contact-line a { color: #111111 !important; text-decoration: none; }
@@ -202,39 +203,41 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
           .pdf-export-container h2 { 
             font-size: 13pt; 
             font-weight: 800; 
-            margin: 25px 0 10px 0; 
+            margin: 16px 0 8px 0; 
             color: ${themeColor} !important; 
             text-transform: uppercase; 
             letter-spacing: 0.08em;
-            border-bottom: none;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 4px;
             line-height: 1.2;
           }
           .pdf-export-container h3 { 
             font-size: 11pt; 
             font-weight: 700; 
-            margin: 15px 0 5px 0; 
+            margin: 10px 0 4px 0; 
             color: #111111 !important; 
           }
           .pdf-export-container p { 
-            margin: 0 0 8px 0; 
+            margin: 0 0 6px 0; 
             color: #222222 !important; 
             text-align: left;
-            line-height: 1.5;
+            line-height: 1.38;
           }
           .pdf-export-container ul { 
-            margin: 0 0 12px 0; 
+            margin: 0 0 10px 0; 
             padding-left: 20px; 
             list-style-type: disc; 
           }
           .pdf-export-container li { 
-            margin-bottom: 5px; 
+            margin-bottom: 3px; 
             color: #333333 !important; 
-            line-height: 1.5;
+            line-height: 1.38;
           }
           .pdf-export-container strong { 
             font-weight: 700; 
             color: #000000 !important; 
           }
+          .pdf-export-container hr { border: none; border-top: 1px solid #e5e7eb; margin: 10px 0; }
           /* Page breaking safety */
           .pdf-export-container h1, .pdf-export-container h2, .pdf-export-container h3 { 
             page-break-after: avoid;
@@ -259,14 +262,17 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
               <div className="pdf-contact-meta">
                 {name && <div className="pdf-contact-name">{name}</div>}
                 {contactItems.length > 0 && (
-                  <p className="pdf-contact-line">
-                    {contactItems.map((item, idx) => (
-                      <React.Fragment key={item.key}>
-                        {idx > 0 && <span className="pdf-contact-sep">•</span>}
-                        {item.node}
-                      </React.Fragment>
-                    ))}
-                  </p>
+                  <>
+                    <div className="pdf-contact-label">Contact Information</div>
+                    <p className="pdf-contact-line">
+                      {contactItems.map((item, idx) => (
+                        <React.Fragment key={item.key}>
+                          {idx > 0 && <span className="pdf-contact-sep">•</span>}
+                          {item.node}
+                        </React.Fragment>
+                      ))}
+                    </p>
+                  </>
                 )}
               </div>
               {hasPhoto && <img className="pdf-contact-photo" src={photo} alt="Profile" />}

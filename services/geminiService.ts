@@ -1011,11 +1011,22 @@ export const generateContent = async (
       
       **Keywords to naturally incorporate**: ${analysis.missingKeywords.join(", ")}
       
-      **OUTPUT FORMAT:**
-      - Markdown format: # for name, ## for sections, - for bullets
-      - Single column layout, NO tables
-      - Include: Summary, Experience, Education, Skills
-      - Do NOT include Contact Info (it will be added separately)
+      **OUTPUT FORMAT (Rich Text 2.0, ATS-Optimized, One Page):**
+      - Output ONLY valid Markdown (no HTML).
+      - Use: # for name, ## for section headers, ### for role entries, - for bullets.
+      - Single column layout. NO tables. NO multi-column formatting. NO icons. NO images.
+      - Sections MUST be clearly separated by a blank line and a ## header.
+      - Required section order (use these exact headers):
+        1) ## SUMMARY
+        2) ## EXPERIENCE
+        3) ## SKILLS
+        4) ## EDUCATION
+      - Contact info will be rendered separately; DO NOT include phone/email/location/links in the Markdown.
+      - Keep it strictly ONE PAGE:
+        - SUMMARY: 2-3 lines max (no bullets)
+        - EXPERIENCE: include the most relevant roles; max 3 roles; max 3 bullets per role; keep bullets 1 line when possible
+        - SKILLS: compact (comma-separated or short grouped lines), no long paragraphs
+        - EDUCATION: 1-2 lines per entry, no bullets unless essential
       - If you cannot quantify something, OMIT the metric (do not use placeholders).
       
       **LANGUAGE:** ${langInstruction}

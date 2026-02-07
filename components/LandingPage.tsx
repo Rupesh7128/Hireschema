@@ -72,7 +72,7 @@ const FeatureMarquee = () => {
     const items = [
         "Find Missing Keywords", "Get Your ATS Score", "Fix Resume Gaps", "Generate Cover Letters", 
         "Prepare for Interviews", "Learn Missing Skills", "100% Secure",
-        "Download as PDF", "Instant Results"
+        "Download as PDF", "Works in 8 Languages", "Instant Results"
     ];
 
     return (
@@ -320,6 +320,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
       title: "Learn What You're Missing",
       desc: "If you're missing a skill, we show you free resources to learn it quickly.",
       micro: "Turn weaknesses into strengths."
+    },
+    {
+      id: "translate",
+      title: "Works in 8 Languages",
+      desc: "Generate ATS-friendly resumes and documents in your preferred language, ready to apply anywhere.",
+      micro: "Apply globally, stay readable."
     }
   ];
 

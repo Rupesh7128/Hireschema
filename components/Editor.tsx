@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { FileData, AnalysisResult, GeneratorType } from '../types';
 import { generateContent, calculateImprovedScore, refineContent, regenerateSection } from '../services/geminiService';
+import { normalizeAtsResumeMarkdown } from '../services/atsResumeMarkdown';
 import { saveStateBeforePayment } from '../services/stateService';
 import PaymentLock from './PaymentLock';
 import { PdfTemplate } from './PdfTemplate';
@@ -74,6 +75,7 @@ export const Editor: React.FC<EditorProps> = ({
     const [isDownloading, setIsDownloading] = useState(false);
 
     const pdfRef = useRef<HTMLDivElement>(null);
+    const previewPdfRef = useRef<HTMLDivElement>(null);
     const lastLanguageRef = useRef(appLanguage);
 
     const isMeaningfulText = (value: string) => {
@@ -260,9 +262,10 @@ export const Editor: React.FC<EditorProps> = ({
                 language: appLanguage,
                 resumeText: localResumeText
             });
-            setGeneratedData(prev => ({ ...prev, [tab]: content }));
+            const normalized = tab === GeneratorType.ATS_RESUME ? normalizeAtsResumeMarkdown(content) : content;
+            setGeneratedData(prev => ({ ...prev, [tab]: normalized }));
             if (tab === GeneratorType.ATS_RESUME) {
-                const score = await calculateImprovedScore(content, jobDescription);
+                const score = await calculateImprovedScore(normalized, jobDescription);
                 setOptimizedScore(score);
             }
         } catch (err: any) {
@@ -316,10 +319,11 @@ export const Editor: React.FC<EditorProps> = ({
             console.log('[Editor] Calling refineContent...');
             const newContent = await refineContent(generatedData[activeTab], prompt, jobDescription);
             console.log('[Editor] refineContent success, updating state');
-            setGeneratedData(prev => ({ ...prev, [activeTab]: newContent }));
+            const normalized = activeTab === GeneratorType.ATS_RESUME ? normalizeAtsResumeMarkdown(newContent) : newContent;
+            setGeneratedData(prev => ({ ...prev, [activeTab]: normalized }));
             setChatInput("");
             if (activeTab === GeneratorType.ATS_RESUME) {
-                const score = await calculateImprovedScore(newContent, jobDescription);
+                const score = await calculateImprovedScore(normalized, jobDescription);
                 setOptimizedScore(score);
             }
         } catch (err) {
@@ -592,7 +596,7 @@ export const Editor: React.FC<EditorProps> = ({
                                                         ) : (
                                                             activeTab === GeneratorType.ATS_RESUME ? (
                                                                 <PdfTemplate
-                                                                    ref={pdfRef}
+                                                                    ref={previewPdfRef}
                                                                     mode="preview"
                                                                     content={generatedData[activeTab] || ''}
                                                                     themeColor={accentColor.value}
@@ -613,15 +617,14 @@ export const Editor: React.FC<EditorProps> = ({
                         </AnimatePresence>
                     </div>
 
-                    {activeTab !== GeneratorType.ATS_RESUME && (
-                        <PdfTemplate
-                            ref={pdfRef}
-                            content={generatedData[activeTab] || ''}
-                            themeColor={accentColor.value}
-                            profile={analysis.contactProfile}
-                            showContactHeader={false}
-                        />
-                    )}
+                    <PdfTemplate
+                        ref={pdfRef}
+                        mode="export"
+                        content={generatedData[activeTab] || ''}
+                        themeColor={accentColor.value}
+                        profile={analysis.contactProfile}
+                        showContactHeader={activeTab === GeneratorType.ATS_RESUME}
+                    />
                 </div>
 
                 {/* --- RIGHT CONTROL PANEL --- */}
