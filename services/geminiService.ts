@@ -1258,6 +1258,7 @@ export const generateContent = async (
       3. **Spacing**: Use DOUBLE BLANK LINES between every paragraph. This is critical for readability.
       4. **Length**: STRICTLY ONE PAGE. Be concise but impactful.
       5. **Padding/Spacing**: Ensure the content fits comfortably within a standard page with good whitespace.
+      6. **Typography**: Use standard Title Case for headers (e.g., "Dear Hiring Manager"). DO NOT USE ALL CAPS.
 
       The cover letter should:
       1. Open with enthusiasm for the specific role
@@ -1292,6 +1293,7 @@ export const generateContent = async (
       
       Structure the output clearly with headers.
       CRITICAL: Separate each Question/Answer pair with a DOUBLE BLANK LINE to ensure proper spacing.
+      CRITICAL: Use Title Case for headers (e.g., "1. Tell me about yourself"). DO NOT USE ALL CAPS.
       
       ${langInstruction}
       `;

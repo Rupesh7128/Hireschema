@@ -11,6 +11,7 @@ interface PdfTemplateProps {
   profile?: ContactProfile;
   showContactHeader?: boolean;
   mode?: 'export' | 'preview';
+  type?: 'resume' | 'cover_letter' | 'interview' | 'general';
 }
 
 const isMeaningfulText = (value: string) => {
@@ -107,7 +108,7 @@ const CustomH3 = ({ children }: { children: React.ReactNode }) => {
   return <h3>{children}</h3>;
 };
 
-export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ content, themeColor = '#374151', profile, showContactHeader = true, mode = 'export' }, ref) => {
+export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ content, themeColor = '#374151', profile, showContactHeader = true, mode = 'export', type = 'resume' }, ref) => {
   const name = (profile?.name || '').trim();
   const email = (profile?.email || '').trim();
   const phone = (profile?.phone || '').trim();
@@ -163,11 +164,13 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
       const needed = block.scrollHeight;
       if (!available || !needed) return;
       if (needed <= available) return;
+      // For resumes, we might shrink to fit. For others, we generally prefer multi-page flow, 
+      // but since this is a single page template, we still scale.
       const next = Math.max(0.65, Math.min(1, available / needed));
       setScale(next);
     });
     return () => cancelAnimationFrame(id);
-  }, [contentToRender, name, email, phone, linkedin, location, showContactHeader, themeColor, mode]);
+  }, [contentToRender, name, email, phone, linkedin, location, showContactHeader, themeColor, mode, type]);
 
   const outerStyle =
     mode === 'export'
@@ -196,7 +199,7 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
         style={{ 
           backgroundColor: '#ffffff',
           color: '#000000',
-          padding: '12mm 14mm',
+          padding: '10mm',
           width: '210mm',
           height: '297mm',
           fontFamily: "'Inter', 'Helvetica', 'Arial', sans-serif",
@@ -244,7 +247,7 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
             font-weight: 800; 
             margin: 18px 0 8px 0; 
             color: #374151 !important; 
-            text-transform: uppercase; 
+            text-transform: ${type === 'resume' ? 'uppercase' : 'none'}; 
             letter-spacing: 0.05em;
             border-bottom: 1.5px solid #374151;
             padding-bottom: 4px;
@@ -268,7 +271,7 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
 
           /* Body Text */
           .pdf-export-container p { 
-            margin: 0 0 6px 0; 
+            margin: 0 0 ${type === 'resume' ? '6px' : '12px'} 0; 
             color: #374151 !important; 
             text-align: left;
             line-height: 1.45;

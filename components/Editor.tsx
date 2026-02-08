@@ -448,8 +448,8 @@ export const Editor: React.FC<EditorProps> = ({
         <ReactMarkdown
             remarkPlugins={[remarkGfm, remarkBreaks]}
             components={{
-                h1: ({...props}) => <h1 className="text-4xl font-black uppercase tracking-tight mb-6 border-b-2 pb-2 text-black" style={{ borderColor: accentColor.value }} {...props} />,
-                h2: ({...props}) => <h2 className="text-lg font-black uppercase tracking-widest mt-12 mb-4" style={{ color: accentColor.value }} {...props} />,
+                h1: ({...props}) => <h1 className="text-4xl font-black tracking-tight mb-6 border-b-2 pb-2 text-black" style={{ borderColor: accentColor.value }} {...props} />,
+                h2: ({...props}) => <h2 className="text-lg font-black tracking-widest mt-12 mb-4" style={{ color: accentColor.value }} {...props} />,
                 h3: ({...props}) => <h3 className="text-base font-bold mt-6 mb-2 text-zinc-900" {...props} />,
                 p: ({...props}) => <p className="text-sm sm:text-base leading-relaxed text-zinc-800 mb-4" {...props} />,
                 ul: ({...props}) => <ul className="space-y-3 my-6" {...props} />,
@@ -642,6 +642,11 @@ export const Editor: React.FC<EditorProps> = ({
                         themeColor={accentColor.value}
                         profile={analysis.contactProfile}
                         showContactHeader={activeTab === GeneratorType.ATS_RESUME}
+                        type={
+                            activeTab === GeneratorType.ATS_RESUME ? 'resume' :
+                            activeTab === GeneratorType.COVER_LETTER ? 'cover_letter' :
+                            activeTab === GeneratorType.INTERVIEW_PREP ? 'interview' : 'general'
+                        }
                     />
                 </div>
 
