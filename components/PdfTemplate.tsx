@@ -131,7 +131,7 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
           key: 'linkedin',
           node: (
             <a href={normalizeUrl(linkedin)} target="_blank" rel="noopener noreferrer">
-              {linkedin.replace(/^https?:\/\/(www\.)?/, '')}
+              LinkedIn
             </a>
           )
         }
