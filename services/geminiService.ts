@@ -1033,6 +1033,7 @@ export const generateContent = async (
       3. **SKILLS**:
          - Use "## SKILLS" header.
          - Group skills by category if possible (e.g., "**Leadership:** Speaking, Fundraising...").
+         - CRITICAL: Put EACH skill category on a NEW LINE. Do not combine them.
          - Keep it compact.
 
       - CRITICAL: Do NOT include the candidate NAME in the Markdown (it will be rendered separately).
