@@ -258,6 +258,64 @@ export const Editor: React.FC<EditorProps> = ({
         return { present, stillMissing };
     };
 
+    const extractJobMinYears = (jd: string): number | null => {
+        const text = (jd || '').replace(/\s+/g, ' ').trim();
+        if (!text) return null;
+        const patterns = [
+            /\bminimum\s+of\s+(\d{1,2})\s*\+?\s*(?:years?|yrs?)\b/i,
+            /\b(\d{1,2})\s*\+?\s*(?:years?|yrs?)\s+(?:of\s+)?experience\b/i,
+            /\brequires?\s+(\d{1,2})\s*\+?\s*(?:years?|yrs?)\b/i
+        ];
+        for (const re of patterns) {
+            const m = text.match(re);
+            if (!m) continue;
+            const n = Number(m[1]);
+            if (Number.isFinite(n) && n > 0 && n < 50) return n;
+        }
+        return null;
+    };
+
+    const JD_SKILL_CANDIDATES = [
+        'Excel',
+        'Google Sheets',
+        'Power BI',
+        'Tableau',
+        'SQL',
+        'Python',
+        'AWS',
+        'Amazon Web Services',
+        'Azure',
+        'Microsoft Azure',
+        'GCP',
+        'Google Cloud Platform',
+        'JavaScript',
+        'TypeScript',
+        'React',
+        'Node',
+        'Docker',
+        'Kubernetes',
+        'Git',
+        'Jira',
+        'Agile',
+        'Scrum',
+        'ETL',
+        'CI/CD'
+    ];
+
+    const getMustIncludeSkills = (resumeText: string, jd: string) => {
+        const out: string[] = [];
+        const seen = new Set<string>();
+        for (const skill of JD_SKILL_CANDIDATES) {
+            const key = skill.toLowerCase();
+            if (seen.has(key)) continue;
+            if (!includesKeyword(jd, skill)) continue;
+            if (!includesKeyword(resumeText, skill)) continue;
+            seen.add(key);
+            out.push(skill);
+        }
+        return out.slice(0, 12);
+    };
+
     const generateTabContent = async (tab: GeneratorType, force = false) => {
         if (!isPaid || !localResumeText) return;
         if (loadingStates[tab]) return;
@@ -274,11 +332,19 @@ export const Editor: React.FC<EditorProps> = ({
             let normalized = tab === GeneratorType.ATS_RESUME ? normalizeAtsResumeMarkdown(content) : content;
             if (tab === GeneratorType.ATS_RESUME) {
                 try {
+                    const minYears = extractJobMinYears(jobDescription);
+                    const mustIncludeSkills = getMustIncludeSkills(localResumeText, jobDescription);
                     const missingKeywords = prioritizeKeywords(analysis.missingKeywords || []).slice(0, 18);
                     const basePrompt = [
                         QUICK_ACTIONS[0].prompt,
                         missingKeywords.length > 0
                             ? `Strategically incorporate these missing keywords where truthful and natural: ${missingKeywords.join(', ')}.`
+                            : '',
+                        mustIncludeSkills.length > 0
+                            ? `Ensure these skills/tools (already present in the ORIGINAL resume and mentioned in the JD) appear in the final resume, preferably in ## SKILLS: ${mustIncludeSkills.join(', ')}.`
+                            : '',
+                        minYears
+                            ? `The JD mentions a minimum of ${minYears}+ years of experience. If (and only if) the ORIGINAL resume dates support it, state "${minYears}+ years" in the SUMMARY. Otherwise omit.`
                             : '',
                         `Do not add new claims. Do not change employers/titles/dates. Do not remove any existing skills/tools/technologies from the ORIGINAL resume text. Prefer adding keywords into Skills/Tools and existing bullets where they already apply. Avoid keyword stuffing.`
                     ].filter(Boolean).join('\n');
@@ -295,6 +361,19 @@ export const Editor: React.FC<EditorProps> = ({
                         ].join('\n');
                         const boosted2 = await refineAtsResumeContent(normalized, followUpPrompt, jobDescription, localResumeText);
                         normalized = normalizeAtsResumeMarkdown(boosted2);
+                    }
+
+                    if (mustIncludeSkills.length > 0) {
+                        const stillMissingSkills = mustIncludeSkills.filter(s => !includesKeyword(normalized, s));
+                        if (stillMissingSkills.length > 0) {
+                            const skillPassPrompt = [
+                                `Final pass: ensure key JD skills that are already in the ORIGINAL resume are present in the final output.`,
+                                `Missing (but present in resume + JD): ${stillMissingSkills.join(', ')}.`,
+                                `Add them to ## SKILLS (or existing bullets) without inventing any new claims. Keep one-page and ATS formatting rules.`
+                            ].join('\n');
+                            const boosted3 = await refineAtsResumeContent(normalized, skillPassPrompt, jobDescription, localResumeText);
+                            normalized = normalizeAtsResumeMarkdown(boosted3);
+                        }
                     }
                 } catch {}
             }
@@ -472,27 +551,141 @@ export const Editor: React.FC<EditorProps> = ({
     };
 
     // --- RENDER HELPERS ---
-    const renderMarkdown = (content: string) => (
-        <ReactMarkdown
-            remarkPlugins={[remarkGfm, remarkBreaks]}
-            components={{
-                h1: ({...props}) => <h1 className="text-4xl font-black tracking-tight mb-6 border-b-2 pb-2 text-black" style={{ borderColor: accentColor.value }} {...props} />,
-                h2: ({...props}) => <h2 className="text-lg font-black tracking-widest mt-12 mb-4" style={{ color: accentColor.value }} {...props} />,
-                h3: ({...props}) => <h3 className="text-base font-bold mt-6 mb-2 text-zinc-900" {...props} />,
-                p: ({...props}) => <p className="text-sm sm:text-base leading-relaxed text-zinc-800 mb-4" {...props} />,
-                ul: ({...props}) => <ul className="space-y-3 my-6" {...props} />,
-                li: ({...props}) => (
-                    <li className="flex items-start gap-3 text-sm sm:text-base text-zinc-800">
-                        <span className="mt-2 w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: accentColor.value }} />
-                        <span>{props.children}</span>
-                    </li>
-                ),
-                strong: ({...props}) => <strong className="font-bold text-black" {...props} />,
-            }}
-        >
-            {content}
-        </ReactMarkdown>
-    );
+    const markdownText = (node: any): string => {
+        if (node == null) return '';
+        if (typeof node === 'string' || typeof node === 'number') return String(node);
+        if (Array.isArray(node)) return node.map(markdownText).join('');
+        if (typeof node === 'object' && 'props' in node) return markdownText((node as any).props?.children);
+        return '';
+    };
+
+    const renderMarkdown = (content: string) => {
+        const isCover = activeTab === GeneratorType.COVER_LETTER;
+        const isInterview = activeTab === GeneratorType.INTERVIEW_PREP;
+        const isGaps = activeTab === GeneratorType.LEARNING_PATH;
+
+        const containerClassName = isCover
+            ? 'text-zinc-900'
+            : 'text-zinc-900';
+
+        return (
+            <div className={containerClassName}>
+                <ReactMarkdown
+                    remarkPlugins={[remarkGfm, remarkBreaks]}
+                    components={{
+                        h1: ({ ...props }) => (
+                            <h1
+                                className={`tracking-tight mb-5 ${isCover ? 'text-3xl sm:text-4xl font-extrabold' : 'text-4xl font-black'} border-b pb-2`}
+                                style={{ borderColor: accentColor.value }}
+                                {...props}
+                            />
+                        ),
+                        h2: ({ ...props }) => (
+                            <h2
+                                className={`${isCover ? 'text-lg sm:text-xl font-black tracking-tight mt-10 mb-3' : 'text-lg font-black tracking-widest mt-12 mb-4'} `}
+                                style={{ color: accentColor.value }}
+                                {...props}
+                            />
+                        ),
+                        h3: ({ ...props }) => (
+                            <h3 className={`${isCover ? 'text-base font-bold mt-7 mb-2 text-zinc-900' : 'text-base font-bold mt-6 mb-2 text-zinc-900'}`} {...props} />
+                        ),
+                        p: ({ ...props }) => {
+                            const text = markdownText(props.children).trim();
+                            if (isInterview) {
+                                const lower = text.toLowerCase();
+                                if (lower.startsWith('q:') || lower.startsWith('question:')) {
+                                    return (
+                                        <div className="mt-5 mb-3 p-4 rounded-xl border border-zinc-200 bg-zinc-50">
+                                            <div className="text-[11px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Question</div>
+                                            <p className="text-sm sm:text-base font-semibold leading-relaxed text-zinc-900" {...props} />
+                                        </div>
+                                    );
+                                }
+                                if (lower.startsWith('a:') || lower.startsWith('answer:')) {
+                                    return (
+                                        <div className="mb-4 p-4 rounded-xl border border-zinc-200 bg-white">
+                                            <div className="text-[11px] font-black uppercase tracking-widest text-zinc-500 mb-1.5">Answer</div>
+                                            <p className="text-sm sm:text-base leading-relaxed text-zinc-800" {...props} />
+                                        </div>
+                                    );
+                                }
+                            }
+                            return (
+                                <p
+                                    className={`${isCover ? 'text-[15px] sm:text-base leading-[1.85] text-zinc-800 mb-5 font-serif' : 'text-sm sm:text-base leading-relaxed text-zinc-800 mb-4'}`}
+                                    {...props}
+                                />
+                            );
+                        },
+                        ul: ({ ...props }) => (
+                            <ul className={`${isCover ? 'my-5 pl-6 list-disc space-y-2' : 'space-y-3 my-6'}`} {...props} />
+                        ),
+                        ol: ({ ...props }) => (
+                            <ol className={`${isCover ? 'my-5 pl-6 list-decimal space-y-2' : 'my-6 pl-6 list-decimal space-y-3'}`} {...props} />
+                        ),
+                        li: ({ ...props }) => {
+                            if (isCover) return <li className="text-[15px] sm:text-base leading-relaxed text-zinc-800 font-serif" {...props} />;
+                            if (isGaps) return <li className="text-sm sm:text-base text-zinc-800 leading-relaxed" {...props} />;
+                            return (
+                                <li className="flex items-start gap-3 text-sm sm:text-base text-zinc-800">
+                                    <span className="mt-2 w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: accentColor.value }} />
+                                    <span>{props.children}</span>
+                                </li>
+                            );
+                        },
+                        blockquote: ({ ...props }) => (
+                            <blockquote
+                                className="my-6 pl-4 border-l-4 text-zinc-700 italic"
+                                style={{ borderColor: accentColor.value }}
+                                {...props}
+                            />
+                        ),
+                        a: ({ ...props }) => (
+                            <a className="text-orange-600 underline underline-offset-2 hover:text-orange-500" target="_blank" rel="noopener noreferrer" {...props} />
+                        ),
+                        hr: ({ ...props }) => <hr className="my-8 border-zinc-200" {...props} />,
+                        code: ({ inline, className, children, ...props }: any) => {
+                            if (inline) {
+                                return (
+                                    <code className="px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-900 font-mono text-[0.85em]" {...props}>
+                                        {children}
+                                    </code>
+                                );
+                            }
+                            return (
+                                <code className={`block font-mono text-xs sm:text-sm text-zinc-100 ${className || ''}`} {...props}>
+                                    {children}
+                                </code>
+                            );
+                        },
+                        pre: ({ ...props }) => (
+                            <pre className="my-6 p-4 rounded-xl bg-zinc-950 overflow-x-auto border border-zinc-800" {...props} />
+                        ),
+                        table: ({ ...props }) => (
+                            <div className="my-6 overflow-x-auto border border-zinc-200 rounded-xl">
+                                <table className="min-w-full text-sm" {...props} />
+                            </div>
+                        ),
+                        thead: ({ ...props }) => <thead className="bg-zinc-50" {...props} />,
+                        th: ({ ...props }) => <th className="text-left px-3 py-2 font-black text-xs uppercase tracking-widest text-zinc-600 border-b border-zinc-200" {...props} />,
+                        td: ({ ...props }) => <td className="px-3 py-2 text-zinc-800 border-b border-zinc-100 align-top" {...props} />,
+                        input: ({ ...props }) => (
+                            <input
+                                {...props}
+                                className="mr-2 accent-orange-600"
+                                type="checkbox"
+                                disabled
+                            />
+                        ),
+                        strong: ({ ...props }) => <strong className="font-bold text-black" {...props} />
+                    }}
+                >
+                    {content}
+                </ReactMarkdown>
+            </div>
+        );
+    };
 
     return (
         <div className="flex flex-col h-full bg-black text-white font-sans overflow-hidden">

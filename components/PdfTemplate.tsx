@@ -202,7 +202,7 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
           padding: '10mm',
           width: '210mm',
           height: '297mm',
-          fontFamily: "'Inter', 'Helvetica', 'Arial', sans-serif",
+          fontFamily: type === 'cover_letter' ? "'Georgia', 'Times New Roman', serif" : "'Inter', 'Helvetica', 'Arial', sans-serif",
           fontSize: '10pt',
           lineHeight: '1.4',
           boxSizing: 'border-box',
@@ -248,8 +248,8 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
             margin: 18px 0 8px 0; 
             color: #374151 !important; 
             text-transform: ${type === 'resume' ? 'uppercase' : 'none'}; 
-            letter-spacing: 0.05em;
-            border-bottom: 1.5px solid #374151;
+            letter-spacing: ${type === 'resume' ? '0.05em' : '0.01em'};
+            border-bottom: ${type === 'resume' ? '1.5px solid #374151' : '1px solid #e5e7eb'};
             padding-bottom: 4px;
             line-height: 1.2;
           }
@@ -271,10 +271,10 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
 
           /* Body Text */
           .pdf-export-container p { 
-            margin: 0 0 ${type === 'resume' ? '6px' : '12px'} 0; 
+            margin: 0 0 ${type === 'resume' ? '6px' : type === 'cover_letter' ? '14px' : '12px'} 0; 
             color: #374151 !important; 
             text-align: left;
-            line-height: 1.45;
+            line-height: ${type === 'cover_letter' ? '1.6' : '1.45'};
             font-weight: 400;
           }
           .pdf-export-container ul { 
@@ -293,6 +293,15 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
             color: #111827 !important; 
           }
           .pdf-export-container hr { border: none; border-top: 1px solid #e5e7eb; margin: 10px 0; }
+
+          .pdf-export-container a { color: #374151 !important; text-decoration: underline; text-underline-offset: 2px; }
+          .pdf-export-container blockquote { margin: 12px 0; padding-left: 10px; border-left: 3px solid #d1d5db; color: #374151 !important; font-style: italic; }
+          .pdf-export-container pre { margin: 10px 0; padding: 10px; background: #111827; color: #f9fafb; border-radius: 6px; overflow-x: auto; }
+          .pdf-export-container code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+          .pdf-export-container :not(pre) > code { background: #f3f4f6; color: #111827; padding: 1px 4px; border-radius: 4px; }
+          .pdf-export-container table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+          .pdf-export-container th { text-align: left; font-weight: 700; font-size: 9pt; padding: 6px 6px; border-bottom: 1px solid #e5e7eb; background: #f9fafb; color: #374151 !important; }
+          .pdf-export-container td { padding: 6px 6px; border-bottom: 1px solid #f3f4f6; color: #374151 !important; vertical-align: top; }
           
           /* Print Safety */
           .pdf-export-container h1, .pdf-export-container h2, .pdf-job-header { 

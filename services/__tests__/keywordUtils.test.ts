@@ -17,6 +17,11 @@ describe('keywordUtils', () => {
       expect(includesKeyword('Tools: MS Excel', 'Microsoft Excel')).toBe(true);
       expect(includesKeyword('Tools: Excel', 'Microsoft Excel')).toBe(true);
     });
+
+    it('treats AWS and Amazon Web Services as equivalents', () => {
+      expect(includesKeyword('Skills: Amazon Web Services (AWS)', 'AWS')).toBe(true);
+      expect(includesKeyword('Skills: AWS', 'Amazon Web Services')).toBe(true);
+    });
   });
 
   describe('prioritizeKeywords', () => {
@@ -32,4 +37,3 @@ describe('keywordUtils', () => {
     });
   });
 });
-

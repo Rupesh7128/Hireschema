@@ -14,6 +14,15 @@ const keywordVariants = (keyword: string) => {
 
   const variants = new Set<string>([base]);
 
+  if (lowered === 'aws') variants.add('Amazon Web Services');
+  if (lowered.includes('amazon web services')) variants.add('AWS');
+
+  if (lowered === 'gcp') variants.add('Google Cloud Platform');
+  if (lowered.includes('google cloud platform')) variants.add('GCP');
+
+  if (lowered === 'azure') variants.add('Microsoft Azure');
+  if (lowered.includes('microsoft azure')) variants.add('Azure');
+
   if (lowered.startsWith('ms ')) variants.add(base.slice(3).trim());
   if (lowered.startsWith('microsoft ')) variants.add(base.slice('microsoft '.length).trim());
 
