@@ -575,85 +575,45 @@ export const Editor: React.FC<EditorProps> = ({
                                 exit={{ opacity: 0, y: -15 }}
                                 className={`relative overflow-hidden ${activeTab === GeneratorType.ATS_RESUME && !loadingStates[activeTab] && !isEditing && !isCompare && !!generatedData[activeTab] ? 'bg-transparent border-0 p-0 shadow-none min-h-[1123px]' : 'bg-white border border-zinc-200 p-6 sm:p-12 rounded-sm shadow-2xl min-h-[900px]'}`}
                             >
-                                {isRefining && (
-                                    <div className="absolute inset-0 z-[60] bg-white/90 backdrop-blur-sm flex items-center justify-center p-6">
-                                        <div className="w-full max-w-sm">
-                                            <div className="bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden shadow-2xl">
-                                                <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
-                                                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">AI Processing</div>
-                                                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500">{refineLabel || 'Optimizing'}</div>
-                                                </div>
-                                                <div className="relative h-28">
-                                                    <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-transparent" />
-                                                    <div className="absolute top-0 left-0 w-full h-1 bg-orange-500/50 shadow-[0_0_10px_rgba(249,115,22,0.5)] animate-[scan_2s_ease-in-out_infinite]" />
-                                                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-                                                        <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
-                                                            <Loader2 className="w-5 h-5 text-orange-500 animate-spin" />
-                                                        </div>
-                                                        <div className="text-xs font-black uppercase tracking-widest text-white">{refineLabel || 'Optimizing'}</div>
-                                                        <div className="text-[10px] text-zinc-500 font-mono">Scanning & rewriting…</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-                                {loadingStates[activeTab] ? (
-                                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-                                        <LoadingIndicator message="AI Drafting..." size="md" />
-                                    </div>
+                                {isEditing ? (
+                                    <textarea
+                                        value={generatedData[activeTab] || ''}
+                                        onChange={(e) => setGeneratedData(prev => ({ ...prev, [activeTab]: e.target.value }))}
+                                        className="w-full h-[700px] bg-transparent text-zinc-800 font-mono text-sm resize-none focus:outline-none"
+                                    />
                                 ) : (
                                     <>
-                                        {isEditing ? (
-                                            <textarea
-                                                value={generatedData[activeTab] || ''}
-                                                onChange={(e) => setGeneratedData(prev => ({ ...prev, [activeTab]: e.target.value }))}
-                                                className="w-full h-[700px] bg-transparent text-zinc-800 font-mono text-sm resize-none focus:outline-none"
-                                            />
+                                        {isCompare ? (
+                                            renderCompareView()
                                         ) : (
                                             <>
-                                                {isCompare ? (
-                                                    renderCompareView()
+                                                {activeError && !generatedData[activeTab] ? (
+                                                    <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-900">
+                                                        <div className="text-xs font-black uppercase tracking-widest mb-2">Generation Failed</div>
+                                                        <div className="text-sm font-medium leading-relaxed">{activeError}</div>
+                                                        <button
+                                                            onClick={() => generateTabContent(activeTab, true)}
+                                                            className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 text-white font-black text-xs uppercase tracking-widest rounded-sm transition-all"
+                                                        >
+                                                            <Wand2 className="w-3 h-3" />
+                                                            Try Again
+                                                        </button>
+                                                    </div>
+                                                ) : !generatedData[activeTab] ? (
+                                                    <div className="h-[260px]" />
                                                 ) : (
-                                                    <>
-                                                        {activeError && !generatedData[activeTab] ? (
-                                                            <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-900">
-                                                                <div className="text-xs font-black uppercase tracking-widest mb-2">Generation Failed</div>
-                                                                <div className="text-sm font-medium leading-relaxed">{activeError}</div>
-                                                                <button
-                                                                    onClick={() => generateTabContent(activeTab, true)}
-                                                                    className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 text-white font-black text-xs uppercase tracking-widest rounded-sm transition-all"
-                                                                >
-                                                                    <Wand2 className="w-3 h-3" />
-                                                                    Try Again
-                                                                </button>
-                                                            </div>
-                                                        ) : !generatedData[activeTab] ? (
-                                                            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-                                                                <LoadingIndicator message="Generating..." size="md" />
-                                                                <button
-                                                                    onClick={() => generateTabContent(activeTab, true)}
-                                                                    className="mt-2 inline-flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white font-black text-xs uppercase tracking-widest rounded-sm transition-all"
-                                                                >
-                                                                    <Wand2 className="w-3 h-3" />
-                                                                    Generate Now
-                                                                </button>
-                                                            </div>
-                                                        ) : (
-                                                            activeTab === GeneratorType.ATS_RESUME ? (
-                                                                <PdfTemplate
-                                                                    ref={previewPdfRef}
-                                                                    mode="preview"
-                                                                    content={generatedData[activeTab] || ''}
-                                                                    themeColor={accentColor.value}
-                                                                    profile={analysis.contactProfile}
-                                                                    showContactHeader
-                                                                />
-                                                            ) : (
-                                                                renderMarkdown(generatedData[activeTab] || '')
-                                                            )
-                                                        )}
-                                                    </>
+                                                    activeTab === GeneratorType.ATS_RESUME ? (
+                                                        <PdfTemplate
+                                                            ref={previewPdfRef}
+                                                            mode="preview"
+                                                            content={generatedData[activeTab] || ''}
+                                                            themeColor={accentColor.value}
+                                                            profile={analysis.contactProfile}
+                                                            showContactHeader
+                                                        />
+                                                    ) : (
+                                                        renderMarkdown(generatedData[activeTab] || '')
+                                                    )
                                                 )}
                                             </>
                                         )}
@@ -662,6 +622,32 @@ export const Editor: React.FC<EditorProps> = ({
                             </motion.div>
                         </AnimatePresence>
                     </div>
+
+                    {(isRefining || loadingStates[activeTab] || (!generatedData[activeTab] && !activeError)) && (
+                        <div className="absolute inset-0 z-[80] flex items-center justify-center bg-black/55 backdrop-blur-sm p-4">
+                            <div className="w-full max-w-md bg-zinc-950/85 border border-white/10 rounded-2xl shadow-2xl px-6 py-8 flex flex-col items-center">
+                                <LoadingIndicator
+                                    message={
+                                        isRefining
+                                            ? (refineLabel || 'Optimizing...')
+                                            : loadingStates[activeTab]
+                                                ? 'AI Drafting...'
+                                                : 'Generating...'
+                                    }
+                                    size="lg"
+                                />
+                                {!isRefining && !loadingStates[activeTab] && !generatedData[activeTab] && (
+                                    <button
+                                        onClick={() => generateTabContent(activeTab, true)}
+                                        className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 bg-orange-600 hover:bg-orange-500 text-white font-black text-xs uppercase tracking-widest rounded-sm transition-all"
+                                    >
+                                        <Wand2 className="w-3 h-3" />
+                                        Generate Now
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    )}
 
                     <PdfTemplate
                         ref={pdfRef}
