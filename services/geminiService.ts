@@ -655,6 +655,77 @@ export const refineContent = async (
     }
 };
 
+export const refineAtsResumeContent = async (
+    currentContent: string,
+    instruction: string,
+    jobDescription: string,
+    originalResumeText: string
+): Promise<string> => {
+    const prompt = `
+    You are an expert Resume Writer and ATS Optimization Specialist.
+
+    --------------------------------------------------------------------------------
+    CRITICAL: ZERO FABRICATION POLICY - READ THIS CAREFULLY
+    --------------------------------------------------------------------------------
+    You MUST preserve ALL factual information from the ORIGINAL RESUME.
+
+    ABSOLUTELY FORBIDDEN - DO NOT:
+    • Invent ANY company names, job titles, schools, degrees, locations, dates
+    • Invent ANY skills/tools/technologies/certifications not present in ORIGINAL RESUME
+    • Invent ANY metrics/numbers
+    • Add new roles/projects/employers
+    • Change dates or employers
+    • Output placeholders like [Quantifiable %], [Insert], [TBD], or any bracket placeholders
+
+    YOU MAY:
+    • Reword existing bullet points (same facts, better ATS phrasing)
+    • Improve structure/formatting and consistency
+    • Improve keyword alignment ONLY by emphasizing terms ALREADY PRESENT in the ORIGINAL RESUME
+
+    OUTPUT FORMAT (ATS-Optimized, One Page):
+    - Output ONLY valid Markdown (no HTML).
+    - Use: ## for section headers, ### for role/education entries, - for bullets.
+    - Single column. NO tables. NO multi-column formatting. NO icons. NO images.
+    - Required section order (use these exact headers):
+      1) ## SUMMARY
+      2) ## EXPERIENCE
+      3) ## SKILLS
+      4) ## EDUCATION
+    - EXPERIENCE ENTRIES must be:
+      ### Job Title | Company Name | Date Range | Location
+    - EDUCATION ENTRIES must be:
+      ### Degree Name | School Name | Date Range | Location
+    - SKILLS: each category on a NEW LINE, like:
+      **Category:** Skill 1, Skill 2
+
+    CRITICAL:
+    - Do NOT include the candidate NAME in the Markdown (rendered separately).
+    - Do NOT include contact info in the Markdown.
+
+    ORIGINAL RESUME (SOURCE OF TRUTH):
+    ${originalResumeText.substring(0, 20000)}
+
+    CURRENT ATS RESUME (to refine):
+    ${currentContent}
+
+    JOB DESCRIPTION (context only, do NOT invent experience):
+    ${jobDescription.substring(0, 3000)}
+
+    USER INSTRUCTION:
+    "${instruction}"
+
+    Output ONLY the updated ATS resume Markdown. No explanations.
+    `;
+
+    try {
+        const response = await generateWithFallback(MODEL_PRIMARY, prompt);
+        return cleanMarkdownOutput(response.response.text() || currentContent);
+    } catch (error: any) {
+        console.error("ATS refine failed:", error);
+        throw new Error(getActionableError(error) || "Unable to refine ATS resume.");
+    }
+};
+
 export const regenerateSection = async (
     currentContent: string,
     sectionName: string,
@@ -1071,12 +1142,10 @@ export const generateContent = async (
       
       YOU MAY IMPROVE:
       • Reword bullet points to sound more impactful (same facts, better phrasing)
-      • Add relevant keywords from the job description INTO existing bullet points
+      • Improve ATS keyword alignment ONLY by emphasizing terms already present in the original resume
       • Write a professional summary based on their ACTUAL experience
       • Reorganize sections for better flow
       • Use stronger action verbs
-      
-      **Keywords to naturally incorporate**: ${analysis.missingKeywords.join(", ")}
       
       **OUTPUT FORMAT (Rich Text 2.0, ATS-Optimized, One Page):**
       - Output ONLY valid Markdown (no HTML).

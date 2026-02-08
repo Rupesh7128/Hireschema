@@ -321,7 +321,7 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                     transition={{ delay: 0.4 }}
                     className="w-full max-w-sm px-2"
                 >
-                    <label className="group relative flex flex-col items-center justify-center w-full h-48 sm:h-56 rounded-xl border-2 border-dashed border-zinc-800 hover:border-orange-500/50 active:border-orange-500/70 bg-zinc-900/30 hover:bg-zinc-900 transition-all cursor-pointer overflow-hidden touch-target">
+                    <label className="group relative flex flex-col items-center justify-center w-full h-48 sm:h-56 rounded-xl border-2 border-dashed border-white/10 hover:border-orange-500/50 active:border-orange-500/70 bg-zinc-900/40 hover:bg-zinc-900/60 transition-all cursor-pointer overflow-hidden touch-target">
                         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5"></div>
                         <div className="relative z-10 flex flex-col items-center justify-center pt-4 pb-5">
                             <p className="mb-1.5 text-sm sm:text-base text-white font-bold uppercase tracking-widest">Drop PDF here</p>
@@ -404,7 +404,7 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                         </div>
                         
                         {/* Category Breakdown */}
-                        <div className="bg-zinc-900/80 border border-zinc-800 p-3 sm:p-4 rounded-xl relative overflow-hidden flex flex-col items-center">
+                        <div className="bg-zinc-900/50 border border-white/10 p-3 sm:p-4 rounded-xl relative overflow-hidden flex flex-col items-center">
                             <div className="text-zinc-400 text-xs font-bold uppercase tracking-widest mb-2">Damage Report</div>
                             <div className="h-24 w-full">
                                 <ResponsiveContainer width="100%" height="100%">
@@ -438,7 +438,7 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                         </div>
                         
                         {/* Cringe Analytics */}
-                        <div className="bg-zinc-900/80 border border-zinc-800 p-3 sm:p-4 rounded-xl relative overflow-hidden flex flex-col items-center">
+                        <div className="bg-zinc-900/50 border border-white/10 p-3 sm:p-4 rounded-xl relative overflow-hidden flex flex-col items-center">
                             <div className="text-zinc-400 text-xs font-bold uppercase tracking-widest mb-2">Cringe Metrics</div>
                             <div className="h-24 w-full">
                                 <ResponsiveContainer width="100%" height="100%">

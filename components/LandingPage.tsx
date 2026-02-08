@@ -415,7 +415,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1.4, delay: 0.4 }}
-                className="max-w-2xl text-base sm:text-xl text-zinc-400 mb-5 leading-relaxed font-light"
+                className="max-w-2xl text-base sm:text-xl text-zinc-400 mb-5 leading-relaxed font-medium"
             >
                Companies use <span className="text-white font-semibold">ATS</span> to auto-reject resumes missing keywords. 
                We scan your resume and show you exactly what's missing to get hired.

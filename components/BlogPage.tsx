@@ -269,7 +269,7 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onBack, initialSlug, onNavig
       {/* Background Gradients */}
       <div className="fixed inset-0 z-0 pointer-events-none">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-[128px]" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-[128px]" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-zinc-500/5 rounded-full blur-[128px]" />
       </div>
 
       <main className="relative z-10 container mx-auto max-w-6xl px-6">
@@ -291,7 +291,7 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onBack, initialSlug, onNavig
                 <h1 className="text-5xl sm:text-7xl font-bold tracking-tight text-white mb-6">
                   Latest <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">Insights</span>
                 </h1>
-                <p className="text-xl text-zinc-400 font-light leading-relaxed max-w-2xl">
+                <p className="text-xl text-zinc-400 font-medium leading-relaxed max-w-2xl">
                   Expert advice on resume optimization, ATS strategies, and career growth in the AI era.
                 </p>
               </div>
@@ -307,7 +307,7 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onBack, initialSlug, onNavig
               {posts.slice(3).map((post, i) => (
                 <article 
                   key={post.slug}
-                  className="group cursor-pointer flex flex-col bg-zinc-900/20 border border-white/5 rounded-2xl overflow-hidden hover:border-orange-500/30 transition-all duration-300 hover:bg-zinc-900/40"
+                  className="group cursor-pointer flex flex-col bg-zinc-900/40 border border-white/10 rounded-xl overflow-hidden hover:border-orange-500/30 transition-all duration-300 hover:bg-zinc-900/50"
                   onClick={() => handlePostClick(post.slug)}
                 >
                   {post.featuredImage && (

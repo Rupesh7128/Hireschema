@@ -50,7 +50,7 @@ export const FeaturePage: React.FC<FeaturePageProps> = ({
         
         {/* HERO */}
         <div className="flex flex-col items-center text-center mb-32 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <div className="px-6 py-2 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center mb-10 shadow-2xl shadow-orange-900/20 relative">
+          <div className="px-6 py-2 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mb-10 shadow-2xl shadow-orange-900/20 relative">
             <div className="absolute inset-0 bg-orange-500/10 rounded-xl blur-xl" />
             <span className="text-orange-500 font-black text-sm uppercase tracking-[0.3em] relative z-10">Feature Deep-Dive</span>
           </div>
@@ -59,7 +59,7 @@ export const FeaturePage: React.FC<FeaturePageProps> = ({
             {title}
           </h1>
           
-          <p className="text-xl sm:text-2xl text-zinc-400 font-light max-w-2xl mb-12 leading-relaxed">
+          <p className="text-xl sm:text-2xl text-zinc-400 font-medium max-w-2xl mb-12 leading-relaxed">
             {subtitle}
           </p>
           
@@ -247,4 +247,3 @@ export const FeaturePage: React.FC<FeaturePageProps> = ({
 };
 
 export default FeaturePage;
-

@@ -11,7 +11,7 @@ import {
     Eye, Settings, Layout, Minimize2
 } from 'lucide-react';
 import { FileData, AnalysisResult, GeneratorType } from '../types';
-import { generateContent, calculateImprovedScore, refineContent, regenerateSection } from '../services/geminiService';
+import { generateContent, calculateImprovedScore, refineContent, refineAtsResumeContent, regenerateSection } from '../services/geminiService';
 import { normalizeAtsResumeMarkdown } from '../services/atsResumeMarkdown';
 import { saveStateBeforePayment } from '../services/stateService';
 import PaymentLock from './PaymentLock';
@@ -266,7 +266,7 @@ export const Editor: React.FC<EditorProps> = ({
             let normalized = tab === GeneratorType.ATS_RESUME ? normalizeAtsResumeMarkdown(content) : content;
             if (tab === GeneratorType.ATS_RESUME) {
                 try {
-                    const boosted = await refineContent(normalized, QUICK_ACTIONS[0].prompt, jobDescription);
+                    const boosted = await refineAtsResumeContent(normalized, QUICK_ACTIONS[0].prompt, jobDescription, localResumeText);
                     normalized = normalizeAtsResumeMarkdown(boosted);
                 } catch {}
             }
@@ -324,7 +324,9 @@ export const Editor: React.FC<EditorProps> = ({
         setRefineLabel(label || 'Optimizing');
         try {
             console.log('[Editor] Calling refineContent...');
-            const newContent = await refineContent(generatedData[activeTab], prompt, jobDescription);
+            const newContent = activeTab === GeneratorType.ATS_RESUME
+                ? await refineAtsResumeContent(generatedData[activeTab], prompt, jobDescription, localResumeText)
+                : await refineContent(generatedData[activeTab], prompt, jobDescription);
             console.log('[Editor] refineContent success, updating state');
             const normalized = activeTab === GeneratorType.ATS_RESUME ? normalizeAtsResumeMarkdown(newContent) : newContent;
             setGeneratedData(prev => ({ ...prev, [activeTab]: normalized }));
@@ -754,7 +756,7 @@ export const Editor: React.FC<EditorProps> = ({
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
-                            className="bg-zinc-900 border border-white/10 p-8 rounded-[2.5rem] max-w-md w-full shadow-2xl"
+                            className="bg-zinc-900 border border-white/10 p-8 rounded-2xl max-w-md w-full shadow-2xl"
                             onClick={e => e.stopPropagation()}
                         >
                             <h2 className="text-xl font-black text-white uppercase tracking-widest mb-6 text-center">Select Language</h2>
