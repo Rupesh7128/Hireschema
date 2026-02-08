@@ -43,7 +43,8 @@ const LANGUAGES = [
 const QUICK_ACTIONS = [
     { id: 'ats', label: 'ATS Optimize', icon: Target, prompt: "Optimize this for ATS keywords and professional clarity." },
     { id: 'impact', label: 'High Impact', icon: Zap, prompt: "Rewrite to be more impact-driven with strong action verbs." },
-    { id: 'concise', label: 'Make Concise', icon: Minimize2, prompt: "Shorten this while keeping all key information." }
+    { id: 'concise', label: 'Make Concise', icon: Minimize2, prompt: "Shorten this while keeping all key information." },
+    { id: 'format', label: 'Fix Formatting', icon: Layout, prompt: "Fix formatting issues: improve readability, spacing, headings, and bullet consistency. Keep it ATS-friendly." }
 ];
 
 export const Editor: React.FC<EditorProps> = ({
@@ -262,7 +263,13 @@ export const Editor: React.FC<EditorProps> = ({
                 language: appLanguage,
                 resumeText: localResumeText
             });
-            const normalized = tab === GeneratorType.ATS_RESUME ? normalizeAtsResumeMarkdown(content) : content;
+            let normalized = tab === GeneratorType.ATS_RESUME ? normalizeAtsResumeMarkdown(content) : content;
+            if (tab === GeneratorType.ATS_RESUME) {
+                try {
+                    const boosted = await refineContent(normalized, QUICK_ACTIONS[0].prompt, jobDescription);
+                    normalized = normalizeAtsResumeMarkdown(boosted);
+                } catch {}
+            }
             setGeneratedData(prev => ({ ...prev, [tab]: normalized }));
             if (tab === GeneratorType.ATS_RESUME) {
                 const score = await calculateImprovedScore(normalized, jobDescription);
