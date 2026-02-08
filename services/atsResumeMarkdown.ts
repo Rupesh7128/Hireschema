@@ -13,6 +13,10 @@ export const normalizeAtsResumeMarkdown = (markdown: string) => {
     return `## ${sectionWord.toUpperCase()}`;
   };
 
+  // Fix: Ensure headers starting with ## or ### are on their own lines with proper spacing
+  // Case: Header follows text on the same line or next line without sufficient spacing
+  out = out.replace(/([^\n])\s*(#{2,3}\s+)/g, '$1\n\n$2');
+
   const lines = out.split('\n');
   let firstNonEmpty = 0;
   while (firstNonEmpty < lines.length && lines[firstNonEmpty].trim() === '') firstNonEmpty += 1;

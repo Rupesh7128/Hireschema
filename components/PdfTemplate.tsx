@@ -85,17 +85,17 @@ const CustomH3 = ({ children }: { children: React.ReactNode }) => {
     const parts = text.split('|').map(p => p.trim());
     
     // Format: Job Title | Company | Date | Location
-    if (parts.length >= 3) {
+    if (parts.length >= 2) {
       const title = parts[0];
       const company = parts[1];
-      const date = parts[2];
+      const date = parts[2] || '';
       const location = parts[3] || '';
 
       return (
         <div className="pdf-job-header">
           <div className="pdf-job-row">
             <span className="pdf-job-title">{title}</span>
-            <span className="pdf-job-date">{date}{location ? `, ${location}` : ''}</span>
+            {date && <span className="pdf-job-date">{date}{location ? `, ${location}` : ''}</span>}
           </div>
           <div className="pdf-job-company">{company}</div>
         </div>
