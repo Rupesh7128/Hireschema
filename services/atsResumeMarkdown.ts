@@ -19,7 +19,8 @@ export const normalizeAtsResumeMarkdown = (markdown: string) => {
 
   // Fix: Ensure bolded keys (like **Category:**) start on a new line if they are embedded in text
   // This is common in Skills sections where AI might inline multiple categories
-  out = out.replace(/([^\n])\s+(\*\*[^*]+:\*\*)/g, '$1\n\n$2');
+  // We handle both **Category:** and **Category**: patterns
+  out = out.replace(/([^\n])\s*(\*\*[^*]+:\*\*|\*\*[^*]+\*\*:)/g, '$1\n\n$2');
 
   const lines = out.split('\n');
   let firstNonEmpty = 0;
