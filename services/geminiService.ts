@@ -1255,8 +1255,9 @@ export const generateContent = async (
       FORMATTING REQUIREMENTS:
       1. **Formal Letter Format**: Include a proper salutation and sign-off.
       2. **Structure**: Use clear paragraphs (Introduction, Body, Conclusion).
-      3. **Length**: STRICTLY ONE PAGE. Be concise but impactful.
-      4. **Padding/Spacing**: Ensure the content fits comfortably within a standard page with good whitespace.
+      3. **Spacing**: Use DOUBLE BLANK LINES between every paragraph. This is critical for readability.
+      4. **Length**: STRICTLY ONE PAGE. Be concise but impactful.
+      5. **Padding/Spacing**: Ensure the content fits comfortably within a standard page with good whitespace.
 
       The cover letter should:
       1. Open with enthusiasm for the specific role
@@ -1290,6 +1291,7 @@ export const generateContent = async (
       4. Common pitfalls to avoid.
       
       Structure the output clearly with headers.
+      CRITICAL: Separate each Question/Answer pair with a DOUBLE BLANK LINE to ensure proper spacing.
       
       ${langInstruction}
       `;
@@ -1323,6 +1325,7 @@ export const generateContent = async (
         3. **Study Plan**: Estimated time and key concepts to master.
         
         Present it as a step-by-step roadmap to job readiness.
+        CRITICAL: Separate each module with a DOUBLE BLANK LINE.
         
         ${langInstruction}
         `;

@@ -2,6 +2,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
+import remarkBreaks from 'remark-breaks';
+import remarkGfm from 'remark-gfm';
 import { 
     FileText, Mail, MessageSquare, GraduationCap, 
     Download, Printer, RefreshCw, Globe, 
@@ -444,6 +446,7 @@ export const Editor: React.FC<EditorProps> = ({
     // --- RENDER HELPERS ---
     const renderMarkdown = (content: string) => (
         <ReactMarkdown
+            remarkPlugins={[remarkGfm, remarkBreaks]}
             components={{
                 h1: ({...props}) => <h1 className="text-4xl font-black uppercase tracking-tight mb-6 border-b-2 pb-2 text-black" style={{ borderColor: accentColor.value }} {...props} />,
                 h2: ({...props}) => <h2 className="text-lg font-black uppercase tracking-widest mt-12 mb-4" style={{ color: accentColor.value }} {...props} />,

@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { forwardRef } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkBreaks from 'remark-breaks';
+import remarkGfm from 'remark-gfm';
 import { ContactProfile } from '../types';
 
 interface PdfTemplateProps {
@@ -324,6 +326,7 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
           )}
           
           <ReactMarkdown
+            remarkPlugins={[remarkGfm, remarkBreaks]}
             components={{
               h3: CustomH3
             }}

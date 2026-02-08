@@ -5,6 +5,7 @@ import { Upload, AlertCircle, ArrowRight, Flame, Skull, TrendingDown, Trophy, Ro
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 import { AnimatedLogo } from './AnimatedLogo';
 import { FileData, GeneratorType } from '../types';
 import { generateContent, extractTextFromPdf } from '../services/geminiService';
@@ -523,7 +524,7 @@ export const RoastPage: React.FC<RoastPageProps> = ({ onNavigate, appLanguage = 
                             prose-code:bg-zinc-800 prose-code:text-orange-400 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-[10px]
                         ">
                             <ReactMarkdown 
-                                remarkPlugins={[remarkGfm]}
+                                remarkPlugins={[remarkGfm, remarkBreaks]}
                                 components={{
                                     h1: ({node, ...props}) => <h1 className="text-2xl font-black text-orange-500 mb-5 pb-3 border-b border-orange-500/20 tracking-tight" {...props} />,
                                     h2: ({node, ...props}) => <h2 className="text-xl font-black text-orange-500 mt-8 mb-3 pb-1.5 border-b border-white/5" {...props} />,
