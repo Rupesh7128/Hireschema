@@ -43,8 +43,83 @@ const LANGUAGES = [
     "English", "Spanish", "French", "German", "Hindi", "Portuguese", "Japanese", "Korean"
 ];
 
+const ATS_OPTIMIZE_DEFAULT_PROMPT = `You are a senior recruiter + ATS optimization expert for mid to senior-level roles.
+
+INPUTS:
+1. Job Description (JD)
+2. Candidate Resume (raw text)
+
+OBJECTIVE:
+Optimize the resume to be a strong match for the given Job Description while keeping all content truthful, senior, and ATS-friendly.
+
+STRICT RULES (DO NOT VIOLATE):
+- Do NOT invent companies, tools, metrics, or experience
+- Do NOT exaggerate numbers or responsibilities
+- Use ONLY information already present in the resume
+- If a JD skill is missing, reframe adjacent experience instead of fabricating it
+- Keep formatting clean, simple, and ATS-readable (no tables, icons, or graphics)
+
+PROCESS TO FOLLOW STEP-BY-STEP:
+
+STEP 1: JD INTELLIGENCE EXTRACTION
+From the Job Description, extract and list:
+- Core role title(s)
+- Top 10–15 hard keywords (skills, tools, processes)
+- Top 5–8 business outcomes the role is accountable for
+- Seniority level and operating model (IC / Manager / Global / Marketplace / D2C / B2B / B2C)
+
+STEP 2: RESUME GAP MAPPING
+Compare the JD requirements against the resume and:
+- Identify matching experience
+- Identify partial matches that can be reframed
+- Identify gaps that must be left out (do NOT fabricate)
+
+STEP 3: SUMMARY REWRITE
+Rewrite the resume summary to:
+- Mirror the JD role title and seniority
+- Highlight scale (revenue, GMV, impact) relevant to the JD
+- Mention the operating model (e-commerce, marketplace, private brands, global, etc.)
+- Be 3–4 lines maximum
+- Sound confident, not generic
+
+STEP 4: EXPERIENCE OPTIMIZATION
+For each role:
+- Rewrite bullets to emphasize JD-aligned outcomes
+- Lead with impact (growth, margin, scale, efficiency)
+- Use JD keywords naturally in context
+- Keep 4–6 bullets per role
+- Use action verbs (Owned, Drove, Led, Scaled, Optimized)
+
+STEP 5: SKILLS SECTION REBUILD
+Rebuild the Skills section into:
+- Business & Category Management
+- Analytics & Tools
+- Buying / Sourcing / Vendor Management
+- Leadership & Stakeholder Management
+
+Only include skills that are:
+- Present in the resume OR
+- Strongly implied by responsibilities
+
+STEP 6: ATS CHECK
+Before final output:
+- Ensure JD keywords appear naturally across Summary, Experience, and Skills
+- Avoid keyword stuffing
+- Ensure consistent job titles
+- Ensure no unexplained gaps or contradictions
+
+OUTPUT FORMAT:
+- Final optimized resume in clean text
+- Use standard resume headings:
+  ## SUMMARY
+  ## EXPERIENCE
+  ## SKILLS
+  ## EDUCATION
+- Do NOT include explanations or analysis
+- Do NOT include confidence scores or commentary`;
+
 const QUICK_ACTIONS = [
-    { id: 'ats', label: 'ATS Optimize', icon: Target, prompt: "Optimize this for ATS keywords while preserving the original content and tone." },
+    { id: 'ats', label: 'ATS Optimize', icon: Target, prompt: ATS_OPTIMIZE_DEFAULT_PROMPT },
     { id: 'impact', label: 'High Impact', icon: Zap, prompt: "Rewrite to be more impact-driven with strong action verbs." },
     { id: 'concise', label: 'Make Concise', icon: Minimize2, prompt: "Shorten this while keeping all key information." },
     { id: 'format', label: 'Fix Formatting', icon: Layout, prompt: "Fix formatting issues: improve readability, spacing, headings, and bullet consistency. Keep it ATS-friendly." }
@@ -336,7 +411,7 @@ export const Editor: React.FC<EditorProps> = ({
                     const mustIncludeSkills = getMustIncludeSkills(localResumeText, jobDescription);
                     const missingKeywords = prioritizeKeywords(analysis.missingKeywords || []).slice(0, 18);
                     const basePrompt = [
-                        QUICK_ACTIONS[0].prompt,
+                        ATS_OPTIMIZE_DEFAULT_PROMPT,
                         missingKeywords.length > 0
                             ? `Strategically incorporate these missing keywords where truthful and natural: ${missingKeywords.join(', ')}.`
                             : '',
@@ -357,7 +432,8 @@ export const Editor: React.FC<EditorProps> = ({
                             `Second pass ATS keyword injection.`,
                             `Remaining missing keywords: ${prioritizeKeywords(coverage.stillMissing).slice(0, 18).join(', ')}.`,
                             `Add ONLY if they plausibly match existing experience/skills. Place them into Skills/Tools/Tech stack lists rather than inventing new work.`,
-                            `Keep formatting tight and ATS-friendly.`
+                            `Keep formatting tight and ATS-friendly.`,
+                            `Return ONLY the resume. Keep headings as: ## SUMMARY, ## EXPERIENCE, ## SKILLS, ## EDUCATION.`
                         ].join('\n');
                         const boosted2 = await refineAtsResumeContent(normalized, followUpPrompt, jobDescription, localResumeText);
                         normalized = normalizeAtsResumeMarkdown(boosted2);
@@ -369,7 +445,8 @@ export const Editor: React.FC<EditorProps> = ({
                             const skillPassPrompt = [
                                 `Final pass: ensure key JD skills that are already in the ORIGINAL resume are present in the final output.`,
                                 `Missing (but present in resume + JD): ${stillMissingSkills.join(', ')}.`,
-                                `Add them to ## SKILLS (or existing bullets) without inventing any new claims. Keep one-page and ATS formatting rules.`
+                                `Add them to ## SKILLS (or existing bullets) without inventing any new claims. Keep formatting clean and ATS-friendly.`,
+                                `Return ONLY the resume. Keep headings as: ## SUMMARY, ## EXPERIENCE, ## SKILLS, ## EDUCATION.`
                             ].join('\n');
                             const boosted3 = await refineAtsResumeContent(normalized, skillPassPrompt, jobDescription, localResumeText);
                             normalized = normalizeAtsResumeMarkdown(boosted3);
