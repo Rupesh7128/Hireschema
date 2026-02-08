@@ -205,6 +205,8 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
           fontFamily: type === 'cover_letter' ? "'Georgia', 'Times New Roman', serif" : "'Inter', 'Helvetica', 'Arial', sans-serif",
           fontSize: '10pt',
           lineHeight: '1.4',
+          overflowWrap: 'anywhere',
+          wordBreak: 'break-word',
           boxSizing: 'border-box',
           overflow: 'hidden'
         }}
@@ -256,9 +258,9 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
           
           /* Job Headers (Custom H3) */
           .pdf-job-header { margin: 12px 0 4px 0; }
-          .pdf-job-row { display: flex; justify-content: space-between; align-items: baseline; }
-          .pdf-job-title { font-size: 10.5pt; font-weight: 800; color: #111827; }
-          .pdf-job-date { font-size: 10pt; font-weight: 700; color: #111827; text-align: right; }
+          .pdf-job-row { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; }
+          .pdf-job-title { font-size: 10.5pt; font-weight: 800; color: #111827; flex: 1 1 auto; min-width: 0; }
+          .pdf-job-date { font-size: 10pt; font-weight: 700; color: #111827; text-align: right; flex: 0 0 auto; white-space: nowrap; }
           .pdf-job-company { font-size: 10pt; font-weight: 600; color: #374151; margin-top: 1px; }
           
           /* Fallback H3 */

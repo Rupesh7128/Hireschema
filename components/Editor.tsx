@@ -605,8 +605,8 @@ export const Editor: React.FC<EditorProps> = ({
             await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
             await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
 
-            const exportWidth = Math.max(794, element.scrollWidth, element.clientWidth);
-            const exportHeight = Math.max(1123, element.scrollHeight, element.clientHeight);
+            const exportWidth = Math.max(794, element.clientWidth);
+            const exportHeight = Math.max(1123, element.scrollHeight);
             const maxCanvasHeight = 30000;
             const preferredScale = 2;
             const minScale = 0.25;
