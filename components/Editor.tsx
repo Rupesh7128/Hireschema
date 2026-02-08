@@ -9,8 +9,6 @@ import {
     Download, Printer, RefreshCw, Globe, 
     Check, ChevronDown, Wand2, Copy, 
     Edit2, Send, Loader2, Sparkles,
-    Target, ShieldCheck, Zap, ArrowRight,
-    Eye, Settings, Layout, Minimize2
 } from 'lucide-react';
 import { FileData, AnalysisResult, GeneratorType } from '../types';
 import { generateContent, calculateImprovedScore, refineContent, refineAtsResumeContent, regenerateSection } from '../services/geminiService';
@@ -117,13 +115,6 @@ OUTPUT FORMAT:
   ## EDUCATION
 - Do NOT include explanations or analysis
 - Do NOT include confidence scores or commentary`;
-
-const QUICK_ACTIONS = [
-    { id: 'ats', label: 'ATS Optimize', icon: Target, prompt: ATS_OPTIMIZE_DEFAULT_PROMPT },
-    { id: 'impact', label: 'High Impact', icon: Zap, prompt: "Rewrite to be more impact-driven with strong action verbs." },
-    { id: 'concise', label: 'Make Concise', icon: Minimize2, prompt: "Shorten this while keeping all key information." },
-    { id: 'format', label: 'Fix Formatting', icon: Layout, prompt: "Fix formatting issues: improve readability, spacing, headings, and bullet consistency. Keep it ATS-friendly." }
-];
 
 export const Editor: React.FC<EditorProps> = ({
     analysisId,
@@ -421,6 +412,7 @@ export const Editor: React.FC<EditorProps> = ({
                         minYears
                             ? `The JD mentions a minimum of ${minYears}+ years of experience. If (and only if) the ORIGINAL resume dates support it, state "${minYears}+ years" in the SUMMARY. Otherwise omit.`
                             : '',
+                        `Make the resume high-impact and ATS-clean automatically: lead bullets with outcomes + action verbs, and ensure clean headings and consistent bullets.`,
                         `Do not add new claims. Do not change employers/titles/dates. Do not remove any existing skills/tools/technologies from the ORIGINAL resume text. Prefer adding keywords into Skills/Tools and existing bullets where they already apply. Avoid keyword stuffing.`
                     ].filter(Boolean).join('\n');
                     const boosted = await refineAtsResumeContent(normalized, basePrompt, jobDescription, localResumeText);
@@ -936,29 +928,6 @@ export const Editor: React.FC<EditorProps> = ({
 
                 {/* --- RIGHT CONTROL PANEL --- */}
                 <div className="w-[260px] border-l border-white/5 bg-zinc-950 flex flex-col shrink-0">
-                    <div className="p-3 border-b border-white/5">
-                        <h3 className="text-xs font-black text-zinc-500 uppercase tracking-[0.2em] mb-3">Tools</h3>
-                        
-                        <div className="space-y-2">
-                            {QUICK_ACTIONS.map(action => (
-                                <button
-                                    key={action.id}
-                                    onClick={() => handleRefine(action.prompt, action.label)}
-                                    disabled={isRefining || loadingStates[activeTab] || !generatedData[activeTab]}
-                                    className="w-full group flex items-center gap-2.5 p-2.5 bg-zinc-900/50 border border-white/5 rounded-lg hover:border-orange-500/50 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    <div className="w-7 h-7 rounded-md bg-orange-500/10 flex items-center justify-center shrink-0 group-hover:bg-orange-500 transition-colors">
-                                        <action.icon className="w-3 h-3 text-orange-500 group-hover:text-white" />
-                                    </div>
-                                    <div>
-                                        <div className="text-xs font-black text-white uppercase tracking-wider">{action.label}</div>
-                                        <div className="text-[10px] text-zinc-600 mt-0.5 tracking-tight">One-click boost</div>
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
                     <div className="flex-1 p-3 overflow-y-auto custom-scrollbar">
                         <div className="flex items-center justify-between mb-2.5">
                             <h3 className="text-xs font-black text-zinc-500 uppercase tracking-[0.2em]">Insights</h3>
