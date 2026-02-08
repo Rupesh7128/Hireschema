@@ -1194,7 +1194,8 @@ export const generateContent = async (
       • ONLY edit bullet points to integrate missing keywords from the Job Description.
       • Do NOT rewrite bullet points just to make them sound "better" or "more impactful" if they don't need keywords.
       • Keep the tone authentic to the original resume.
-      • Do NOT remove any Skills or Experience unless they are completely irrelevant.
+      • Do NOT remove any skills/tools/technologies mentioned anywhere in the ORIGINAL RESUME. If space is tight, compress/deduplicate and group, but keep every real skill.
+      • Do NOT remove or hide experience duration. If the JD expects "X+ years", ensure the resume reflects the candidate's real tenure based on the ORIGINAL RESUME dates (without inventing).
       • Do NOT change the meaning of any bullet point.
       
       **OUTPUT FORMAT (Rich Text 2.0, ATS-Optimized, One Page):**
@@ -1228,7 +1229,7 @@ export const generateContent = async (
       - The first non-empty line MUST be: ## SUMMARY
       - Keep it strictly ONE PAGE:
         - SUMMARY: 2-3 lines max (no bullets)
-        - EXPERIENCE: include the most relevant roles; max 3 roles; max 3 bullets per role; keep bullets 1 line when possible
+        - EXPERIENCE: include roles that best match the JD while preserving the candidate's real tenure; keep bullets 1 line when possible
         - EDUCATION: 1-2 lines per entry, no bullets unless essential
       - If you cannot quantify something, OMIT the metric (do not use placeholders).
       

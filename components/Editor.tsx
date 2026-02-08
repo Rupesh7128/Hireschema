@@ -16,6 +16,7 @@ import { FileData, AnalysisResult, GeneratorType } from '../types';
 import { generateContent, calculateImprovedScore, refineContent, refineAtsResumeContent, regenerateSection } from '../services/geminiService';
 import { normalizeAtsResumeMarkdown } from '../services/atsResumeMarkdown';
 import { saveStateBeforePayment } from '../services/stateService';
+import { includesKeyword, prioritizeKeywords } from '../services/keywordUtils';
 import PaymentLock from './PaymentLock';
 import { PdfTemplate } from './PdfTemplate';
 import { LoadingIndicator } from './LoadingIndicator';
@@ -250,6 +251,13 @@ export const Editor: React.FC<EditorProps> = ({
         setLocalResumeText(resumeText || '');
     }, [resumeText]);
 
+    const getKeywordCoverage = (optimizedMarkdown: string) => {
+        const missing = (analysis.missingKeywords || []).filter(Boolean);
+        const present = missing.filter(k => includesKeyword(optimizedMarkdown, k));
+        const stillMissing = missing.filter(k => !includesKeyword(optimizedMarkdown, k));
+        return { present, stillMissing };
+    };
+
     const generateTabContent = async (tab: GeneratorType, force = false) => {
         if (!isPaid || !localResumeText) return;
         if (loadingStates[tab]) return;
@@ -266,8 +274,28 @@ export const Editor: React.FC<EditorProps> = ({
             let normalized = tab === GeneratorType.ATS_RESUME ? normalizeAtsResumeMarkdown(content) : content;
             if (tab === GeneratorType.ATS_RESUME) {
                 try {
-                    const boosted = await refineAtsResumeContent(normalized, QUICK_ACTIONS[0].prompt, jobDescription, localResumeText);
+                    const missingKeywords = prioritizeKeywords(analysis.missingKeywords || []).slice(0, 18);
+                    const basePrompt = [
+                        QUICK_ACTIONS[0].prompt,
+                        missingKeywords.length > 0
+                            ? `Strategically incorporate these missing keywords where truthful and natural: ${missingKeywords.join(', ')}.`
+                            : '',
+                        `Do not add new claims. Do not change employers/titles/dates. Do not remove any existing skills/tools/technologies from the ORIGINAL resume text. Prefer adding keywords into Skills/Tools and existing bullets where they already apply. Avoid keyword stuffing.`
+                    ].filter(Boolean).join('\n');
+                    const boosted = await refineAtsResumeContent(normalized, basePrompt, jobDescription, localResumeText);
                     normalized = normalizeAtsResumeMarkdown(boosted);
+
+                    const coverage = getKeywordCoverage(normalized);
+                    if (coverage.stillMissing.length > 0) {
+                        const followUpPrompt = [
+                            `Second pass ATS keyword injection.`,
+                            `Remaining missing keywords: ${prioritizeKeywords(coverage.stillMissing).slice(0, 18).join(', ')}.`,
+                            `Add ONLY if they plausibly match existing experience/skills. Place them into Skills/Tools/Tech stack lists rather than inventing new work.`,
+                            `Keep formatting tight and ATS-friendly.`
+                        ].join('\n');
+                        const boosted2 = await refineAtsResumeContent(normalized, followUpPrompt, jobDescription, localResumeText);
+                        normalized = normalizeAtsResumeMarkdown(boosted2);
+                    }
                 } catch {}
             }
             setGeneratedData(prev => ({ ...prev, [tab]: normalized }));
