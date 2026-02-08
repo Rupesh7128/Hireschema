@@ -451,6 +451,16 @@ export async function extractTextFromPdf(base64Data: string): Promise<string> {
     const pdf = await loadingTask.promise;
     const maxPages = Math.min(pdf.numPages || 0, 50);
     let fullText = '';
+    const collectedLinks: string[] = [];
+
+    const normalizeLink = (value: string) => {
+      const trimmed = String(value || '').trim();
+      if (!trimmed) return '';
+      if (/^(https?:\/\/|mailto:|tel:)/i.test(trimmed)) return trimmed;
+      if (/^www\./i.test(trimmed)) return `https://${trimmed}`;
+      if (/^linkedin\.com\//i.test(trimmed)) return `https://${trimmed}`;
+      return trimmed;
+    };
 
     for (let i = 1; i <= maxPages; i++) {
       const page = await pdf.getPage(i);
@@ -460,14 +470,20 @@ export async function extractTextFromPdf(base64Data: string): Promise<string> {
       // @ts-ignore
       const items = (textContent.items || []) as Array<{ str?: string; hasEOL?: boolean }>;
 
-      // Extract annotations (links)
       // @ts-ignore
       const annotations = await page.getAnnotations();
       const linksFromAnnotations = (annotations || [])
         // @ts-ignore
-        .filter((a: any) => a.subtype === 'Link' && a.url)
+        .filter((a: any) => a && a.subtype === 'Link')
         // @ts-ignore
-        .map((a: any) => a.url);
+        .map((a: any) => a.url || a.unsafeUrl || a?.action?.url || a?.action?.unsafeUrl)
+        .filter((u: any) => typeof u === 'string')
+        .map((u: string) => normalizeLink(u))
+        .filter((u: string) => {
+          if (!u) return false;
+          if (/^(https?:\/\/|mailto:|tel:)/i.test(u)) return true;
+          return /linkedin\.com/i.test(u);
+        });
 
       const buf: string[] = [];
       for (const item of items) {
@@ -484,17 +500,26 @@ export async function extractTextFromPdf(base64Data: string): Promise<string> {
         .replace(/[ \t]{2,}/g, ' ')
         .trim();
 
-      const linkedinRegex = /linkedin\.com\/in\/[a-zA-Z0-9_-]+/gi;
-      const links = pageText.match(linkedinRegex) || [];
-      const uniqueLinks = [...new Set([...links, ...linksFromAnnotations.filter((l: string) => l.includes('linkedin.com'))])];
-      const linksText = uniqueLinks.length > 0 ? `\n\n[Metadata: ${uniqueLinks.join(', ')}]\n` : '';
-
       if (pageText) {
-        fullText += pageText + linksText + '\n';
+        fullText += pageText + '\n';
+      }
+
+      const urlRegex = /\bhttps?:\/\/[^\s)<>"']+/gi;
+      const urlsInText = pageText.match(urlRegex) || [];
+      const linkedinRegex = /\blinkedin\.com\/(?:in|company)\/[a-zA-Z0-9_-]+/gi;
+      const linkedinNoScheme = pageText.match(linkedinRegex) || [];
+      const normalizedInlineLinks = [...urlsInText, ...linkedinNoScheme.map(normalizeLink)]
+        .map(normalizeLink)
+        .filter(Boolean);
+
+      for (const u of [...linksFromAnnotations, ...normalizedInlineLinks]) {
+        if (u) collectedLinks.push(u);
       }
     }
 
-    return fullText.trim();
+    const uniqueLinks = [...new Set(collectedLinks)].filter(Boolean);
+    const linksText = uniqueLinks.length > 0 ? `\n\n[Metadata: ${uniqueLinks.slice(0, 25).join(', ')}]\n` : '';
+    return (fullText + linksText).trim();
   } catch (e: any) {
     if (e?.name === 'PasswordException' || String(e?.message || '').toLowerCase().includes('password')) {
       throw new Error('The PDF is password protected. Please remove the password and upload again.');
@@ -789,9 +814,27 @@ export const analyzeResume = async (
   }
 
   let resumeText = '';
+  let pdfMetadataLinks: string[] = [];
+  const extractMetadataLinks = (raw: string) => {
+    const input = String(raw || '');
+    const matches = [...input.matchAll(/\[Metadata:\s*([^\]]+)\]/gi)];
+    const parts = matches
+      .map(m => String(m[1] || ''))
+      .join(', ')
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean);
+    const urls = parts
+      .map(u => u.trim())
+      .filter(u => /^(https?:\/\/|mailto:|tel:)/i.test(u) || /linkedin\.com/i.test(u))
+      .map(u => (u.startsWith('http') || u.startsWith('mailto:') || u.startsWith('tel:')) ? u : `https://${u}`);
+    return [...new Set(urls)].slice(0, 25);
+  };
+
   if ((resumeFile.type || '').includes('pdf')) {
     try {
       resumeText = await extractTextFromPdf(resumeFile.base64);
+      pdfMetadataLinks = extractMetadataLinks(resumeText);
     } catch (e: any) {
       throw new Error(e?.message || 'Failed to read PDF.');
     }
@@ -808,6 +851,9 @@ export const analyzeResume = async (
     const visionText = await extractTextFromPdfWithVision(resumeFile.base64, 5);
     if (visionText) {
       resumeText = visionText;
+      if (pdfMetadataLinks.length > 0) {
+        resumeText += `\n\n[Metadata: ${pdfMetadataLinks.join(', ')}]\n`;
+      }
     } else {
       throw new Error('Could not extract readable text from this PDF. If it is scanned, please export a text-based PDF and upload again.');
     }
@@ -815,6 +861,9 @@ export const analyzeResume = async (
     const visionText = await extractTextFromPdfWithVision(resumeFile.base64, 3);
     if (visionText) {
       resumeText = visionText;
+      if (pdfMetadataLinks.length > 0) {
+        resumeText += `\n\n[Metadata: ${pdfMetadataLinks.join(', ')}]\n`;
+      }
     }
   }
   
@@ -906,6 +955,15 @@ export const analyzeResume = async (
     const txt = response.response.text();
     const parsed = safeJson(txt);
     if (parsed) {
+      const contactProfile = (parsed as any).contactProfile && typeof (parsed as any).contactProfile === 'object'
+        ? { ...(parsed as any).contactProfile }
+        : { name: '', email: '', phone: '', linkedin: '', location: '' };
+      const hasLinkedIn = typeof contactProfile.linkedin === 'string' && contactProfile.linkedin.trim().length > 0;
+      if (!hasLinkedIn && pdfMetadataLinks.length > 0) {
+        const linkedInFromPdf = pdfMetadataLinks.find(u => /linkedin\.com\/in\//i.test(u) || /linkedin\.com\/company\//i.test(u)) || '';
+        if (linkedInFromPdf) contactProfile.linkedin = linkedInFromPdf;
+      }
+
       const requiredLanguages = Array.isArray((parsed as any).requiredLanguages) ? (parsed as any).requiredLanguages : [];
       const resumeLanguages = Array.isArray((parsed as any).languages) ? (parsed as any).languages : [];
       const languageMatch = computeLanguageMatch(requiredLanguages, resumeLanguages);
@@ -922,6 +980,7 @@ export const analyzeResume = async (
         ...(parsed as AnalysisResult),
         jobTitle: resolvedJobTitle || (parsed as any).jobTitle,
         company: resolvedCompany || (parsed as any).company,
+        contactProfile,
         languages: resumeLanguages,
         requiredLanguages,
         languageMatch

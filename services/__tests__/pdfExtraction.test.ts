@@ -12,11 +12,15 @@ describe('extractTextFromPdf', () => {
     const getTextContent = vi.fn()
       .mockResolvedValueOnce({ items: [{ str: 'Hello', hasEOL: true }, { str: 'World' }] })
       .mockResolvedValueOnce({ items: [{ str: 'Page2', hasEOL: true }, { str: 'Text' }] });
+    const getAnnotations = vi.fn()
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([]);
 
     const fakePdf = {
       numPages: 2,
       getPage: vi.fn(async () => ({
-        getTextContent
+        getTextContent,
+        getAnnotations
       }))
     };
 
@@ -33,6 +37,30 @@ describe('extractTextFromPdf', () => {
     expect(text).toContain('Text');
   });
 
+  it('extracts hyperlink URLs from annotations', async () => {
+    const getTextContent = vi.fn().mockResolvedValue({ items: [] });
+    const getAnnotations = vi.fn().mockResolvedValue([
+      { subtype: 'Link', url: 'https://linkedin.com/in/test-user' }
+    ]);
+
+    const fakePdf = {
+      numPages: 1,
+      getPage: vi.fn(async () => ({
+        getTextContent,
+        getAnnotations
+      }))
+    };
+
+    (global as any).window = {
+      pdfjsLib: {
+        getDocument: vi.fn(() => ({ promise: Promise.resolve(fakePdf) }))
+      }
+    };
+
+    const text = await extractTextFromPdf(base64Of('fakepdf'));
+    expect(text).toContain('https://linkedin.com/in/test-user');
+  });
+
   it('throws a clear error for password-protected PDFs', async () => {
     (global as any).window = {
       pdfjsLib: {
@@ -43,4 +71,3 @@ describe('extractTextFromPdf', () => {
     await expect(extractTextFromPdf(base64Of('fakepdf'))).rejects.toThrow(/password protected/i);
   });
 });
-
