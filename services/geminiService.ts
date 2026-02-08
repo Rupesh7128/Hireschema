@@ -1255,11 +1255,31 @@ export const generateContent = async (
       
       FORMATTING REQUIREMENTS:
       1. **Formal Letter Format**: Include a proper salutation and sign-off.
-      2. **Structure**: Use clear paragraphs (Introduction, Body, Conclusion).
+      2. **Structure**: 4–6 SHORT paragraphs (each paragraph max 2–4 sentences).
       3. **Spacing**: Use DOUBLE BLANK LINES between every paragraph. This is critical for readability.
       4. **Length**: STRICTLY ONE PAGE. Be concise but impactful.
-      5. **Padding/Spacing**: Ensure the content fits comfortably within a standard page with good whitespace.
-      6. **Typography**: Use standard Title Case for headers (e.g., "Dear Hiring Manager"). DO NOT USE ALL CAPS.
+      5. **Typography**: Do NOT use ALL CAPS headers. No tables.
+      6. **No Wall-of-Text**: Break long ideas into separate paragraphs. Do NOT output one giant paragraph.
+      
+      REQUIRED OUTPUT TEMPLATE (follow exactly; fill with JD-specific details, but never fabricate):
+      ${profile.name || 'Candidate Name'}
+      ${[profile.email, profile.phone, profile.location].filter(Boolean).join(' | ') || ''}
+      
+      Re: <Role Title from JD>
+      
+      Dear Hiring Manager,
+      
+      <Paragraph 1: Role interest + 1-line fit summary>
+      
+      <Paragraph 2: Most relevant experience #1 (from resume) aligned to JD outcomes>
+      
+      <Paragraph 3: Most relevant experience #2 (from resume) aligned to JD keywords>
+      
+      <Paragraph 4: Why this company/role (only what can be inferred from JD) + close>
+      
+      Sincerely,
+      
+      ${profile.name || 'Candidate Name'}
 
       The cover letter should:
       1. Open with enthusiasm for the specific role
@@ -1293,8 +1313,16 @@ export const generateContent = async (
       4. Common pitfalls to avoid.
       
       Structure the output clearly with headers.
-      CRITICAL: Separate each Question/Answer pair with a DOUBLE BLANK LINE to ensure proper spacing.
-      CRITICAL: Use Title Case for headers (e.g., "1. Tell me about yourself"). DO NOT USE ALL CAPS.
+      
+      FORMATTING REQUIREMENTS (follow exactly):
+      - Use Markdown.
+      - Use these exact blocks for every Q/A pair:
+        Q: <question text>
+        
+        A: <answer text (2–5 short paragraphs or a short bullet list when helpful)>
+      - Separate each Question/Answer pair with a DOUBLE BLANK LINE.
+      - Use Title Case for section headers. DO NOT USE ALL CAPS.
+      - Avoid walls of text. Prefer short paragraphs and bullets where appropriate.
       
       ${langInstruction}
       `;
@@ -1318,7 +1346,7 @@ export const generateContent = async (
         **Missing skills to learn**: ${analysis.missingKeywords.slice(0, 5).join(", ")}
         **Candidate's existing strengths**: ${analysis.keyStrengths.join(", ")}
         
-        Structure this as a formal educational syllabus/roadmap. For each missing skill, provide:
+        Structure this as a formal educational syllabus/roadmap. Make it extremely readable with strong spacing. For each missing skill, provide:
         
         ### [Skill Name] - Module
         1. **Why it matters**: Brief context for the target role.
@@ -1326,9 +1354,11 @@ export const generateContent = async (
            - **MUST include hyperlinks** (e.g., [Course Name](url)).
            - Prioritize free or highly reputable sources (Coursera, edX, YouTube, official docs).
         3. **Study Plan**: Estimated time and key concepts to master.
+        4. **Practice Tasks**: 3–5 hands-on tasks/projects the candidate can do (no fabrication; generic practice tasks are fine).
         
         Present it as a step-by-step roadmap to job readiness.
         CRITICAL: Separate each module with a DOUBLE BLANK LINE.
+        CRITICAL: No tables. Use bullets and short paragraphs.
         
         ${langInstruction}
         `;
