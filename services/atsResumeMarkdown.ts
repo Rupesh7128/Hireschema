@@ -3,6 +3,15 @@ export const normalizeAtsResumeMarkdown = (markdown: string) => {
   let out = input;
 
   const recognizedSections = new Set(['summary', 'experience', 'skills', 'education']);
+  const normalizePlainHeadingLine = (line: string) => {
+    const trimmed = (line || '').trim();
+    const upper = trimmed.toUpperCase();
+    if (upper === 'SUMMARY') return '## SUMMARY';
+    if (upper === 'EXPERIENCE') return '## EXPERIENCE';
+    if (upper === 'SKILLS') return '## SKILLS';
+    if (upper === 'EDUCATION') return '## EDUCATION';
+    return null;
+  };
 
   const splitInlineSection = (line: string) => {
     const idx = line.indexOf('##');
@@ -23,6 +32,10 @@ export const normalizeAtsResumeMarkdown = (markdown: string) => {
   out = out.replace(/([^\n])\s*(\*\*[^*]+:\*\*|\*\*[^*]+\*\*:)/g, '$1\n\n$2');
 
   const lines = out.split('\n');
+  for (let i = 0; i < lines.length; i += 1) {
+    const normalized = normalizePlainHeadingLine(lines[i]);
+    if (normalized) lines[i] = normalized;
+  }
   let firstNonEmpty = 0;
   while (firstNonEmpty < lines.length && lines[firstNonEmpty].trim() === '') firstNonEmpty += 1;
   if (firstNonEmpty < lines.length) {

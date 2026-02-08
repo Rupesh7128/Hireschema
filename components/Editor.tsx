@@ -41,80 +41,99 @@ const LANGUAGES = [
     "English", "Spanish", "French", "German", "Hindi", "Portuguese", "Japanese", "Korean"
 ];
 
-const ATS_OPTIMIZE_DEFAULT_PROMPT = `You are a senior recruiter + ATS optimization expert for mid to senior-level roles.
+const ATS_OPTIMIZE_DEFAULT_PROMPT = `You are a Senior Hiring Manager, ATS Architect, and Resume Optimization Engine.
 
-INPUTS:
-1. Job Description (JD)
-2. Candidate Resume (raw text)
+Your task is to transform a candidate’s resume into a highly targeted, JD-specific, “killer” resume that maximizes interview chances — while remaining 100% truthful and ATS-safe.
 
-OBJECTIVE:
-Optimize the resume to be a strong match for the given Job Description while keeping all content truthful, senior, and ATS-friendly.
+=====================
+INPUTS
+=====================
+1. Job Description (JD) – raw text
+2. Candidate Resume – raw text
 
-STRICT RULES (DO NOT VIOLATE):
-- Do NOT invent companies, tools, metrics, or experience
-- Do NOT exaggerate numbers or responsibilities
-- Use ONLY information already present in the resume
-- If a JD skill is missing, reframe adjacent experience instead of fabricating it
-- Keep formatting clean, simple, and ATS-readable (no tables, icons, or graphics)
+=====================
+ABSOLUTE CONSTRAINTS (NON-NEGOTIABLE)
+=====================
+- NEVER invent experience, tools, skills, metrics, companies, or certifications
+- NEVER exaggerate seniority, scope, or ownership
+- NEVER add keywords that cannot be reasonably inferred from the resume
+- If a JD requirement is missing:
+  → Reframe adjacent experience if possible
+  → Otherwise OMIT it silently
+- Do NOT mention missing skills or gaps
+- Keep formatting plain text, ATS-friendly, and recruiter-readable
 
-PROCESS TO FOLLOW STEP-BY-STEP:
+=====================
+CORE OBJECTIVE
+=====================
+Make the resume feel like it was written specifically for THIS job description,
+while preserving factual accuracy and professional seniority.
 
-STEP 1: JD INTELLIGENCE EXTRACTION
-From the Job Description, extract and list:
-- Core role title(s)
-- Top 10–15 hard keywords (skills, tools, processes)
-- Top 5–8 business outcomes the role is accountable for
-- Seniority level and operating model (IC / Manager / Global / Marketplace / D2C / B2B / B2C)
+=====================
+STEP-BY-STEP PROCESS (MANDATORY)
+=====================
 
-STEP 2: RESUME GAP MAPPING
-Compare the JD requirements against the resume and:
-- Identify matching experience
-- Identify partial matches that can be reframed
-- Identify gaps that must be left out (do NOT fabricate)
+STEP 1: JOB DESCRIPTION DECONSTRUCTION (CRITICAL)
+From the JD, extract and normalize:
+A. Role identity (title, seniority, domain, functional focus)
+B. Hard keywords (15–25): skills, processes, metrics, tools ONLY if explicitly listed in JD
+C. Responsibility clusters (4–6 buckets)
+D. Success signals (what success looks like)
 
-STEP 3: SUMMARY REWRITE
-Rewrite the resume summary to:
-- Mirror the JD role title and seniority
-- Highlight scale (revenue, GMV, impact) relevant to the JD
-- Mention the operating model (e-commerce, marketplace, private brands, global, etc.)
-- Be 3–4 lines maximum
-- Sound confident, not generic
+STEP 2: RESUME INTELLIGENCE EXTRACTION
+From the resume, extract roles/titles/companies/timelines, responsibilities, metrics/scale, tools/skills explicitly mentioned, and strongly implied skills (only reasonable professional implication).
 
-STEP 4: EXPERIENCE OPTIMIZATION
+STEP 3: JD → RESUME MAPPING LOGIC
+For each JD responsibility/keyword:
+- DIRECT MATCH (explicit)
+- PARTIAL MATCH (adjacent; can be reframed)
+- NO MATCH (ignore)
+Use ONLY DIRECT and PARTIAL matches.
+
+STEP 4: TITLE & POSITIONING ALIGNMENT
+Rewrite the headline / positioning to match the JD job title as closely as possible while staying truthful.
+Format:
+<Job Title> | <Core JD Function> | <Scale / Outcome>
+
+STEP 5: SUMMARY REWRITE (HIGH-IMPACT)
+- Mirror JD language and seniority
+- Mention domain + platform type
+- Highlight scale and outcomes relevant to JD
+- Include 2–3 key JD keywords naturally
+- 3–4 lines, no generic fluff
+
+STEP 6: EXPERIENCE SECTION REENGINEERING
 For each role:
-- Rewrite bullets to emphasize JD-aligned outcomes
-- Lead with impact (growth, margin, scale, efficiency)
-- Use JD keywords naturally in context
-- Keep 4–6 bullets per role
-- Use action verbs (Owned, Drove, Led, Scaled, Optimized)
+- 4–6 bullets max
+- Each bullet MUST follow: Action Verb → Scope → Method → Metric → Business Impact
+- Embed JD keywords ONLY where experience genuinely supports them
+- Prioritize JD-relevant bullets first; remove weak/irrelevant bullets
 
-STEP 5: SKILLS SECTION REBUILD
-Rebuild the Skills section into:
-- Business & Category Management
-- Analytics & Tools
-- Buying / Sourcing / Vendor Management
-- Leadership & Stakeholder Management
+STEP 7: SKILLS SECTION (ATS ENGINEERING)
+Rebuild SKILLS into these 4 sections:
+1. Business / Role-Specific Skills
+2. Domain & Functional Skills
+3. Analytics / Tools
+4. Leadership & Stakeholder Management
+Rules:
+- Use JD wording wherever truthful
+- Include only explicit or strongly implied skills
+- Tools ONLY if explicitly in JD AND present/implied in resume
 
-Only include skills that are:
-- Present in the resume OR
-- Strongly implied by responsibilities
+STEP 8: ATS + HUMAN VALIDATION PASS
+- JD job title appears naturally
+- 70%+ of critical JD keywords represented without stuffing
+- No contradictions in titles/timelines/scope
+- Senior, confident, precise language
 
-STEP 6: ATS CHECK
-Before final output:
-- Ensure JD keywords appear naturally across Summary, Experience, and Skills
-- Avoid keyword stuffing
-- Ensure consistent job titles
-- Ensure no unexplained gaps or contradictions
-
-OUTPUT FORMAT:
-- Final optimized resume in clean text
-- Use standard resume headings:
-  ## SUMMARY
-  ## EXPERIENCE
-  ## SKILLS
-  ## EDUCATION
-- Do NOT include explanations or analysis
-- Do NOT include confidence scores or commentary`;
+FINAL OUTPUT RULES
+- Output ONLY the final optimized resume
+- No explanations, no analysis, no scoring
+- Use standard headings only (plain text):
+  SUMMARY
+  EXPERIENCE
+  SKILLS
+  EDUCATION`;
 
 export const Editor: React.FC<EditorProps> = ({
     analysisId,
@@ -412,7 +431,6 @@ export const Editor: React.FC<EditorProps> = ({
                         minYears
                             ? `The JD mentions a minimum of ${minYears}+ years of experience. If (and only if) the ORIGINAL resume dates support it, state "${minYears}+ years" in the SUMMARY. Otherwise omit.`
                             : '',
-                        `Make the resume high-impact and ATS-clean automatically: lead bullets with outcomes + action verbs, and ensure clean headings and consistent bullets.`,
                         `Do not add new claims. Do not change employers/titles/dates. Do not remove any existing skills/tools/technologies from the ORIGINAL resume text. Prefer adding keywords into Skills/Tools and existing bullets where they already apply. Avoid keyword stuffing.`
                     ].filter(Boolean).join('\n');
                     const boosted = await refineAtsResumeContent(normalized, basePrompt, jobDescription, localResumeText);
@@ -521,7 +539,10 @@ export const Editor: React.FC<EditorProps> = ({
 
     const handleCopy = () => {
         if (generatedData[activeTab]) {
-            navigator.clipboard.writeText(generatedData[activeTab]);
+            const toCopy = activeTab === GeneratorType.ATS_RESUME
+                ? buildOptimizedPlainText()
+                : generatedData[activeTab];
+            navigator.clipboard.writeText(toCopy);
             setShowCopyToast(true);
             setTimeout(() => setShowCopyToast(false), 2000);
         }
