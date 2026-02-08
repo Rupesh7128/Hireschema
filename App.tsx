@@ -7,7 +7,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { LoadingIndicator } from './components/LoadingIndicator';
 import { FileData, AnalysisResult, HistoryItem, ContactProfile } from './types';
-import { analyzeResume, extractTextFromPdf, fetchJobDescriptionContent } from './services/geminiService';
+import { analyzeResume, extractResumeTextWithFallback, fetchJobDescriptionContent } from './services/geminiService';
 import { db } from './services/db';
 import { logEvent, logPageView } from './services/analytics';
 import { verifyDodoPayment, savePaymentState, isIdPaid } from './services/paymentService';
@@ -434,7 +434,7 @@ export default function App() {
     setResumeFile(file);
     if (file && file.type === 'application/pdf') {
       try {
-        const text = await extractTextFromPdf(file.base64);
+        const text = await extractResumeTextWithFallback(file);
         setResumeText(text);
       } catch (e) {
         console.error('Failed to extract text from PDF:', e);
@@ -758,10 +758,21 @@ export default function App() {
                           return (
                             <button 
                               key={item.id}
-                              onClick={() => {
+                              onClick={async () => {
                                 setSelectedHistoryId(item.id);
                                 setResumeFile(item.resumeFile);
-                                setResumeText(item.resumeText || '');
+                                const storedText = item.resumeText || '';
+                                if (storedText.trim().length >= 120) {
+                                  setResumeText(storedText);
+                                } else {
+                                  setResumeText('');
+                                  try {
+                                    const extracted = await extractResumeTextWithFallback(item.resumeFile);
+                                    setResumeText(extracted);
+                                  } catch {
+                                    setResumeText(storedText);
+                                  }
+                                }
                                 setJobDescription(item.jobDescription);
                                 setAnalysisResult(item.analysisResult);
                                 setDashboardView('result');

@@ -194,7 +194,7 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
         style={{ 
           backgroundColor: '#ffffff',
           color: '#000000',
-          padding: '14mm 16mm',
+          padding: '12mm 14mm',
           width: '210mm',
           height: '297mm',
           fontFamily: "'Inter', 'Helvetica', 'Arial', sans-serif",

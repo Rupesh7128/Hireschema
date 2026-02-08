@@ -41,7 +41,7 @@ const LANGUAGES = [
 ];
 
 const QUICK_ACTIONS = [
-    { id: 'ats', label: 'ATS Optimize', icon: Target, prompt: "Optimize this for ATS keywords and professional clarity." },
+    { id: 'ats', label: 'ATS Optimize', icon: Target, prompt: "Optimize this for ATS keywords while preserving the original content and tone." },
     { id: 'impact', label: 'High Impact', icon: Zap, prompt: "Rewrite to be more impact-driven with strong action verbs." },
     { id: 'concise', label: 'Make Concise', icon: Minimize2, prompt: "Shorten this while keeping all key information." },
     { id: 'format', label: 'Fix Formatting', icon: Layout, prompt: "Fix formatting issues: improve readability, spacing, headings, and bullet consistency. Keep it ATS-friendly." }
@@ -245,10 +245,8 @@ export const Editor: React.FC<EditorProps> = ({
 
     // --- INITIALIZATION & AUTO-GENERATION ---
     useEffect(() => {
-        if (!localResumeText && resumeText) {
-            setLocalResumeText(resumeText);
-        }
-    }, [resumeText, localResumeText]);
+        setLocalResumeText(resumeText || '');
+    }, [resumeText]);
 
     const generateTabContent = async (tab: GeneratorType, force = false) => {
         if (!isPaid || !localResumeText) return;

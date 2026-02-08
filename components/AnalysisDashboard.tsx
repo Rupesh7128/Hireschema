@@ -483,7 +483,7 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
               { title: "Skill Injection", desc: "Embed the top 3 missing keywords into your bullet points.", linkText: "GO TO EDITOR", onClick: () => onNavigateTab?.('generator') },
               { title: "Format Cleanup", desc: "Remove identified risks to ensure 100% ATS readability.", linkText: "VIEW RISKS", onClick: () => onNavigateTab?.('generator') },
               { title: "Story Alignment", desc: "Sync your summary with the Role Fit analysis below.", linkText: "UPDATE BIO", onClick: () => onNavigateTab?.('generator') },
-              { title: "Final Validation", desc: "Re-run analysis to hit the 85% golden score.", linkText: "RE-SCAN", onClick: () => onNavigateTab?.('generator') },
+              { title: "Final Validation", desc: "Re-run analysis to hit the 85% golden score.", linkText: "RE-SCAN", onClick: () => onReScan?.() },
             ].map((step, i) => (
               <div 
                 key={i} 
@@ -508,26 +508,32 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
         
         <div className="lg:col-span-5 space-y-4 lg:order-2">
           {/* Missing Keywords */}
-          <div className="bg-zinc-900/40 border border-white/5 p-4 rounded-2xl shadow-xl relative overflow-hidden">
-            <div className="flex items-center justify-between gap-3 mb-3">
-              <h3 className="text-xs font-black text-white uppercase tracking-widest">The Skill Gap</h3>
+          <div className="bg-zinc-900/40 border border-white/5 p-4 rounded-2xl shadow-xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-orange-500/5 blur-[40px] -mr-10 -mt-10 transition-opacity group-hover:opacity-100 opacity-50" />
+            <div className="flex items-center justify-between gap-3 mb-4 relative z-10">
+              <div className="flex items-center gap-2">
+                <Target className="w-4 h-4 text-orange-500" />
+                <h3 className="text-xs font-black text-white uppercase tracking-widest">The Skill Gap</h3>
+              </div>
               <button 
                 onClick={copyKeywords}
                 className={secondaryButtonClasses}
               >
-                {copiedKeywords ? 'DONE' : 'COPY ALL'}
+                {copiedKeywords ? 'COPIED' : 'COPY LIST'}
               </button>
             </div>
             
-            <div className="flex flex-wrap gap-1.5 mb-2">
+            <div className="flex flex-wrap gap-2 mb-2 relative z-10">
               {result.missingKeywords.length > 0 ? (
                 result.missingKeywords.map((keyword, idx) => (
-                  <span key={idx} className="px-2 py-1 bg-orange-500/5 text-orange-500 border border-orange-500/10 rounded-lg text-sm font-black tracking-tight">
+                  <span key={idx} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-zinc-950/50 text-orange-400 border border-orange-500/20 rounded-lg text-xs font-bold tracking-tight hover:bg-orange-500/10 transition-colors cursor-default">
+                    <X className="w-3 h-3 text-orange-500/70" />
                     {keyword}
                   </span>
                 ))
               ) : (
-                <div className="text-zinc-600 text-sm font-bold bg-zinc-950/50 p-2 rounded-lg w-full border border-orange-500/10 text-center">
+                <div className="text-emerald-400 text-sm font-bold bg-emerald-500/10 p-3 rounded-xl w-full border border-emerald-500/20 text-center flex items-center justify-center gap-2">
+                  <CheckCircle className="w-4 h-4" />
                   100% Keyword Match
                 </div>
               )}
@@ -596,16 +602,21 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
 
           {/* Technical Risks */}
           <div ref={risksRef} className="bg-zinc-900/40 border border-white/5 p-4 rounded-2xl shadow-xl">
-            <h3 className="text-xs font-black text-white uppercase tracking-widest mb-3">Technical Risks</h3>
-            <div className="space-y-2">
+            <div className="flex items-center gap-2 mb-4">
+              <ShieldAlert className="w-4 h-4 text-orange-500" />
+              <h3 className="text-xs font-black text-white uppercase tracking-widest">Critical Risks</h3>
+            </div>
+            <div className="space-y-2.5">
               {result.criticalIssues.length > 0 ? (
                 result.criticalIssues.map((issue, idx) => (
-                  <div key={idx} className="p-2 bg-orange-500/5 border border-orange-500/10 rounded-lg">
-                    <span className="text-sm text-zinc-400 leading-snug font-bold">{issue}</span>
+                  <div key={idx} className="flex gap-3 p-3 bg-red-500/5 border border-red-500/10 rounded-xl hover:bg-red-500/10 transition-colors group">
+                    <AlertTriangle className="w-4 h-4 text-red-500 shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
+                    <span className="text-xs text-zinc-300 leading-relaxed font-medium">{issue}</span>
                   </div>
                 ))
               ) : (
-                <div className="text-zinc-600 text-sm font-bold bg-zinc-950/50 p-2 rounded-lg border border-orange-500/10 text-center">
+                <div className="text-emerald-400 text-sm font-bold bg-emerald-500/10 p-3 rounded-xl border border-emerald-500/20 text-center flex items-center justify-center gap-2">
+                  <ShieldCheck className="w-4 h-4" />
                   Clean Formatting
                 </div>
               )}

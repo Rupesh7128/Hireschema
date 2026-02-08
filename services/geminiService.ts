@@ -597,6 +597,45 @@ const extractTextFromPdfWithVision = async (base64Data: string, pageLimit: numbe
   return String(response?.response?.text?.() || '').trim();
 };
 
+export const extractResumeTextWithFallback = async (resumeFile: FileData): Promise<string> => {
+  if (!resumeFile || !(resumeFile.type || '').includes('pdf')) return '';
+
+  let initialText = await extractTextFromPdf(resumeFile.base64);
+  if (initialText && isDefinitelyNotResume(initialText)) {
+    throw new Error(NON_RESUME_MESSAGE);
+  }
+
+  const extractMetadataLinks = (raw: string) => {
+    const input = String(raw || '');
+    const matches = [...input.matchAll(/\[Metadata:\s*([^\]]+)\]/gi)];
+    const parts = matches
+      .map(m => String(m[1] || ''))
+      .join(', ')
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean);
+    const urls = parts
+      .map(u => u.trim())
+      .filter(u => /^(https?:\/\/|mailto:|tel:)/i.test(u) || /linkedin\.com/i.test(u))
+      .map(u => (u.startsWith('http') || u.startsWith('mailto:') || u.startsWith('tel:')) ? u : `https://${u}`);
+    return [...new Set(urls)].slice(0, 25);
+  };
+
+  const stripMetadata = (raw: string) => String(raw || '').replace(/\[Metadata:[^\]]*\]/gi, ' ');
+  const { compactLen, hits } = getResumeSignals(stripMetadata(initialText));
+
+  if (compactLen < 120 || (compactLen < 250 && hits === 0)) {
+    const metadataLinks = extractMetadataLinks(initialText);
+    const visionText = await extractTextFromPdfWithVision(resumeFile.base64, compactLen < 120 ? 5 : 3);
+    if (visionText) {
+      const linksText = metadataLinks.length > 0 ? `\n\n[Metadata: ${metadataLinks.join(', ')}]\n` : '';
+      initialText = (visionText + linksText).trim();
+    }
+  }
+
+  return initialText;
+};
+
 export const calculateImprovedScore = async (
     generatedResumeText: string,
     jobDescription: string
@@ -678,9 +717,14 @@ export const refineAtsResumeContent = async (
     • Output placeholders like [Quantifiable %], [Insert], [TBD], or any bracket placeholders
 
     YOU MAY:
-    • Reword existing bullet points (same facts, better ATS phrasing)
+    • Improve ATS keyword alignment by emphasizing terms ALREADY PRESENT in the ORIGINAL RESUME
     • Improve structure/formatting and consistency
-    • Improve keyword alignment ONLY by emphasizing terms ALREADY PRESENT in the ORIGINAL RESUME
+
+    CRITICAL INSTRUCTIONS FOR CONTENT PRESERVATION:
+    • PRESERVE existing bullet points as much as possible.
+    • ONLY edit bullet points to integrate keywords.
+    • Do NOT rewrite bullet points just for style or "impact".
+    • Keep the tone authentic to the original resume.
 
     OUTPUT FORMAT (ATS-Optimized, One Page):
     - Output ONLY valid Markdown (no HTML).
@@ -1141,11 +1185,17 @@ export const generateContent = async (
       • Do NOT fabricate or guess missing details
       
       YOU MAY IMPROVE:
-      • Reword bullet points to sound more impactful (same facts, better phrasing)
-      • Improve ATS keyword alignment ONLY by emphasizing terms already present in the original resume
+      • Improve ATS keyword alignment by naturally integrating terms from the JD into existing bullet points
       • Write a professional summary based on their ACTUAL experience
       • Reorganize sections for better flow
-      • Use stronger action verbs
+      
+      CRITICAL INSTRUCTIONS FOR CONTENT PRESERVATION:
+      • PRESERVE the original bullet points as much as possible.
+      • ONLY edit bullet points to integrate missing keywords from the Job Description.
+      • Do NOT rewrite bullet points just to make them sound "better" or "more impactful" if they don't need keywords.
+      • Keep the tone authentic to the original resume.
+      • Do NOT remove any Skills or Experience unless they are completely irrelevant.
+      • Do NOT change the meaning of any bullet point.
       
       **OUTPUT FORMAT (Rich Text 2.0, ATS-Optimized, One Page):**
       - Output ONLY valid Markdown (no HTML).
@@ -1194,7 +1244,7 @@ export const generateContent = async (
 
     case GeneratorType.COVER_LETTER:
       userPrompt = `
-      Write a persuasive Cover Letter for the candidate.
+      Write a professional, persuasive Cover Letter for the candidate.
       
       CRITICAL - ZERO FABRICATION POLICY:
       • Use ONLY companies, job titles, and achievements from the ORIGINAL RESUME above
@@ -1202,6 +1252,12 @@ export const generateContent = async (
       • Reference their REAL work history exactly as shown in the resume
       • The candidate's name is: ${profile.name || 'the candidate'}
       
+      FORMATTING REQUIREMENTS:
+      1. **Formal Letter Format**: Include a proper salutation and sign-off.
+      2. **Structure**: Use clear paragraphs (Introduction, Body, Conclusion).
+      3. **Length**: STRICTLY ONE PAGE. Be concise but impactful.
+      4. **Padding/Spacing**: Ensure the content fits comfortably within a standard page with good whitespace.
+
       The cover letter should:
       1. Open with enthusiasm for the specific role
       2. Highlight 2-3 relevant experiences FROM THE RESUME
@@ -1211,25 +1267,29 @@ export const generateContent = async (
       ${langInstruction}
       ${toneInstruction}
       
-      Output only the cover letter text, ready to use.
+      Output only the cover letter text in Markdown, ready to use.
       `;
       break;
 
     case GeneratorType.INTERVIEW_PREP:
       userPrompt = `
-      Create an Interview Prep Kit for this candidate.
+      Create a comprehensive Interview Prep Kit for this candidate.
       
       CRITICAL - ZERO FABRICATION POLICY:
-      • ALL STAR examples MUST use companies, projects, and achievements from the ORIGINAL RESUME above
+      • ALL answers MUST use companies, projects, and achievements from the ORIGINAL RESUME above
       • Do NOT invent fictional scenarios or fake accomplishments
       • Reference ONLY their real work history as shown in the resume
       
       Include:
-      1. 10 Predicted Interview Questions based on the job description
-      2. STAR Method examples using ONLY experiences from the resume above
-         - For each STAR example, cite the specific company/role from their resume
-      3. Questions to ask the interviewer
-      4. Common pitfalls to avoid
+      1. **20 Predicted Interview Questions** based on the job description and resume.
+      2. **Professional Answers** for each question. 
+         - Do NOT use the STAR method labels explicitly. 
+         - Instead, provide natural, conversational, and impactful answers.
+         - Cite specific experiences from the resume to back up the answers.
+      3. Questions to ask the interviewer.
+      4. Common pitfalls to avoid.
+      
+      Structure the output clearly with headers.
       
       ${langInstruction}
       `;
@@ -1248,15 +1308,21 @@ export const generateContent = async (
     
     case GeneratorType.LEARNING_PATH:
         userPrompt = `
-        Create a "Mini Learning Path" to help this candidate fill skill gaps.
+        Create a comprehensive "Skill Gap Syllabus & Roadmap" to help this candidate fill skill gaps.
         
-        **Missing skills to learn**: ${analysis.missingKeywords.slice(0, 4).join(", ")}
+        **Missing skills to learn**: ${analysis.missingKeywords.slice(0, 5).join(", ")}
         **Candidate's existing strengths**: ${analysis.keyStrengths.join(", ")}
         
-        For each missing skill, provide:
-        1. Why it matters for the target role
-        2. 2-3 specific resources (courses, tutorials, projects)
-        3. Estimated time to learn basics
+        Structure this as a formal educational syllabus/roadmap. For each missing skill, provide:
+        
+        ### [Skill Name] - Module
+        1. **Why it matters**: Brief context for the target role.
+        2. **Curated Resources**: Provide 2-3 specific, high-quality courses or tutorials.
+           - **MUST include hyperlinks** (e.g., [Course Name](url)).
+           - Prioritize free or highly reputable sources (Coursera, edX, YouTube, official docs).
+        3. **Study Plan**: Estimated time and key concepts to master.
+        
+        Present it as a step-by-step roadmap to job readiness.
         
         ${langInstruction}
         `;
@@ -1338,7 +1404,8 @@ export const generateContent = async (
   console.log('[generateContent] originalResumeText length:', originalResumeText?.length || 0);
   console.log('[generateContent] First 200 chars of resumeText:', originalResumeText?.substring(0, 200) || 'EMPTY');
   
-  const resumeContext = originalResumeText && originalResumeText.length > 100
+  const hasOriginalResumeText = !!(originalResumeText && originalResumeText.trim().length > 0);
+  const resumeContext = hasOriginalResumeText
     ? `
 --------------------------------------------------------------------------------
 ORIGINAL RESUME CONTENT - THIS IS YOUR ONLY SOURCE OF TRUTH
@@ -1366,8 +1433,8 @@ Using limited profile data from analysis:
 - Key Strengths: ${analysis.keyStrengths?.join(", ") || 'Not available'}
 - Contact: ${JSON.stringify(analysis.contactProfile || {})}
 
-Since original resume is unavailable, create a TEMPLATE with placeholders.
-Use <Company Name>, <Job Title>, <School Name> as placeholders.
+CRITICAL: Do NOT fabricate details. If a required detail is missing, OMIT it.
+Do NOT output bracket placeholders like [TBD] or [Insert X].
 --------------------------------------------------------------------------------
 `;
 
