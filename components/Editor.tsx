@@ -554,16 +554,26 @@ export const Editor: React.FC<EditorProps> = ({
 
     const handleDownloadPDF = async () => {
         if (!generatedData[activeTab] || !pdfRef.current) return;
-        
-        // @ts-ignore
-        if (typeof window.html2pdf === 'undefined') {
-            console.error('html2pdf library not loaded');
-            alert('PDF library is still loading. Please try again in a moment.');
-            return;
-        }
+        const getHtml2Pdf = async (): Promise<any> => {
+            const w = window as any;
+            if (typeof w.html2pdf === 'function') return w.html2pdf;
+            try {
+                const mod: any = await import('html2pdf.js');
+                const fn = mod?.default || mod;
+                if (typeof fn === 'function') {
+                    w.html2pdf = fn;
+                    return fn;
+                }
+            } catch {}
+            return null;
+        };
 
         setIsDownloading(true);
         try {
+            const html2pdf = await getHtml2Pdf();
+            if (!html2pdf) {
+                throw new Error('PDF export library unavailable');
+            }
             const element = pdfRef.current;
             // Ensure fonts/layout are settled before rasterizing for PDF
             // @ts-ignore
@@ -609,8 +619,7 @@ export const Editor: React.FC<EditorProps> = ({
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
                 pagebreak: { mode: ['css', 'legacy'] }
             };
-            // @ts-ignore
-            await window.html2pdf().set(opt).from(element).save();
+            await html2pdf().set(opt).from(element).save();
         } catch (err) {
             console.error('PDF Generation Error:', err);
             alert('Unable to generate a PDF right now. Please try again in a moment.');

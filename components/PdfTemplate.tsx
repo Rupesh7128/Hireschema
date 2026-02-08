@@ -178,7 +178,7 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
           position: 'fixed' as const,
           top: '0',
           left: '0',
-          transform: 'translateX(-10000px)',
+          opacity: 0,
           width: '210mm',
           height: 'auto',
           overflow: 'visible',
