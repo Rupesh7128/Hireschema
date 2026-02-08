@@ -877,10 +877,10 @@ export default function App() {
                               initial={{ opacity: 0, y: 10 }}
                               animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, y: -10 }}
-                              className="max-w-3xl mx-auto h-full flex flex-col items-center justify-center px-2 sm:px-0"
+                              className="max-w-3xl mx-auto w-full min-h-[70vh] sm:min-h-[calc(100dvh-180px)] flex flex-col items-center justify-center px-2 sm:px-0"
                            >
                                {isAnalyzing ? (
-                                  <div className="text-center px-4">
+                                 <div className="w-full flex flex-col items-center justify-center text-center px-4 py-10">
                                       <LoadingIndicator 
                                           message={analysisProgress < 30 ? "Analyzing Resume..." : 
                                                    analysisProgress < 60 ? "Extracting Skills..." :
