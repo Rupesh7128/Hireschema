@@ -499,7 +499,15 @@ export const Editor: React.FC<EditorProps> = ({
                             onClick={() => generateTabContent(activeTab, true)}
                             disabled={!isPaid || !localResumeText || loadingStates[activeTab]}
                             className="p-1.5 text-zinc-500 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            title="Regenerate"
+                            title="Refresh / Regenerate"
+                        >
+                            <RefreshCw className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                            onClick={() => generateTabContent(activeTab, true)}
+                            disabled={!isPaid || !localResumeText || loadingStates[activeTab]}
+                            className="p-1.5 text-zinc-500 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            title="Enhance / Magic"
                         >
                             <Wand2 className="w-3.5 h-3.5" />
                         </button>
