@@ -460,6 +460,15 @@ export async function extractTextFromPdf(base64Data: string): Promise<string> {
       // @ts-ignore
       const items = (textContent.items || []) as Array<{ str?: string; hasEOL?: boolean }>;
 
+      // Extract annotations (links)
+      // @ts-ignore
+      const annotations = await page.getAnnotations();
+      const linksFromAnnotations = (annotations || [])
+        // @ts-ignore
+        .filter((a: any) => a.subtype === 'Link' && a.url)
+        // @ts-ignore
+        .map((a: any) => a.url);
+
       const buf: string[] = [];
       for (const item of items) {
         const s = String(item?.str || '');
@@ -477,7 +486,7 @@ export async function extractTextFromPdf(base64Data: string): Promise<string> {
 
       const linkedinRegex = /linkedin\.com\/in\/[a-zA-Z0-9_-]+/gi;
       const links = pageText.match(linkedinRegex) || [];
-      const uniqueLinks = [...new Set(links)];
+      const uniqueLinks = [...new Set([...links, ...linksFromAnnotations.filter((l: string) => l.includes('linkedin.com'))])];
       const linksText = uniqueLinks.length > 0 ? `\n\n[Metadata: ${uniqueLinks.join(', ')}]\n` : '';
 
       if (pageText) {
