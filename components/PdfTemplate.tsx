@@ -217,20 +217,20 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
           
           /* Header */
           .pdf-contact-header { 
-            margin: 0 0 ${type === 'cover_letter' ? '30px' : '16px'} 0; 
+            margin: 0 0 ${type === 'cover_letter' ? '24px' : '16px'} 0; 
             display: flex; 
             flex-direction: column; 
             align-items: ${type === 'cover_letter' ? 'flex-start' : 'center'}; 
             text-align: ${type === 'cover_letter' ? 'left' : 'center'}; 
             border-bottom: ${type === 'cover_letter' ? '1px solid #e5e7eb' : 'none'};
-            padding-bottom: ${type === 'cover_letter' ? '20px' : '0'};
+            padding-bottom: ${type === 'cover_letter' ? '16px' : '0'};
           }
           .pdf-contact-name { 
-            font-size: ${type === 'cover_letter' ? '28pt' : '24pt'}; 
+            font-size: ${type === 'cover_letter' ? '24pt' : '24pt'}; 
             font-weight: 800; 
             letter-spacing: -0.02em; 
             line-height: 1.1; 
-            margin: 0 0 ${type === 'cover_letter' ? '12px' : '6px'} 0; 
+            margin: 0 0 ${type === 'cover_letter' ? '8px' : '6px'} 0; 
             color: #111827 !important; 
             text-transform: capitalize;
           }
@@ -286,12 +286,13 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
 
           /* Body Text */
           .pdf-export-container p { 
-            margin: 0 0 ${type === 'resume' ? '6px' : '18px'} 0; 
+            margin: 0 0 ${type === 'resume' ? '6px' : '12px'} 0; 
             color: #374151 !important; 
             text-align: left;
-            line-height: ${type === 'cover_letter' ? '1.75' : '1.45'};
+            line-height: ${type === 'cover_letter' ? '1.6' : '1.45'};
             font-weight: 400;
-            font-size: ${type === 'cover_letter' ? '11pt' : '10pt'};
+            font-size: ${type === 'cover_letter' ? '10.5pt' : '10pt'};
+            white-space: pre-wrap; /* Preserve whitespace for cover letters */
           }
           .pdf-export-container ul { 
             margin: 0 0 16px 0; 
