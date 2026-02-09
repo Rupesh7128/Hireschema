@@ -15,6 +15,7 @@ import { restoreStateAfterPayment, clearPersistedState } from './services/stateS
 import { AnimatedLogo } from './components/AnimatedLogo';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
+import { WhatsAppSupport } from './components/WhatsAppSupport';
 
 // Lazy load heavy components for better initial load performance
 const ResumeUploader = lazy(() => import('./components/ResumeUploader'));
@@ -1106,6 +1107,7 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
+      <WhatsAppSupport />
     </ErrorBoundary>
   );
 }
