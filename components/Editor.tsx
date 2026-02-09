@@ -674,20 +674,20 @@ export const Editor: React.FC<EditorProps> = ({
                     components={{
                         h1: ({ ...props }) => (
                             <h1
-                                className={`tracking-tight mb-5 ${isCover ? 'text-3xl sm:text-4xl font-extrabold' : 'text-4xl font-black'} border-b pb-2`}
+                                className={`tracking-tight mb-6 ${isCover ? 'text-2xl sm:text-3xl font-black text-zinc-900 uppercase' : 'text-4xl font-black'} border-b-2 pb-4`}
                                 style={{ borderColor: accentColor.value }}
                                 {...props}
                             />
                         ),
                         h2: ({ ...props }) => (
                             <h2
-                                className={`${isCover ? 'text-lg sm:text-xl font-black tracking-tight mt-10 mb-3' : 'text-lg font-black tracking-widest mt-12 mb-4'} `}
-                                style={{ color: accentColor.value }}
+                                className={`${isCover ? 'text-lg sm:text-xl font-bold tracking-tight mt-8 mb-4 text-zinc-800' : 'text-lg font-black tracking-widest mt-12 mb-4'} `}
+                                style={!isCover ? { color: accentColor.value } : {}}
                                 {...props}
                             />
                         ),
                         h3: ({ ...props }) => (
-                            <h3 className={`${isCover ? 'text-base font-bold mt-7 mb-2 text-zinc-900' : 'text-base font-bold mt-6 mb-2 text-zinc-900'}`} {...props} />
+                            <h3 className={`${isCover ? 'text-base font-bold mt-6 mb-3 text-zinc-900' : 'text-base font-bold mt-6 mb-2 text-zinc-900'}`} {...props} />
                         ),
                         p: ({ ...props }) => {
                             const text = markdownText(props.children).trim();
@@ -712,19 +712,19 @@ export const Editor: React.FC<EditorProps> = ({
                             }
                             return (
                                 <p
-                                    className={`${isCover ? 'text-[15px] sm:text-base leading-[1.85] text-zinc-800 mb-5 font-serif' : 'text-sm sm:text-base leading-relaxed text-zinc-800 mb-4'}`}
+                                    className={`${isCover ? 'text-base sm:text-[15px] leading-7 text-zinc-800 mb-6 whitespace-pre-line font-medium' : 'text-sm sm:text-base leading-relaxed text-zinc-800 mb-4'}`}
                                     {...props}
                                 />
                             );
                         },
                         ul: ({ ...props }) => (
-                            <ul className={`${isCover ? 'my-5 pl-6 list-disc space-y-2' : 'space-y-3 my-6'}`} {...props} />
+                            <ul className={`${isCover ? 'my-6 pl-5 list-disc space-y-2 marker:text-zinc-400' : 'space-y-3 my-6'}`} {...props} />
                         ),
                         ol: ({ ...props }) => (
-                            <ol className={`${isCover ? 'my-5 pl-6 list-decimal space-y-2' : 'my-6 pl-6 list-decimal space-y-3'}`} {...props} />
+                            <ol className={`${isCover ? 'my-6 pl-5 list-decimal space-y-2 marker:text-zinc-500' : 'my-6 pl-6 list-decimal space-y-3'}`} {...props} />
                         ),
                         li: ({ ...props }) => {
-                            if (isCover) return <li className="text-[15px] sm:text-base leading-relaxed text-zinc-800 font-serif" {...props} />;
+                            if (isCover) return <li className="text-base sm:text-[15px] leading-7 text-zinc-800 pl-1" {...props} />;
                             if (isGaps) return <li className="text-sm sm:text-base text-zinc-800 leading-relaxed" {...props} />;
                             return (
                                 <li className="flex items-start gap-3 text-sm sm:text-base text-zinc-800">
@@ -735,7 +735,7 @@ export const Editor: React.FC<EditorProps> = ({
                         },
                         blockquote: ({ ...props }) => (
                             <blockquote
-                                className="my-6 pl-4 border-l-4 text-zinc-700 italic"
+                                className="my-8 pl-6 border-l-4 text-zinc-600 italic text-lg leading-relaxed bg-zinc-50 py-4 pr-4 rounded-r-lg"
                                 style={{ borderColor: accentColor.value }}
                                 {...props}
                             />
