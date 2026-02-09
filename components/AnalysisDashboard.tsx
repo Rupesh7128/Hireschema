@@ -470,27 +470,27 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
       {/* --- MAJOR ACTION CARD --- */}
       <div className={`p-6 rounded-2xl border shadow-xl relative overflow-hidden transition-all ${
         actionState === 'ready' 
-          ? 'bg-emerald-950/40 border-emerald-500/20 shadow-emerald-900/10' 
+          ? 'bg-orange-950/30 border-orange-500/20 shadow-orange-900/10' 
           : actionState === 'needs_edit'
             ? 'bg-orange-950/40 border-orange-500/20 shadow-orange-900/10'
             : 'bg-red-950/40 border-red-500/20 shadow-red-900/10'
       }`}>
         <div className={`absolute top-0 right-0 w-64 h-64 blur-[80px] -mr-20 -mt-20 opacity-20 pointer-events-none ${
-          actionState === 'ready' ? 'bg-emerald-500' : actionState === 'needs_edit' ? 'bg-orange-500' : 'bg-red-500'
+          actionState === 'ready' ? 'bg-orange-500' : actionState === 'needs_edit' ? 'bg-orange-500' : 'bg-red-500'
         }`} />
         
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex-1 text-center md:text-left">
             <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
               {actionState === 'ready' ? (
-                <CheckCircle className="w-5 h-5 text-emerald-500" />
+                <CheckCircle className="w-5 h-5 text-orange-500" />
               ) : actionState === 'needs_edit' ? (
                 <Sparkles className="w-5 h-5 text-orange-500" />
               ) : (
                 <AlertTriangle className="w-5 h-5 text-red-500" />
               )}
               <h2 className={`text-lg font-black tracking-tight uppercase ${
-                actionState === 'ready' ? 'text-emerald-400' : actionState === 'needs_edit' ? 'text-orange-400' : 'text-red-400'
+                actionState === 'ready' ? 'text-orange-400' : actionState === 'needs_edit' ? 'text-orange-400' : 'text-red-400'
               }`}>
                 {actionState === 'ready' ? 'Ready to Apply' : actionState === 'needs_edit' ? 'Optimization Needed' : 'Low Alignment'}
               </h2>
@@ -510,7 +510,7 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
               <>
                 <button 
                   onClick={() => onNavigateTab?.('generator')}
-                  className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl shadow-lg shadow-emerald-900/20 transition-all flex items-center gap-2"
+                  className="px-5 py-2.5 bg-orange-600 hover:bg-orange-500 text-white font-black rounded-xl shadow-lg shadow-orange-900/20 transition-all flex items-center gap-2"
                 >
                   <FileSearch className="w-4 h-4" /> Generate Cover Letter
                 </button>
