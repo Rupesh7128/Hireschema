@@ -637,6 +637,9 @@ export const Editor: React.FC<EditorProps> = ({
     const displayedScore = activeTab === GeneratorType.ATS_RESUME
         ? (activeCompliance?.scoring.ats_score ?? optimizedScore ?? analysis.atsScore)
         : (analysis.atsScore);
+    const displayedRecruiterScore = activeTab === GeneratorType.ATS_RESUME
+        ? (activeCompliance?.scoring.recruiter_score ?? analysis.dualScoring?.recruiter_score ?? analysis.recruiterScore ?? null)
+        : null;
 
     // --- ACTIONS ---
     const handleRefine = async (customPrompt?: string, label?: string) => {
@@ -995,9 +998,15 @@ export const Editor: React.FC<EditorProps> = ({
 
                 <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900/50 border border-white/5 rounded-full">
-                        <span className="text-xs font-black text-zinc-500 uppercase tracking-widest">Score</span>
+                        <span className="text-xs font-black text-zinc-500 uppercase tracking-widest">ATS</span>
                         <span className="text-sm font-black text-orange-500">{displayedScore}%</span>
                     </div>
+                    {displayedRecruiterScore !== null && (
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900/50 border border-white/5 rounded-full">
+                            <span className="text-xs font-black text-zinc-500 uppercase tracking-widest">Recruiter</span>
+                            <span className="text-sm font-black text-white">{displayedRecruiterScore}</span>
+                        </div>
+                    )}
                     
                     <div className="h-5 w-px bg-white/10" />
                     

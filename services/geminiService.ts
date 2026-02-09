@@ -1148,7 +1148,14 @@ export const analyzeResume = async (
       const jdForScoring = jdText.startsWith('http')
         ? jdText.split(/\r?\n/).slice(1).join('\n').trim()
         : jdText;
-      const dualScoring = buildDualScoringFromText({ resumeText, jobDescription: jdForScoring });
+      const baseDualScoring = buildDualScoringFromText({ resumeText, jobDescription: jdForScoring });
+      const parsedAtsScoreRaw = (parsed as any).atsScore;
+      const parsedAtsScore = typeof parsedAtsScoreRaw === 'number' && Number.isFinite(parsedAtsScoreRaw)
+        ? Math.max(0, Math.min(100, Math.round(parsedAtsScoreRaw)))
+        : null;
+      const dualScoring = parsedAtsScore !== null
+        ? { ...baseDualScoring, ats_score: parsedAtsScore }
+        : baseDualScoring;
       const contactProfile = (parsed as any).contactProfile && typeof (parsed as any).contactProfile === 'object'
         ? { ...(parsed as any).contactProfile }
         : { name: '', email: '', phone: '', linkedin: '', location: '' };
@@ -1195,7 +1202,8 @@ export const analyzeResume = async (
     const jdForScoring = jdText.startsWith('http')
       ? jdText.split(/\r?\n/).slice(1).join('\n').trim()
       : jdText;
-    const dualScoring = buildDualScoringFromText({ resumeText, jobDescription: jdForScoring });
+    const baseDualScoring = buildDualScoringFromText({ resumeText, jobDescription: jdForScoring });
+    const dualScoring = { ...baseDualScoring, ats_score: 60 };
     const fallback: AnalysisResult = {
         jobTitle: 'General Resume Scan',
         company: 'Self-Initiated',
