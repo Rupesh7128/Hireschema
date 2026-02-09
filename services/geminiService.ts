@@ -863,6 +863,45 @@ export const analyzeResume = async (
   const jdText = jobDescription?.trim() || "NO_JD_PROVIDED";
 
   const normalizeMeta = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
+  const isMeaningfulText = (value: unknown): boolean => {
+    if (typeof value !== 'string') return false;
+    const trimmed = value.trim();
+    if (!trimmed) return false;
+    const lowered = trimmed.toLowerCase();
+    return !['not provided', 'n/a', 'na', 'none', 'null', 'undefined', '-', 'unknown'].includes(lowered);
+  };
+  const inferNameFromResumeText = (text: string): string => {
+    const lines = (text || '').split(/\r?\n/).map(l => l.trim()).filter(Boolean).slice(0, 25);
+    const isPhoneLike = (line: string) => /\+?\d[\d\s().-]{7,}\d/.test(line);
+    const isEmailLike = (line: string) => /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i.test(line);
+    const isLinkLike = (line: string) => /\bhttps?:\/\//i.test(line) || /\blinkedin\.com\b/i.test(line);
+    const isNoisy = (line: string) => {
+      const lower = line.toLowerCase();
+      return (
+        lower.includes('resume') ||
+        lower.includes('curriculum vitae') ||
+        lower.includes('cv') ||
+        lower.includes('page ') ||
+        lower.startsWith('summary') ||
+        lower.startsWith('experience') ||
+        lower.startsWith('education') ||
+        lower.startsWith('skills')
+      );
+    };
+
+    for (const line of lines) {
+      if (line.length < 4 || line.length > 70) continue;
+      if (isEmailLike(line) || isPhoneLike(line) || isLinkLike(line) || isNoisy(line)) continue;
+      if (/[0-9]/.test(line)) continue;
+      if (!/^[A-Za-zÀ-ÖØ-öø-ÿ'’.\- ]+$/.test(line)) continue;
+      const words = line.split(/\s+/).filter(Boolean);
+      if (words.length < 2 || words.length > 4) continue;
+      const alphaWords = words.filter(w => /[A-Za-zÀ-ÖØ-öø-ÿ]/.test(w));
+      if (alphaWords.length < 2) continue;
+      return line.replace(/\s{2,}/g, ' ').trim();
+    }
+    return '';
+  };
   const stripInferred = (value: string): string =>
     value
       .replace(/\s*\(inferred\)\s*/ig, ' ')
@@ -1113,6 +1152,10 @@ export const analyzeResume = async (
       const contactProfile = (parsed as any).contactProfile && typeof (parsed as any).contactProfile === 'object'
         ? { ...(parsed as any).contactProfile }
         : { name: '', email: '', phone: '', linkedin: '', location: '' };
+      if (!isMeaningfulText(contactProfile.name)) {
+        const inferred = inferNameFromResumeText(resumeText);
+        if (inferred) contactProfile.name = inferred;
+      }
       const hasLinkedIn = typeof contactProfile.linkedin === 'string' && contactProfile.linkedin.trim().length > 0;
       if (!hasLinkedIn && pdfMetadataLinks.length > 0) {
         const linkedInFromPdf = pdfMetadataLinks.find(u => /linkedin\.com\/in\//i.test(u) || /linkedin\.com\/company\//i.test(u)) || '';
