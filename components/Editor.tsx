@@ -41,103 +41,141 @@ const LANGUAGES = [
     "English", "Spanish", "French", "German", "Hindi", "Portuguese", "Japanese", "Korean"
 ];
 
-const ATS_OPTIMIZE_DEFAULT_PROMPT = `You are a Senior Hiring Manager, ATS Architect, and Resume Optimization Engine.
+const ATS_OPTIMIZE_DEFAULT_PROMPT = `HIRE SCHEMA — MASTER RESUME INTELLIGENCE PROMPT (V3 – FINAL)
 
-Your task is to transform a candidate’s resume into a highly targeted, JD-specific, “killer” resume that maximizes interview chances — while remaining 100% truthful and ATS-safe.
+Use this as the GLOBAL SYSTEM PROMPT for HireSchema
 
-=====================
-INPUTS
-=====================
-1. Job Description (JD) – raw text
-2. Candidate Resume – raw text
+CORE IDENTITY (NON-NEGOTIABLE)
+You are HireSchema, a Resume Intelligence & Verification Engine.
 
-=====================
-ABSOLUTE CONSTRAINTS (NON-NEGOTIABLE)
-=====================
-- NEVER invent experience, tools, skills, metrics, companies, or certifications
-- NEVER exaggerate seniority, scope, or ownership
-- NEVER add keywords that cannot be reasonably inferred from the resume
-- If a JD requirement is missing:
-  → Reframe adjacent experience if possible
-  → Otherwise OMIT it silently
-- Do NOT mention missing skills or gaps
-- Keep formatting plain text, ATS-friendly, and recruiter-readable
-- NEVER keyword-stuff or cluster keywords unnaturally
-- Keyword frequency caps for any inserted/target JD terms:
-  - Max 2 total uses in the entire resume
-  - Max 1 use per section (SUMMARY, EXPERIENCE, SKILLS, EDUCATION)
+You do NOT optimize for keyword count.
+You do NOT mirror job descriptions.
+You do NOT invent experience.
 
-=====================
-CORE OBJECTIVE
-=====================
-Make the resume feel like it was written specifically for THIS job description,
-while preserving factual accuracy and professional seniority.
+You optimize for:
+- Truth
+- Credibility
+- ATS semantic alignment
+- Recruiter trust
 
-=====================
-STEP-BY-STEP PROCESS (MANDATORY)
-=====================
+If forced to choose, ALWAYS prioritize truth over ATS.
 
-STEP 1: JOB DESCRIPTION DECONSTRUCTION (CRITICAL)
-From the JD, extract and normalize:
-A. Role identity (title, seniority, domain, functional focus)
-B. Hard keywords (15–25): skills, processes, metrics, tools ONLY if explicitly listed in JD
-C. Responsibility clusters (4–6 buckets)
-D. Success signals (what success looks like)
+ULTIMATE OBJECTIVE
+Produce the strongest possible resume that:
+1. Is factually accurate
+2. Passes modern ATS systems
+3. Sounds written by a competent human
+4. Survives recruiter + interview scrutiny
+5. Aligns with the job WITHOUT imitation
 
-STEP 2: RESUME INTELLIGENCE EXTRACTION
-From the resume, extract roles/titles/companies/timelines, responsibilities, metrics/scale, tools/skills explicitly mentioned, and strongly implied skills (only reasonable professional implication).
+ABSOLUTE HARD-STOP CONDITIONS
+If ANY of the following occur, you MUST self-correct before output:
+- Keyword stuffing
+- Repetition of JD phrases
+- Tool-first bullet points
+- Buzzword inflation
+- Experience exaggeration
+- Section-level keyword clustering
+- Resume reads like SEO content
 
-STEP 3: JD → RESUME MAPPING LOGIC
-For each JD responsibility/keyword:
-- DIRECT MATCH (explicit)
-- PARTIAL MATCH (adjacent; can be reframed)
-- NO MATCH (ignore)
-Use ONLY DIRECT and PARTIAL matches.
-
-STEP 4: TITLE & POSITIONING ALIGNMENT
-Rewrite the headline / positioning to match the JD job title as closely as possible while staying truthful.
-Format:
-<Job Title> | <Core JD Function> | <Scale / Outcome>
-
-STEP 5: SUMMARY REWRITE (HIGH-IMPACT)
-- Mirror JD language and seniority
-- Mention domain + platform type
-- Highlight scale and outcomes relevant to JD
-- Include key JD language only where the resume supports it (no repetition)
-- 3–4 lines, no generic fluff
-
-STEP 6: EXPERIENCE SECTION REENGINEERING
-For each role:
-- 4–6 bullets max
-- Each bullet MUST follow: Action Verb → Scope → Method → Metric → Business Impact
-- Embed JD language ONLY where experience genuinely supports it, with strict frequency caps
-- Prioritize JD-relevant bullets first; remove weak/irrelevant bullets
-
-STEP 7: SKILLS SECTION (ATS ENGINEERING)
-Rebuild SKILLS into these 4 sections:
-1. Business / Role-Specific Skills
-2. Domain & Functional Skills
-3. Analytics / Tools
-4. Leadership & Stakeholder Management
+MULTI-LAYER INTELLIGENCE PIPELINE (MANDATORY)
+LAYER 1: EXPERIENCE AS SOURCE OF TRUTH
+Resume = Evidence
+JD = Reference
 Rules:
-- Use JD wording wherever truthful
-- Include only explicit or strongly implied skills
-- Tools ONLY if explicitly in JD AND present/implied in resume
+- NOTHING enters the resume unless supported by evidence
+- JD keywords are suggestions, not requirements
+- Absence of evidence = no keyword
 
-STEP 8: ATS + HUMAN VALIDATION PASS
-- JD job title appears naturally
-- 70%+ of critical JD keywords represented without stuffing
-- No contradictions in titles/timelines/scope
-- Senior, confident, precise language
+LAYER 2: SKILL & KEYWORD DECOMPOSITION
+For EACH JD keyword, decompose internally into:
+1. Skill Type:
+   - Tool
+   - Function
+   - Outcome
+   - Responsibility
+   - Contextual language
+2. Proof Requirement:
+   - Direct proof
+   - Indirect proof
+   - No proof
+If No proof → keyword is banned.
 
-FINAL OUTPUT RULES
-- Output ONLY the final optimized resume
-- No explanations, no analysis, no scoring
-- Use standard headings only (plain text):
-  SUMMARY
-  EXPERIENCE
-  SKILLS
-  EDUCATION`;
+LAYER 3: ELIGIBILITY GATE (STRICT)
+A keyword is eligible ONLY if:
+- Resume shows ownership or execution
+- The task can be defended verbally
+- The keyword fits naturally in a sentence
+Fail ANY → keyword is rejected.
+
+FREQUENCY & DISTRIBUTION GOVERNOR (CRITICAL)
+GLOBAL MAX LIMITS:
+Tool keywords (Excel, SQL): ≤ 2 total
+Functional skills: ≤ 1 total
+Outcome concepts: ≤ 1 total
+Buzzwords: 0 (default)
+PER SECTION:
+- No keyword may appear more than once per section
+No override allowed. Ever.
+
+SEMANTIC DIVERSITY ENFORCER
+If a keyword is used once:
+→ Subsequent mentions MUST be meaningfully different
+→ Synonyms must not share the same root or ATS stem
+Example:
+inventory management / inventory oversight (bad)
+stock coordination / supply tracking (good)
+
+EXPERIENCE-FIRST BULLET FORMULA (MANDATORY)
+ALL bullets MUST follow this structure:
+Action → Scope → Impact → Evidence → Tool (optional)
+Rules:
+- Tools are optional, outcomes are not
+- Tools NEVER lead sentences
+- Impact must be measurable or observable
+
+ATS SIMULATION ENGINE (ADVANCED)
+ATS looks for:
+- Contextual relevance
+- Skill-to-task mapping
+- Natural phrasing
+ATS penalizes:
+- Repetition
+- Keyword clusters
+- Copy-paste JD language
+If detected → rewrite.
+
+RECRUITER TRUST SIMULATION (MANDATORY)
+Ask internally for EACH bullet:
+“Would a senior recruiter believe this without raising an eyebrow?”
+“Could the candidate explain this confidently in an interview?”
+If NO → rewrite or remove.
+
+HIGH-RISK KEYWORD FIREWALL
+Excel: Allowed ONLY if resume shows analysis/reporting/tracking/modeling; else use “data analysis tools”.
+Large Data Sets: Allowed ONLY if scale/frequency/volume is explicit; else use “operational data”.
+Inventory Management: Allowed ONLY if ownership/accountability is proven; else use “stock tracking” or “supply coordination”.
+Customer Experience: Allowed ONLY if direct customer interaction OR CX outcomes exist; else use “customer interactions” or “service delivery”.
+
+5-STAGE SELF-VERIFICATION LOOP (MANDATORY)
+Stage 1: Truth Audit (no invented skills, no inflated scope, no assumption-based rewriting)
+Stage 2: Keyword Abuse Scan (no repeated phrases, no density patterns, no ATS baiting)
+Stage 3: Semantic Quality Check (replace robotic/templated language; natural professional tone)
+Stage 4: ATS + Human Balance Test (must pass BOTH)
+Stage 5: Interview Survival Test (if asked, answer must exist)
+If any stage fails → redo silently.
+
+FINAL OUTPUT GUARANTEES
+- Read like lived experience
+- Avoid keyword gaming
+- ATS-safe by structure, not spam
+- Increase interview probability without risk
+
+FINAL INTERNAL CHECK (DO NOT SKIP)
+- No keyword exceeds limits
+- No JD sentence is mirrored
+- No tool is overused
+- Resume sounds human, confident, credible`;
 
 export const Editor: React.FC<EditorProps> = ({
     analysisId,
@@ -340,14 +378,8 @@ export const Editor: React.FC<EditorProps> = ({
         setLocalResumeText(resumeText || '');
     }, [resumeText]);
 
-    const getKeywordCoverage = (optimizedMarkdown: string) => {
-        const missing = (analysis.missingKeywords || []).filter(Boolean);
-        const present = missing.filter(k => includesKeyword(optimizedMarkdown, k));
-        const stillMissing = missing.filter(k => !includesKeyword(optimizedMarkdown, k));
-        return { present, stillMissing };
-    };
-
-    const KEYWORD_CAP_GLOBAL = 2;
+    const TOOL_KEYWORD_CAP_GLOBAL = 2;
+    const NON_TOOL_KEYWORD_CAP_GLOBAL = 1;
     const KEYWORD_CAP_PER_SECTION = 1;
 
     const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -399,14 +431,44 @@ export const Editor: React.FC<EditorProps> = ({
         return out;
     };
 
-    const getKeywordCapViolations = (markdown: string, keywords: string[]) => {
-        const ks = dedupeKeywords(keywords);
+    const TOOL_KEYWORD_CANDIDATES = [
+        'excel',
+        'google sheets',
+        'power bi',
+        'tableau',
+        'sql',
+        'python',
+        'aws',
+        'amazon web services',
+        'azure',
+        'microsoft azure',
+        'gcp',
+        'google cloud platform',
+        'javascript',
+        'typescript',
+        'react',
+        'node',
+        'docker',
+        'kubernetes',
+        'git',
+        'jira'
+    ];
+
+    const isToolTerm = (keyword: string) => {
+        const k = (keyword || '').trim().toLowerCase();
+        if (!k) return false;
+        return TOOL_KEYWORD_CANDIDATES.some(t => t === k);
+    };
+
+    const getKeywordCapViolations = (markdown: string, keywordCaps: Record<string, number>) => {
+        const ks = dedupeKeywords(Object.keys(keywordCaps));
         const sections = splitAtsSections(markdown);
         const overGlobal: Array<{ keyword: string; count: number }> = [];
         const overSection: Array<{ keyword: string; section: string; count: number }> = [];
         for (const k of ks) {
             const globalCount = countKeywordOccurrences(markdown, k);
-            if (globalCount > KEYWORD_CAP_GLOBAL) overGlobal.push({ keyword: k, count: globalCount });
+            const cap = keywordCaps[k] ?? NON_TOOL_KEYWORD_CAP_GLOBAL;
+            if (globalCount > cap) overGlobal.push({ keyword: k, count: globalCount });
             for (const [section, content] of Object.entries(sections)) {
                 if (section === 'OTHER') continue;
                 const c = countKeywordOccurrences(content, k);
@@ -414,6 +476,45 @@ export const Editor: React.FC<EditorProps> = ({
             }
         }
         return { overGlobal, overSection };
+    };
+
+    const tokenizeWords = (value: string) =>
+        (value || '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, ' ')
+            .trim()
+            .split(/\s+/)
+            .filter(w => w.length >= 3);
+
+    const countSharedNgrams = (a: string, b: string, n: number) => {
+        const aWords = tokenizeWords(a).slice(0, 1400);
+        const bWords = tokenizeWords(b).slice(0, 1400);
+        if (aWords.length < n || bWords.length < n) return { unique: 0, total: 0 };
+        const set = new Set<string>();
+        for (let i = 0; i <= aWords.length - n; i++) {
+            set.add(aWords.slice(i, i + n).join(' '));
+        }
+        let total = 0;
+        const uniques = new Set<string>();
+        for (let i = 0; i <= bWords.length - n; i++) {
+            const gram = bWords.slice(i, i + n).join(' ');
+            if (set.has(gram)) {
+                total++;
+                uniques.add(gram);
+            }
+        }
+        return { unique: uniques.size, total };
+    };
+
+    const detectJdMirroring = (jd: string, resumeMarkdown: string) => {
+        const n = 7;
+        const overlap = countSharedNgrams(jd, resumeMarkdown, n);
+        return {
+            n,
+            uniqueMatches: overlap.unique,
+            totalMatches: overlap.total,
+            isMirroring: overlap.unique >= 3 || overlap.total >= 6
+        };
     };
 
     const extractJobMinYears = (jd: string): number | null => {
@@ -492,14 +593,17 @@ export const Editor: React.FC<EditorProps> = ({
                 try {
                     const minYears = extractJobMinYears(jobDescription);
                     const mustIncludeSkills = getMustIncludeSkills(localResumeText, jobDescription);
-                    const missingKeywords = prioritizeKeywords(analysis.missingKeywords || []).slice(0, 18);
-                    const targetKeywords = dedupeKeywords([...missingKeywords, ...mustIncludeSkills]);
-                    const keywordRules = `Keyword rules (ATS-safe): Never keyword-stuff. Avoid unnatural clusters. For any target term below, do not use it more than ${KEYWORD_CAP_GLOBAL} times in the entire resume and no more than ${KEYWORD_CAP_PER_SECTION} time per section.`;
+                    const jdSignals = prioritizeKeywords(analysis.missingKeywords || []).slice(0, 12);
+                    const targetTerms = dedupeKeywords([...mustIncludeSkills, ...jdSignals]);
+                    const keywordCaps: Record<string, number> = Object.fromEntries(
+                        targetTerms.map(t => [t, isToolTerm(t) ? TOOL_KEYWORD_CAP_GLOBAL : NON_TOOL_KEYWORD_CAP_GLOBAL])
+                    );
+                    const keywordRules = `Keyword governor (V3): Tool terms may appear up to ${TOOL_KEYWORD_CAP_GLOBAL} times total. All other target terms may appear up to ${NON_TOOL_KEYWORD_CAP_GLOBAL} time total. Any target term may appear at most ${KEYWORD_CAP_PER_SECTION} time per section. Do not cluster terms. Do not mirror JD phrases.`;
                     const basePrompt = [
                         ATS_OPTIMIZE_DEFAULT_PROMPT,
                         keywordRules,
-                        targetKeywords.length > 0
-                            ? `Target terms (use ONLY if supported by the ORIGINAL resume; otherwise omit or use a truthful related phrase without the term): ${targetKeywords.join(', ')}.`
+                        targetTerms.length > 0
+                            ? `JD reference signals (do not force; use ONLY if supported by the ORIGINAL resume and natural): ${targetTerms.join(', ')}.`
                             : '',
                         mustIncludeSkills.length > 0
                             ? `Ensure these skills/tools (already present in the ORIGINAL resume and mentioned in the JD) appear in the final resume, preferably in ## SKILLS: ${mustIncludeSkills.join(', ')}.`
@@ -507,31 +611,10 @@ export const Editor: React.FC<EditorProps> = ({
                         minYears
                             ? `The JD mentions a minimum of ${minYears}+ years of experience. If (and only if) the ORIGINAL resume dates support it, state "${minYears}+ years" in the SUMMARY. Otherwise omit.`
                             : '',
-                        `Do not add new claims. Do not change employers/titles/dates. Do not remove any existing skills/tools/technologies from the ORIGINAL resume text. Prefer adding keywords into Skills/Tools and existing bullets where they already apply. Avoid keyword stuffing.`
+                        `Do not add new claims. Do not change employers/titles/dates. Do not remove any existing skills/tools/technologies from the ORIGINAL resume text. Do not imitate or copy JD sentences. Prefer experience-first bullets (action → scope → impact → evidence → tool optional).`
                     ].filter(Boolean).join('\n');
                     const boosted = await refineAtsResumeContent(normalized, basePrompt, jobDescription, localResumeText);
                     normalized = normalizeAtsResumeMarkdown(boosted);
-
-                    const coverage = getKeywordCoverage(normalized);
-                    if (coverage.stillMissing.length > 0) {
-                        const currentViolations = getKeywordCapViolations(normalized, targetKeywords);
-                        const cappedOut = new Set<string>([
-                            ...currentViolations.overGlobal.map(v => v.keyword.toLowerCase())
-                        ]);
-                        const remainingTargets = prioritizeKeywords(coverage.stillMissing)
-                            .filter(k => !cappedOut.has((k || '').toLowerCase()))
-                            .slice(0, 18);
-                        const followUpPrompt = [
-                            `Second pass ATS keyword injection.`,
-                            keywordRules,
-                            remainingTargets.length > 0 ? `Remaining target terms: ${remainingTargets.join(', ')}.` : `No remaining target terms should be forced if it would cause repetition or unsupported claims.`,
-                            `Add ONLY if they plausibly match existing experience/skills. If unsupported, omit the term and use a truthful related phrase. Place terms into Skills/Tools/Tech stack lists rather than inventing new work.`,
-                            `Keep formatting tight and ATS-friendly.`,
-                            `Return ONLY the resume. Keep headings as: ## SUMMARY, ## EXPERIENCE, ## SKILLS, ## EDUCATION.`
-                        ].join('\n');
-                        const boosted2 = await refineAtsResumeContent(normalized, followUpPrompt, jobDescription, localResumeText);
-                        normalized = normalizeAtsResumeMarkdown(boosted2);
-                    }
 
                     if (mustIncludeSkills.length > 0) {
                         const stillMissingSkills = mustIncludeSkills.filter(s => !includesKeyword(normalized, s));
@@ -548,10 +631,11 @@ export const Editor: React.FC<EditorProps> = ({
                         }
                     }
 
-                    const violations = getKeywordCapViolations(normalized, targetKeywords);
-                    if (violations.overGlobal.length > 0 || violations.overSection.length > 0) {
+                    const violations = getKeywordCapViolations(normalized, keywordCaps);
+                    const mirroring = detectJdMirroring(jobDescription, normalized);
+                    if (violations.overGlobal.length > 0 || violations.overSection.length > 0 || mirroring.isMirroring) {
                         const cleanupPrompt = [
-                            `ATS-safe cleanup pass: reduce repetition and remove any keyword spam patterns.`,
+                            `ATS-safe cleanup pass: reduce repetition, remove keyword spam patterns, and avoid JD imitation.`,
                             keywordRules,
                             violations.overGlobal.length > 0
                                 ? `Over global cap: ${violations.overGlobal.map(v => `${v.keyword} (${v.count})`).join(', ')}.`
@@ -559,7 +643,10 @@ export const Editor: React.FC<EditorProps> = ({
                             violations.overSection.length > 0
                                 ? `Over section cap: ${violations.overSection.map(v => `${v.keyword} in ${v.section} (${v.count})`).join(', ')}.`
                                 : '',
-                            `Rewrite ONLY enough to meet caps while preserving factual accuracy and readability. Prefer synonyms or a truthful related phrase; do not invent experience. Return ONLY the resume with the same headings.`
+                            mirroring.isMirroring
+                                ? `Detected probable JD phrase overlap (shared ${mirroring.n}-grams). Rewrite to eliminate copy-paste JD phrasing while keeping meaning and truth.`
+                                : '',
+                            `Rewrite ONLY enough to meet the governors and remove JD imitation while preserving factual accuracy and readability. Prefer synonyms or a truthful related phrase; do not invent experience. Return ONLY the resume with the same headings.`
                         ].filter(Boolean).join('\n');
                         const cleaned = await refineAtsResumeContent(normalized, cleanupPrompt, jobDescription, localResumeText);
                         normalized = normalizeAtsResumeMarkdown(cleaned);

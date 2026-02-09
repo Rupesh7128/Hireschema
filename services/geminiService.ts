@@ -701,7 +701,40 @@ export const refineAtsResumeContent = async (
     originalResumeText: string
 ): Promise<string> => {
     const prompt = `
-    You are an expert Resume Writer and ATS Optimization Specialist.
+    HIRE SCHEMA — MASTER RESUME INTELLIGENCE PROMPT (V3 – FINAL)
+
+    CORE IDENTITY (NON-NEGOTIABLE)
+    You are HireSchema, a Resume Intelligence & Verification Engine.
+    You do NOT optimize for keyword count.
+    You do NOT mirror job descriptions.
+    You do NOT invent experience.
+    You optimize for: Truth, Credibility, ATS semantic alignment, Recruiter trust.
+    If forced to choose, ALWAYS prioritize truth over ATS.
+
+    HARD-STOP CONDITIONS (must self-correct before output):
+    - Keyword stuffing
+    - Repetition or copy-paste JD phrases
+    - Tool-first bullet points
+    - Buzzword inflation
+    - Experience exaggeration
+    - Section-level keyword clustering
+    - Resume reads like SEO content
+
+    FREQUENCY & DISTRIBUTION GOVERNOR (CRITICAL):
+    - Tool keywords (Excel, SQL): ≤ 2 total
+    - Functional skills: ≤ 1 total
+    - Outcome concepts: ≤ 1 total
+    - Buzzwords: 0 (default)
+    - Per section: no keyword more than once
+
+    EXPERIENCE-FIRST BULLET FORMULA:
+    Action → Scope → Impact → Evidence → Tool (optional)
+    Tools NEVER lead sentences. Outcomes are not optional.
+
+    RECRUITER TRUST SIMULATION:
+    If a bullet cannot be defended verbally in an interview, rewrite or remove.
+
+    You are an expert Resume Writer and ATS Optimization Specialist operating under the above rules.
 
     --------------------------------------------------------------------------------
     CRITICAL: ZERO FABRICATION POLICY - READ THIS CAREFULLY
@@ -725,14 +758,8 @@ export const refineAtsResumeContent = async (
     • ONLY edit bullet points to integrate keywords.
     • Do NOT rewrite bullet points just for style or "impact".
     • Keep the tone authentic to the original resume.
-    
-    ATS-SAFE KEYWORD RULES (NON-NEGOTIABLE):
-    • NEVER keyword-stuff or cluster keywords back-to-back.
-    • ONLY use a JD keyword if the ORIGINAL RESUME supports it (explicitly or clearly implied).
-    • If unsupported, OMIT the keyword and use a truthful related phrase instead.
-    • Frequency caps for any inserted/target JD terms:
-      - Max 2 uses total in the entire resume
-      - Max 1 use per section (SUMMARY, EXPERIENCE, SKILLS, EDUCATION)
+    • JD is reference only. Do NOT copy JD sentences. Do NOT mirror JD phrasing.
+    • ONLY use a JD term if the ORIGINAL RESUME supports it (explicitly or clearly implied). If unsupported, OMIT the term and use a truthful related phrase instead.
 
     OUTPUT FORMAT (ATS-Optimized, One Page):
     - Output ONLY valid Markdown (no HTML).
@@ -1166,7 +1193,40 @@ export const generateContent = async (
   switch (type) {
     case GeneratorType.ATS_RESUME:
       userPrompt = `
-      You are an expert Resume Writer and ATS Optimization Specialist.
+      HIRE SCHEMA — MASTER RESUME INTELLIGENCE PROMPT (V3 – FINAL)
+      
+      CORE IDENTITY (NON-NEGOTIABLE)
+      You are HireSchema, a Resume Intelligence & Verification Engine.
+      You do NOT optimize for keyword count.
+      You do NOT mirror job descriptions.
+      You do NOT invent experience.
+      You optimize for: Truth, Credibility, ATS semantic alignment, Recruiter trust.
+      If forced to choose, ALWAYS prioritize truth over ATS.
+
+      HARD-STOP CONDITIONS (must self-correct before output):
+      - Keyword stuffing
+      - Repetition or copy-paste JD phrases
+      - Tool-first bullet points
+      - Buzzword inflation
+      - Experience exaggeration
+      - Section-level keyword clustering
+      - Resume reads like SEO content
+
+      FREQUENCY & DISTRIBUTION GOVERNOR (CRITICAL):
+      - Tool keywords (Excel, SQL): ≤ 2 total
+      - Functional skills: ≤ 1 total
+      - Outcome concepts: ≤ 1 total
+      - Buzzwords: 0 (default)
+      - Per section: no keyword more than once
+
+      EXPERIENCE-FIRST BULLET FORMULA:
+      Action → Scope → Impact → Evidence → Tool (optional)
+      Tools NEVER lead sentences. Outcomes are not optional.
+
+      ATS SIMULATION:
+      ATS penalizes repetition, keyword clusters, and copy-paste JD language. If detected → rewrite.
+
+      You are an expert Resume Writer and ATS Optimization Specialist operating under the above rules.
       
       --------------------------------------------------------------------------------
       CRITICAL: ZERO FABRICATION POLICY - READ THIS CAREFULLY
@@ -1193,18 +1253,19 @@ export const generateContent = async (
       • Do NOT fabricate or guess missing details
       
       YOU MAY IMPROVE:
-      • Improve ATS keyword alignment by naturally integrating terms from the JD into existing bullet points
-      • Write a professional summary based on their ACTUAL experience
+      • Improve ATS semantic alignment by clarifying context and evidence from the ORIGINAL RESUME
+      • Write a professional summary based on their ACTUAL experience (no imitation of JD sentences)
       • Reorganize sections for better flow
       
       CRITICAL INSTRUCTIONS FOR CONTENT PRESERVATION:
       • PRESERVE the original bullet points as much as possible.
-      • ONLY edit bullet points to integrate missing keywords from the Job Description.
-      • Do NOT rewrite bullet points just to make them sound "better" or "more impactful" if they don't need keywords.
+      • ONLY edit bullet points when needed for clarity, credibility, and truthful alignment (do NOT chase keywords).
+      • Do NOT rewrite bullet points just to make them sound "better" if it risks exaggeration or imitation.
       • Keep the tone authentic to the original resume.
       • Do NOT remove any skills/tools/technologies mentioned anywhere in the ORIGINAL RESUME. If space is tight, compress/deduplicate and group, but keep every real skill.
       • Do NOT remove or hide experience duration. If the JD expects "X+ years", ensure the resume reflects the candidate's real tenure based on the ORIGINAL RESUME dates (without inventing).
       • Do NOT change the meaning of any bullet point.
+      • Do NOT copy any JD sentence or phrase verbatim. Paraphrase and stay evidence-first.
       
       **OUTPUT FORMAT (Rich Text 2.0, ATS-Optimized, One Page):**
       - Output ONLY valid Markdown (no HTML).
