@@ -191,6 +191,70 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
           justifyContent: 'center'
         };
 
+  const CustomP = ({ children }: { children: React.ReactNode }) => {
+    if (type !== 'interview') {
+      return <p>{children}</p>;
+    }
+
+    // Handle Interview Q/A styling
+    const text = React.Children.toArray(children).reduce((acc, child) => {
+        if (typeof child === 'string') return acc + child;
+        return acc; // Simplified for now, mostly text
+    }, '') as string;
+    
+    const lower = text.trim().toLowerCase();
+    const isQuestion = lower.startsWith('q:') || lower.startsWith('question:') || lower.startsWith('q ') || text.trim().endsWith('?');
+    const isAnswer = lower.startsWith('a:') || lower.startsWith('answer:') || lower.startsWith('a ');
+
+    if (isQuestion) {
+      // Strip prefix if present for cleaner look, or keep it? 
+      // User image shows just the question text.
+      // Let's keep the text as is but style the container.
+      return (
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          borderBottom: '1px solid #e5e7eb',
+          padding: '12px 0',
+          marginTop: '12px',
+          marginBottom: '8px',
+          pageBreakInside: 'avoid'
+        }}>
+          <span style={{ 
+            fontWeight: 700, 
+            color: '#111827', 
+            fontSize: '10.5pt',
+            paddingRight: '16px'
+          }}>
+            {children}
+          </span>
+          <span style={{ 
+            color: '#9ca3af', 
+            fontSize: '14pt', 
+            fontWeight: 300,
+            lineHeight: 1
+          }}>+</span>
+        </div>
+      );
+    }
+
+    if (isAnswer) {
+      return (
+        <div style={{
+          padding: '0 0 16px 0',
+          color: '#374151',
+          fontSize: '10pt',
+          lineHeight: '1.6'
+        }}>
+          {children}
+        </div>
+      );
+    }
+
+    return <p>{children}</p>;
+  };
+
   return (
     <div style={outerStyle}>
       <div 
@@ -363,7 +427,8 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
           <ReactMarkdown
             remarkPlugins={[remarkGfm, remarkBreaks]}
             components={{
-              h3: CustomH3
+              h3: CustomH3,
+              p: CustomP
             }}
           >
             {contentToRender}
