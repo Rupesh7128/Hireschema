@@ -12,6 +12,16 @@ export interface AnalysisResult {
   jobTitle?: string; // New: For Dashboard
   company?: string; // New: For Dashboard
   atsScore: number; 
+  recruiterScore?: number;
+  dualScoring?: {
+    ats_score: number;
+    recruiter_score: number;
+    ats_factors: Array<{ factor: string; weight: number; score: number }>;
+    recruiter_factors: Array<{ factor: string; weight: number; score: number }>;
+    verdict: string;
+    risk: 'Low' | 'Medium' | 'High';
+    summary: string;
+  };
   relevanceScore: number; 
   roleFitAnalysis: string; 
   contactProfile: ContactProfile;

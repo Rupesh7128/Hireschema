@@ -8,13 +8,14 @@ import {
     FileText, Mail, MessageSquare, GraduationCap, 
     Download, Printer, RefreshCw, Globe, 
     Check, ChevronDown, Wand2, Copy, 
-    Edit2, Send, Loader2, Sparkles,
+    Edit2, Send, Loader2, Sparkles, X,
 } from 'lucide-react';
 import { FileData, AnalysisResult, GeneratorType } from '../types';
 import { generateContent, calculateImprovedScore, refineContent, refineAtsResumeContent, regenerateSection } from '../services/geminiService';
 import { normalizeAtsResumeMarkdown } from '../services/atsResumeMarkdown';
 import { saveStateBeforePayment } from '../services/stateService';
 import { includesKeyword, prioritizeKeywords } from '../services/keywordUtils';
+import { validateResumeMarkdown, type ResumeComplianceReport } from '../services/resumeCompliance';
 import PaymentLock from './PaymentLock';
 import { PdfTemplate } from './PdfTemplate';
 import { LoadingIndicator } from './LoadingIndicator';
@@ -204,6 +205,9 @@ export const Editor: React.FC<EditorProps> = ({
     const [isCompare, setIsCompare] = useState(false);
     const [showCopyToast, setShowCopyToast] = useState(false);
     const [isDownloading, setIsDownloading] = useState(false);
+    const [removeRiskyKeywords, setRemoveRiskyKeywords] = useState(false);
+    const [complianceReports, setComplianceReports] = useState<Record<string, ResumeComplianceReport | null>>({});
+    const [isComplianceOpen, setIsComplianceOpen] = useState(false);
 
     const pdfRef = useRef<HTMLDivElement>(null);
     const previewPdfRef = useRef<HTMLDivElement>(null);
@@ -378,22 +382,6 @@ export const Editor: React.FC<EditorProps> = ({
         setLocalResumeText(resumeText || '');
     }, [resumeText]);
 
-    const TOOL_KEYWORD_CAP_GLOBAL = 2;
-    const NON_TOOL_KEYWORD_CAP_GLOBAL = 1;
-    const KEYWORD_CAP_PER_SECTION = 1;
-
-    const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-    const countKeywordOccurrences = (text: string, keyword: string) => {
-        const t = (text || '');
-        const k = (keyword || '').trim();
-        if (!t || !k) return 0;
-        const escaped = escapeRegExp(k);
-        const re = new RegExp(`(?<![A-Za-z0-9])${escaped}(?![A-Za-z0-9])`, 'gi');
-        const matches = t.match(re);
-        return matches ? matches.length : 0;
-    };
-
     const dedupeKeywords = (keywords: string[]) => {
         const out: string[] = [];
         const seen = new Set<string>();
@@ -406,115 +394,78 @@ export const Editor: React.FC<EditorProps> = ({
         return out;
     };
 
-    const splitAtsSections = (markdown: string) => {
-        const lines = (markdown || '').split(/\r?\n/);
-        const out: Record<string, string> = {};
-        let current = 'OTHER';
-        let buf: string[] = [];
-        const flush = () => {
-            if (!out[current]) out[current] = '';
-            if (buf.length > 0) {
-                out[current] = (out[current] ? `${out[current]}\n` : '') + buf.join('\n');
-            }
-            buf = [];
-        };
-        for (const line of lines) {
-            const m = line.match(/^##\s+(.+?)\s*$/);
-            if (m) {
-                flush();
-                current = m[1].trim().toUpperCase();
-                continue;
-            }
-            buf.push(line);
-        }
-        flush();
-        return out;
+    const buildTargetKeywordsForCompliance = (resumeText: string, jd: string, missingKeywords: string[]) => {
+        const mustInclude = getMustIncludeSkills(resumeText, jd);
+        const jdSignals = prioritizeKeywords(missingKeywords || []).slice(0, 14);
+        const highRisk = ['Excel', 'Large Data Sets', 'Inventory Management', 'Customer Experience'];
+        return dedupeKeywords([...mustInclude, ...jdSignals, ...highRisk]);
     };
 
-    const TOOL_KEYWORD_CANDIDATES = [
-        'excel',
-        'google sheets',
-        'power bi',
-        'tableau',
-        'sql',
-        'python',
-        'aws',
-        'amazon web services',
-        'azure',
-        'microsoft azure',
-        'gcp',
-        'google cloud platform',
-        'javascript',
-        'typescript',
-        'react',
-        'node',
-        'docker',
-        'kubernetes',
-        'git',
-        'jira'
-    ];
+    const buildAutofixInstruction = (report: ResumeComplianceReport) => {
+        const hard = report.issues.filter(i => i.severity === 'hard');
+        const needRemove = hard.filter(i => i.validator === 'experience_evidence' || i.validator === 'remove_risky_keywords');
+        const needFreq = hard.filter(i => i.validator === 'keyword_frequency');
+        const needMirror = hard.filter(i => i.validator === 'jd_phrase_mirroring');
 
-    const isToolTerm = (keyword: string) => {
-        const k = (keyword || '').trim().toLowerCase();
-        if (!k) return false;
-        return TOOL_KEYWORD_CANDIDATES.some(t => t === k);
+        const removals = dedupeKeywords(
+            needRemove
+                .map(i => String(i.details?.keyword || '').trim())
+                .filter(Boolean)
+        );
+
+        const freqKeywords = dedupeKeywords(
+            needFreq
+                .map(i => String(i.details?.keyword || '').trim())
+                .filter(Boolean)
+        );
+
+        const replacementHints = removals
+            .map(k => {
+                const row = report.keyword_justifications.find(j => (j.keyword || '').toLowerCase() === k.toLowerCase());
+                if (!row?.alternative_used) return '';
+                return `${k} → ${row.alternative_used}`;
+            })
+            .filter(Boolean);
+
+        return [
+            `Run the HireSchema rule validators and fix violations without inventing experience.`,
+            `Hard rules: do not mirror JD phrases; remove keyword stuffing; tools never lead bullets; preserve truth.`,
+            removals.length > 0 ? `Remove or rewrite these unsupported/high-risk terms (use experience-based phrasing): ${removals.join(', ')}.` : '',
+            replacementHints.length > 0 ? `Preferred replacements: ${replacementHints.join('; ')}.` : '',
+            freqKeywords.length > 0 ? `Reduce repetition to meet caps for: ${freqKeywords.join(', ')}.` : '',
+            needMirror.length > 0 ? `Rewrite any sentence that copies the JD phrasing. Keep meaning, change wording.` : '',
+            `Return ONLY the resume. Keep headings as: ## SUMMARY, ## EXPERIENCE, ## SKILLS, ## EDUCATION.`
+        ].filter(Boolean).join('\n');
     };
 
-    const getKeywordCapViolations = (markdown: string, keywordCaps: Record<string, number>) => {
-        const ks = dedupeKeywords(Object.keys(keywordCaps));
-        const sections = splitAtsSections(markdown);
-        const overGlobal: Array<{ keyword: string; count: number }> = [];
-        const overSection: Array<{ keyword: string; section: string; count: number }> = [];
-        for (const k of ks) {
-            const globalCount = countKeywordOccurrences(markdown, k);
-            const cap = keywordCaps[k] ?? NON_TOOL_KEYWORD_CAP_GLOBAL;
-            if (globalCount > cap) overGlobal.push({ keyword: k, count: globalCount });
-            for (const [section, content] of Object.entries(sections)) {
-                if (section === 'OTHER') continue;
-                const c = countKeywordOccurrences(content, k);
-                if (c > KEYWORD_CAP_PER_SECTION) overSection.push({ keyword: k, section, count: c });
-            }
-        }
-        return { overGlobal, overSection };
-    };
+    const runComplianceAndAutofix = async (markdown: string) => {
+        const targetKeywords = buildTargetKeywordsForCompliance(localResumeText, jobDescription, analysis.missingKeywords || []);
+        let current = markdown;
+        let report = validateResumeMarkdown({
+            markdown: current,
+            jobDescription,
+            originalResumeText: localResumeText,
+            targetKeywords,
+            removeRiskyKeywords
+        });
 
-    const tokenizeWords = (value: string) =>
-        (value || '')
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, ' ')
-            .trim()
-            .split(/\s+/)
-            .filter(w => w.length >= 3);
-
-    const countSharedNgrams = (a: string, b: string, n: number) => {
-        const aWords = tokenizeWords(a).slice(0, 1400);
-        const bWords = tokenizeWords(b).slice(0, 1400);
-        if (aWords.length < n || bWords.length < n) return { unique: 0, total: 0 };
-        const set = new Set<string>();
-        for (let i = 0; i <= aWords.length - n; i++) {
-            set.add(aWords.slice(i, i + n).join(' '));
+        for (let i = 0; i < 2; i += 1) {
+            const hard = report.issues.filter(x => x.severity === 'hard');
+            if (hard.length === 0) break;
+            const prompt = buildAutofixInstruction(report);
+            const rewritten = await refineAtsResumeContent(current, prompt, jobDescription, localResumeText);
+            current = normalizeAtsResumeMarkdown(rewritten);
+            report = validateResumeMarkdown({
+                markdown: current,
+                jobDescription,
+                originalResumeText: localResumeText,
+                targetKeywords,
+                removeRiskyKeywords
+            });
         }
-        let total = 0;
-        const uniques = new Set<string>();
-        for (let i = 0; i <= bWords.length - n; i++) {
-            const gram = bWords.slice(i, i + n).join(' ');
-            if (set.has(gram)) {
-                total++;
-                uniques.add(gram);
-            }
-        }
-        return { unique: uniques.size, total };
-    };
 
-    const detectJdMirroring = (jd: string, resumeMarkdown: string) => {
-        const n = 7;
-        const overlap = countSharedNgrams(jd, resumeMarkdown, n);
-        return {
-            n,
-            uniqueMatches: overlap.unique,
-            totalMatches: overlap.total,
-            isMirroring: overlap.unique >= 3 || overlap.total >= 6
-        };
+        setComplianceReports(prev => ({ ...prev, [GeneratorType.ATS_RESUME]: report }));
+        return { markdown: current, report };
     };
 
     const extractJobMinYears = (jd: string): number | null => {
@@ -595,10 +546,7 @@ export const Editor: React.FC<EditorProps> = ({
                     const mustIncludeSkills = getMustIncludeSkills(localResumeText, jobDescription);
                     const jdSignals = prioritizeKeywords(analysis.missingKeywords || []).slice(0, 12);
                     const targetTerms = dedupeKeywords([...mustIncludeSkills, ...jdSignals]);
-                    const keywordCaps: Record<string, number> = Object.fromEntries(
-                        targetTerms.map(t => [t, isToolTerm(t) ? TOOL_KEYWORD_CAP_GLOBAL : NON_TOOL_KEYWORD_CAP_GLOBAL])
-                    );
-                    const keywordRules = `Keyword governor (V3): Tool terms may appear up to ${TOOL_KEYWORD_CAP_GLOBAL} times total. All other target terms may appear up to ${NON_TOOL_KEYWORD_CAP_GLOBAL} time total. Any target term may appear at most ${KEYWORD_CAP_PER_SECTION} time per section. Do not cluster terms. Do not mirror JD phrases.`;
+                    const keywordRules = `Keyword governor (V3): Tool terms may appear up to 2 times total. All other target terms may appear up to 1 time total. No target term may appear more than once per section. Do not cluster terms. Do not mirror JD phrases.`;
                     const basePrompt = [
                         ATS_OPTIMIZE_DEFAULT_PROMPT,
                         keywordRules,
@@ -631,26 +579,8 @@ export const Editor: React.FC<EditorProps> = ({
                         }
                     }
 
-                    const violations = getKeywordCapViolations(normalized, keywordCaps);
-                    const mirroring = detectJdMirroring(jobDescription, normalized);
-                    if (violations.overGlobal.length > 0 || violations.overSection.length > 0 || mirroring.isMirroring) {
-                        const cleanupPrompt = [
-                            `ATS-safe cleanup pass: reduce repetition, remove keyword spam patterns, and avoid JD imitation.`,
-                            keywordRules,
-                            violations.overGlobal.length > 0
-                                ? `Over global cap: ${violations.overGlobal.map(v => `${v.keyword} (${v.count})`).join(', ')}.`
-                                : '',
-                            violations.overSection.length > 0
-                                ? `Over section cap: ${violations.overSection.map(v => `${v.keyword} in ${v.section} (${v.count})`).join(', ')}.`
-                                : '',
-                            mirroring.isMirroring
-                                ? `Detected probable JD phrase overlap (shared ${mirroring.n}-grams). Rewrite to eliminate copy-paste JD phrasing while keeping meaning and truth.`
-                                : '',
-                            `Rewrite ONLY enough to meet the governors and remove JD imitation while preserving factual accuracy and readability. Prefer synonyms or a truthful related phrase; do not invent experience. Return ONLY the resume with the same headings.`
-                        ].filter(Boolean).join('\n');
-                        const cleaned = await refineAtsResumeContent(normalized, cleanupPrompt, jobDescription, localResumeText);
-                        normalized = normalizeAtsResumeMarkdown(cleaned);
-                    }
+                    const compliance = await runComplianceAndAutofix(normalized);
+                    normalized = compliance.markdown;
                 } catch {}
             }
             setGeneratedData(prev => ({ ...prev, [tab]: normalized }));
@@ -678,6 +608,19 @@ export const Editor: React.FC<EditorProps> = ({
 
     useEffect(() => {
         if (!isPaid) return;
+        if (activeTab !== GeneratorType.ATS_RESUME) return;
+        const current = generatedData[GeneratorType.ATS_RESUME];
+        if (!current) return;
+        if (loadingStates[GeneratorType.ATS_RESUME] || isRefining) return;
+        runComplianceAndAutofix(current).then(res => {
+            if (res.markdown !== current) {
+                setGeneratedData(prev => ({ ...prev, [GeneratorType.ATS_RESUME]: res.markdown }));
+            }
+        }).catch(() => {});
+    }, [removeRiskyKeywords]);
+
+    useEffect(() => {
+        if (!isPaid) return;
         setActiveTab(GeneratorType.ATS_RESUME);
     }, [isPaid]);
 
@@ -690,6 +633,10 @@ export const Editor: React.FC<EditorProps> = ({
     }, [activeTab]);
 
     const activeError = generationErrors[activeTab] || '';
+    const activeCompliance = complianceReports[GeneratorType.ATS_RESUME] || null;
+    const displayedScore = activeTab === GeneratorType.ATS_RESUME
+        ? (activeCompliance?.scoring.ats_score ?? optimizedScore ?? analysis.atsScore)
+        : (analysis.atsScore);
 
     // --- ACTIONS ---
     const handleRefine = async (customPrompt?: string, label?: string) => {
@@ -711,7 +658,11 @@ export const Editor: React.FC<EditorProps> = ({
                 ? await refineAtsResumeContent(generatedData[activeTab], prompt, jobDescription, localResumeText)
                 : await refineContent(generatedData[activeTab], prompt, jobDescription);
             console.log('[Editor] refineContent success, updating state');
-            const normalized = activeTab === GeneratorType.ATS_RESUME ? normalizeAtsResumeMarkdown(newContent) : newContent;
+            let normalized = activeTab === GeneratorType.ATS_RESUME ? normalizeAtsResumeMarkdown(newContent) : newContent;
+            if (activeTab === GeneratorType.ATS_RESUME) {
+                const compliance = await runComplianceAndAutofix(normalized);
+                normalized = compliance.markdown;
+            }
             setGeneratedData(prev => ({ ...prev, [activeTab]: normalized }));
             setChatInput("");
             if (activeTab === GeneratorType.ATS_RESUME) {
@@ -1045,7 +996,7 @@ export const Editor: React.FC<EditorProps> = ({
                 <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900/50 border border-white/5 rounded-full">
                         <span className="text-xs font-black text-zinc-500 uppercase tracking-widest">Score</span>
-                        <span className="text-sm font-black text-orange-500">{optimizedScore || analysis.atsScore}%</span>
+                        <span className="text-sm font-black text-orange-500">{displayedScore}%</span>
                     </div>
                     
                     <div className="h-5 w-px bg-white/10" />
@@ -1190,6 +1141,41 @@ export const Editor: React.FC<EditorProps> = ({
                         </div>
 
                         <div className="space-y-2 mb-5">
+                            {activeTab === GeneratorType.ATS_RESUME && activeCompliance && (
+                                <div className="p-2.5 bg-white/5 border border-white/10 rounded-lg">
+                                    <div className="flex items-start justify-between gap-2 mb-2">
+                                        <div>
+                                            <div className="text-xs font-black text-white uppercase tracking-widest">ATS vs Recruiter</div>
+                                            <div className="text-[11px] text-zinc-400 font-medium mt-1">{activeCompliance.scoring.verdict} • Risk: {activeCompliance.scoring.risk}</div>
+                                        </div>
+                                        <button
+                                            onClick={() => setIsComplianceOpen(true)}
+                                            className="px-2 py-1 bg-zinc-950/70 border border-white/10 rounded-md text-[10px] font-black uppercase tracking-widest text-white hover:bg-white/5 transition-all"
+                                        >
+                                            Details
+                                        </button>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div className="bg-zinc-950/70 border border-white/10 rounded-md p-2 text-center">
+                                            <div className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">ATS</div>
+                                            <div className="text-lg font-black text-white leading-none">{activeCompliance.scoring.ats_score}</div>
+                                        </div>
+                                        <div className="bg-zinc-950/70 border border-white/10 rounded-md p-2 text-center">
+                                            <div className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Recruiter</div>
+                                            <div className="text-lg font-black text-white leading-none">{activeCompliance.scoring.recruiter_score}</div>
+                                        </div>
+                                    </div>
+                                    <label className="mt-2.5 flex items-center gap-2 text-xs text-zinc-300 font-bold">
+                                        <input
+                                            type="checkbox"
+                                            checked={removeRiskyKeywords}
+                                            onChange={(e) => setRemoveRiskyKeywords(e.target.checked)}
+                                            className="accent-orange-600"
+                                        />
+                                        Remove risky / over-optimized keywords
+                                    </label>
+                                </div>
+                            )}
                             <div className="p-2.5 bg-orange-500/5 border border-orange-500/10 rounded-lg">
                                 <div className="text-xs font-black text-orange-500 uppercase tracking-widest mb-1.5">ATS Keywords Injected</div>
                                 <div className="flex flex-wrap gap-1.5">
@@ -1322,6 +1308,137 @@ export const Editor: React.FC<EditorProps> = ({
                     </div>
                 </div>
             )}
+
+            <AnimatePresence>
+                {isComplianceOpen && activeCompliance && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setIsComplianceOpen(false)}
+                        className="fixed inset-0 z-[120] bg-black/80 backdrop-blur-md flex items-center justify-center p-6"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.95, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.95, opacity: 0 }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="bg-zinc-950 border border-white/10 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[80vh] overflow-hidden"
+                        >
+                            <div className="p-4 border-b border-white/10 flex items-center justify-between">
+                                <div>
+                                    <div className="text-xs font-black text-zinc-500 uppercase tracking-[0.2em]">Diagnostics</div>
+                                    <div className="text-lg font-black text-white">ATS vs Recruiter Score</div>
+                                </div>
+                                <button
+                                    onClick={() => setIsComplianceOpen(false)}
+                                    className="p-2 text-zinc-400 hover:text-white transition-colors"
+                                    title="Close"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            </div>
+
+                            <div className="p-4 overflow-y-auto custom-scrollbar max-h-[calc(80vh-64px)]">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                    <div className="bg-white/5 border border-white/10 rounded-xl p-3">
+                                        <div className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">ATS Score</div>
+                                        <div className="text-3xl font-black text-white mt-2">{activeCompliance.scoring.ats_score}</div>
+                                    </div>
+                                    <div className="bg-white/5 border border-white/10 rounded-xl p-3">
+                                        <div className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Recruiter Score</div>
+                                        <div className="text-3xl font-black text-white mt-2">{activeCompliance.scoring.recruiter_score}</div>
+                                    </div>
+                                    <div className="bg-white/5 border border-white/10 rounded-xl p-3">
+                                        <div className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Interpretation</div>
+                                        <div className="text-sm font-black text-white mt-2">{activeCompliance.scoring.verdict}</div>
+                                        <div className="text-xs text-zinc-400 font-medium mt-1 leading-relaxed">{activeCompliance.scoring.summary}</div>
+                                    </div>
+                                </div>
+
+                                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <div className="bg-white/5 border border-white/10 rounded-xl p-3">
+                                        <div className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-2">ATS Factors (Weights)</div>
+                                        <div className="space-y-1.5 text-xs">
+                                            {activeCompliance.scoring.ats_factors.map((f, idx) => (
+                                                <div key={idx} className="flex items-center justify-between">
+                                                    <span className="text-zinc-300 font-medium">{f.factor}</span>
+                                                    <span className="text-zinc-500 font-black tabular-nums">{f.weight}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="bg-white/5 border border-white/10 rounded-xl p-3">
+                                        <div className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-2">Recruiter Factors (Weights)</div>
+                                        <div className="space-y-1.5 text-xs">
+                                            {activeCompliance.scoring.recruiter_factors.map((f, idx) => (
+                                                <div key={idx} className="flex items-center justify-between">
+                                                    <span className="text-zinc-300 font-medium">{f.factor}</span>
+                                                    <span className="text-zinc-500 font-black tabular-nums">{f.weight}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="mt-4 bg-white/5 border border-white/10 rounded-xl p-3">
+                                    <div className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-2">Validator Output</div>
+                                    <div className="space-y-2">
+                                        {activeCompliance.issues.length === 0 ? (
+                                            <div className="text-sm text-zinc-400 font-medium">No issues detected.</div>
+                                        ) : (
+                                            activeCompliance.issues.map((i, idx) => (
+                                                <div key={idx} className="flex items-start justify-between gap-3 bg-zinc-950/60 border border-white/10 rounded-lg p-2.5">
+                                                    <div>
+                                                        <div className={`text-[10px] font-black uppercase tracking-widest ${i.severity === 'hard' ? 'text-red-400' : 'text-orange-400'}`}>
+                                                            {i.severity === 'hard' ? 'Hard Fail' : 'Soft Flag'} • {i.validator}
+                                                        </div>
+                                                        <div className="text-sm text-white font-medium mt-1 leading-snug">{i.message}</div>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="mt-4 bg-white/5 border border-white/10 rounded-xl p-3">
+                                    <div className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-2">Keyword Justification Log</div>
+                                    <div className="space-y-2">
+                                        {activeCompliance.keyword_justifications.map((k, idx) => (
+                                            <div key={idx} className="bg-zinc-950/60 border border-white/10 rounded-lg p-3">
+                                                <div className="flex items-start justify-between gap-3">
+                                                    <div>
+                                                        <div className="text-sm font-black text-white">{k.keyword}</div>
+                                                        <div className="text-[10px] text-zinc-500 font-black uppercase tracking-widest mt-0.5">
+                                                            {k.category} • Risk: {k.risk_level} • Freq: {k.frequency}/{k.allowed_frequency}
+                                                        </div>
+                                                    </div>
+                                                    <div className={`px-2 py-1 rounded-full border text-[10px] font-black uppercase tracking-widest ${
+                                                        k.used ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-zinc-800/40 border-white/10 text-zinc-300'
+                                                    }`}>
+                                                        {k.used ? 'Used' : 'Not Used'}
+                                                    </div>
+                                                </div>
+                                                {k.used ? (
+                                                    <>
+                                                        {k.resume_evidence && <div className="text-xs text-zinc-300 font-medium mt-2 leading-relaxed">Evidence: {k.resume_evidence}</div>}
+                                                        {k.job_description_reference && <div className="text-xs text-zinc-500 font-medium mt-1 leading-relaxed">JD: {k.job_description_reference}</div>}
+                                                        {k.justification && <div className="text-xs text-zinc-400 font-medium mt-2 leading-relaxed">{k.justification}</div>}
+                                                    </>
+                                                ) : (
+                                                    <div className="text-xs text-zinc-400 font-medium mt-2 leading-relaxed">
+                                                        {k.reason || 'Not used.'}{k.alternative_used ? ` Alternative: ${k.alternative_used}` : ''}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

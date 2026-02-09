@@ -440,6 +440,86 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
               subtext="Keyword Weighting"
             />
           </div>
+
+          <div className="p-5 bg-zinc-900/60 border border-white/10 rounded-2xl shadow-xl">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h4 className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-1">ATS Score vs Recruiter Score</h4>
+                <p className="text-sm text-zinc-300 font-medium leading-relaxed">Two lenses: ATS parsing + human trust. Truth always wins.</p>
+              </div>
+              <div className="flex items-center gap-3 shrink-0">
+                <div className="px-3 py-2 bg-zinc-950/80 rounded-xl border border-white/10 text-center">
+                  <div className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">ATS</div>
+                  <div className="text-lg font-black text-white leading-none">{(result.dualScoring?.ats_score ?? result.atsScore) || 0}</div>
+                </div>
+                <div className="px-3 py-2 bg-zinc-950/80 rounded-xl border border-white/10 text-center">
+                  <div className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Recruiter</div>
+                  <div className="text-lg font-black text-white leading-none">{(result.dualScoring?.recruiter_score ?? result.recruiterScore) || 0}</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-zinc-950/60 border border-white/10 rounded-xl p-3">
+                <div className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-2">ATS Score (0–100)</div>
+                <div className="space-y-1.5 text-xs">
+                  {(result.dualScoring?.ats_factors || [
+                    { factor: 'Semantic skill match', weight: 30, score: 0 },
+                    { factor: 'Role alignment', weight: 20, score: 0 },
+                    { factor: 'Section structure', weight: 15, score: 0 },
+                    { factor: 'Keyword presence (non-repetitive)', weight: 15, score: 0 },
+                    { factor: 'Formatting clarity', weight: 10, score: 0 },
+                    { factor: 'Consistency', weight: 10, score: 0 }
+                  ]).map((f, idx) => (
+                    <div key={idx} className="flex items-center justify-between">
+                      <span className="text-zinc-300 font-medium">{f.factor}</span>
+                      <span className="text-zinc-500 font-black tabular-nums">{f.weight}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-zinc-950/60 border border-white/10 rounded-xl p-3">
+                <div className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-2">Recruiter Score (0–100)</div>
+                <div className="space-y-1.5 text-xs">
+                  {(result.dualScoring?.recruiter_factors || [
+                    { factor: 'Credibility', weight: 30, score: 0 },
+                    { factor: 'Readability', weight: 20, score: 0 },
+                    { factor: 'Outcome clarity', weight: 20, score: 0 },
+                    { factor: 'Skill believability', weight: 15, score: 0 },
+                    { factor: 'No buzzwords', weight: 10, score: 0 },
+                    { factor: 'Interview defensibility', weight: 5, score: 0 }
+                  ]).map((f, idx) => (
+                    <div key={idx} className="flex items-center justify-between">
+                      <span className="text-zinc-300 font-medium">{f.factor}</span>
+                      <span className="text-zinc-500 font-black tabular-nums">{f.weight}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {result.dualScoring && (
+              <div className="mt-4 bg-zinc-950/60 border border-white/10 rounded-xl p-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Interpretation</div>
+                    <div className="text-sm font-black text-white">{result.dualScoring.verdict}</div>
+                    <div className="text-xs text-zinc-400 font-medium mt-1 leading-relaxed">{result.dualScoring.summary}</div>
+                  </div>
+                  <div className={`px-3 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-widest ${
+                    result.dualScoring.risk === 'Low'
+                      ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                      : result.dualScoring.risk === 'Medium'
+                        ? 'bg-orange-500/10 border-orange-500/20 text-orange-400'
+                        : 'bg-red-500/10 border-red-500/20 text-red-400'
+                  }`}>
+                    Risk: {result.dualScoring.risk}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
           
           {/* Main Verdict */}
           <div className="p-5 bg-zinc-900/60 border border-white/10 rounded-2xl shadow-xl relative overflow-hidden group">

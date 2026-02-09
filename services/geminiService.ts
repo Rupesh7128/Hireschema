@@ -1,6 +1,7 @@
 
 import { GoogleGenerativeAI, GenerativeModel, GenerationConfig, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 import { AnalysisResult, FileData, GeneratorType, ContactProfile } from "../types";
+import { buildDualScoringFromText } from "./resumeCompliance";
 
 // --- CONFIGURATION ---
 const MODEL_PRIMARY = "gemini-1.5-flash-latest"; 
@@ -1105,6 +1106,10 @@ export const analyzeResume = async (
     const txt = response.response.text();
     const parsed = safeJson(txt);
     if (parsed) {
+      const jdForScoring = jdText.startsWith('http')
+        ? jdText.split(/\r?\n/).slice(1).join('\n').trim()
+        : jdText;
+      const dualScoring = buildDualScoringFromText({ resumeText, jobDescription: jdForScoring });
       const contactProfile = (parsed as any).contactProfile && typeof (parsed as any).contactProfile === 'object'
         ? { ...(parsed as any).contactProfile }
         : { name: '', email: '', phone: '', linkedin: '', location: '' };
@@ -1131,6 +1136,10 @@ export const analyzeResume = async (
         jobTitle: resolvedJobTitle || (parsed as any).jobTitle,
         company: resolvedCompany || (parsed as any).company,
         contactProfile,
+        recruiterScore: (parsed as any).recruiterScore && Number.isFinite((parsed as any).recruiterScore) ? Number((parsed as any).recruiterScore) : dualScoring.recruiter_score,
+        dualScoring: (parsed as any).dualScoring && typeof (parsed as any).dualScoring === 'object'
+          ? (parsed as any).dualScoring
+          : dualScoring,
         languages: resumeLanguages,
         requiredLanguages,
         languageMatch
@@ -1140,10 +1149,16 @@ export const analyzeResume = async (
 
   } catch (primaryError: any) {
     const msg = getActionableError(primaryError);
+    const jdForScoring = jdText.startsWith('http')
+      ? jdText.split(/\r?\n/).slice(1).join('\n').trim()
+      : jdText;
+    const dualScoring = buildDualScoringFromText({ resumeText, jobDescription: jdForScoring });
     const fallback: AnalysisResult = {
         jobTitle: 'General Resume Scan',
         company: 'Self-Initiated',
         atsScore: 60,
+        recruiterScore: dualScoring.recruiter_score,
+        dualScoring,
         relevanceScore: 0,
         roleFitAnalysis: 'Analysis degraded due to model availability. Provide a JD for relevance.',
         contactProfile: { name: '', email: '', phone: '', linkedin: '', location: '' },
