@@ -252,8 +252,8 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
             text-transform: ${type === 'resume' ? 'uppercase' : 'none'}; 
             letter-spacing: ${type === 'resume' ? '0.05em' : '0.01em'};
             border-bottom: ${type === 'resume' ? '1.5px solid #374151' : '1px solid #e5e7eb'};
-            padding-bottom: 4px;
-            line-height: 1.2;
+            padding-bottom: 6px;
+            line-height: 1.3;
           }
           
           /* Job Headers (Custom H3) */
