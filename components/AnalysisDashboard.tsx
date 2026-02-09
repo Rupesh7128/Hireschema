@@ -247,6 +247,15 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
     setTimeout(() => setCopiedKeywords(false), 2000);
   };
 
+  // --- MAJOR ACTION LOGIC ---
+  const getMajorActionState = () => {
+    if (result.atsScore >= 80) return 'ready';
+    if (result.relevanceScore >= 40) return 'needs_edit'; // Job aligned but ATS/resume issues
+    return 'not_fit'; // Low relevance
+  };
+
+  const actionState = getMajorActionState();
+
   return (
     <div className="container mx-auto max-w-4xl px-4 py-4 sm:py-6 flex flex-col gap-4 sm:gap-6">
       
@@ -454,6 +463,87 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* --- MAJOR ACTION CARD --- */}
+      <div className={`p-6 rounded-2xl border shadow-xl relative overflow-hidden transition-all ${
+        actionState === 'ready' 
+          ? 'bg-emerald-950/40 border-emerald-500/20 shadow-emerald-900/10' 
+          : actionState === 'needs_edit'
+            ? 'bg-orange-950/40 border-orange-500/20 shadow-orange-900/10'
+            : 'bg-red-950/40 border-red-500/20 shadow-red-900/10'
+      }`}>
+        <div className={`absolute top-0 right-0 w-64 h-64 blur-[80px] -mr-20 -mt-20 opacity-20 pointer-events-none ${
+          actionState === 'ready' ? 'bg-emerald-500' : actionState === 'needs_edit' ? 'bg-orange-500' : 'bg-red-500'
+        }`} />
+        
+        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex-1 text-center md:text-left">
+            <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
+              {actionState === 'ready' ? (
+                <CheckCircle className="w-5 h-5 text-emerald-500" />
+              ) : actionState === 'needs_edit' ? (
+                <Sparkles className="w-5 h-5 text-orange-500" />
+              ) : (
+                <AlertTriangle className="w-5 h-5 text-red-500" />
+              )}
+              <h2 className={`text-lg font-black tracking-tight uppercase ${
+                actionState === 'ready' ? 'text-emerald-400' : actionState === 'needs_edit' ? 'text-orange-400' : 'text-red-400'
+              }`}>
+                {actionState === 'ready' ? 'Ready to Apply' : actionState === 'needs_edit' ? 'Optimization Needed' : 'Low Alignment'}
+              </h2>
+            </div>
+            <p className="text-zinc-300 font-medium leading-relaxed max-w-2xl">
+              {actionState === 'ready' 
+                ? "Your resume is ATS-optimized and aligned with this job description. You're good to go!" 
+                : actionState === 'needs_edit'
+                  ? "Great news: Your experience matches the job! However, your resume formatting is blocking your ATS score. Let's fix that."
+                  : "This role seems to be a stretch based on your current resume. You can still proceed, but we recommend tailoring your experience further."
+              }
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-3 shrink-0">
+            {actionState === 'ready' ? (
+              <>
+                <button 
+                  onClick={() => onNavigateTab?.('generator')}
+                  className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl shadow-lg shadow-emerald-900/20 transition-all flex items-center gap-2"
+                >
+                  <FileSearch className="w-4 h-4" /> Generate Cover Letter
+                </button>
+                <button 
+                  onClick={() => onNavigateTab?.('generator')}
+                  className="px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white font-black rounded-xl border border-white/5 transition-all flex items-center gap-2"
+                >
+                  <BrainCircuit className="w-4 h-4" /> Interview Prep
+                </button>
+              </>
+            ) : actionState === 'needs_edit' ? (
+              <>
+                <button 
+                  onClick={() => onNavigateTab?.('generator')}
+                  className="px-5 py-2.5 bg-orange-600 hover:bg-orange-500 text-white font-black rounded-xl shadow-lg shadow-orange-900/20 transition-all flex items-center gap-2"
+                >
+                  <Sparkles className="w-4 h-4" /> Generate ATS Resume
+                </button>
+                <button 
+                  onClick={scrollToRisks}
+                  className="px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white font-black rounded-xl border border-white/5 transition-all flex items-center gap-2"
+                >
+                  <ShieldAlert className="w-4 h-4" /> View Issues
+                </button>
+              </>
+            ) : (
+              <button 
+                onClick={() => onNavigateTab?.('generator')}
+                className="px-5 py-2.5 bg-red-600 hover:bg-red-500 text-white font-black rounded-xl shadow-lg shadow-red-900/20 transition-all flex items-center gap-2"
+              >
+                <Rocket className="w-4 h-4" /> Proceed Anyway
+              </button>
+            )}
           </div>
         </div>
       </div>
