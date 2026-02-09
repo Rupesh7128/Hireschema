@@ -62,6 +62,10 @@ ABSOLUTE CONSTRAINTS (NON-NEGOTIABLE)
   → Otherwise OMIT it silently
 - Do NOT mention missing skills or gaps
 - Keep formatting plain text, ATS-friendly, and recruiter-readable
+- NEVER keyword-stuff or cluster keywords unnaturally
+- Keyword frequency caps for any inserted/target JD terms:
+  - Max 2 total uses in the entire resume
+  - Max 1 use per section (SUMMARY, EXPERIENCE, SKILLS, EDUCATION)
 
 =====================
 CORE OBJECTIVE
@@ -99,14 +103,14 @@ STEP 5: SUMMARY REWRITE (HIGH-IMPACT)
 - Mirror JD language and seniority
 - Mention domain + platform type
 - Highlight scale and outcomes relevant to JD
-- Include 2–3 key JD keywords naturally
+- Include key JD language only where the resume supports it (no repetition)
 - 3–4 lines, no generic fluff
 
 STEP 6: EXPERIENCE SECTION REENGINEERING
 For each role:
 - 4–6 bullets max
 - Each bullet MUST follow: Action Verb → Scope → Method → Metric → Business Impact
-- Embed JD keywords ONLY where experience genuinely supports them
+- Embed JD language ONLY where experience genuinely supports it, with strict frequency caps
 - Prioritize JD-relevant bullets first; remove weak/irrelevant bullets
 
 STEP 7: SKILLS SECTION (ATS ENGINEERING)
@@ -343,6 +347,75 @@ export const Editor: React.FC<EditorProps> = ({
         return { present, stillMissing };
     };
 
+    const KEYWORD_CAP_GLOBAL = 2;
+    const KEYWORD_CAP_PER_SECTION = 1;
+
+    const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    const countKeywordOccurrences = (text: string, keyword: string) => {
+        const t = (text || '');
+        const k = (keyword || '').trim();
+        if (!t || !k) return 0;
+        const escaped = escapeRegExp(k);
+        const re = new RegExp(`(?<![A-Za-z0-9])${escaped}(?![A-Za-z0-9])`, 'gi');
+        const matches = t.match(re);
+        return matches ? matches.length : 0;
+    };
+
+    const dedupeKeywords = (keywords: string[]) => {
+        const out: string[] = [];
+        const seen = new Set<string>();
+        for (const k of keywords.filter(Boolean)) {
+            const key = k.trim().toLowerCase();
+            if (!key || seen.has(key)) continue;
+            seen.add(key);
+            out.push(k.trim());
+        }
+        return out;
+    };
+
+    const splitAtsSections = (markdown: string) => {
+        const lines = (markdown || '').split(/\r?\n/);
+        const out: Record<string, string> = {};
+        let current = 'OTHER';
+        let buf: string[] = [];
+        const flush = () => {
+            if (!out[current]) out[current] = '';
+            if (buf.length > 0) {
+                out[current] = (out[current] ? `${out[current]}\n` : '') + buf.join('\n');
+            }
+            buf = [];
+        };
+        for (const line of lines) {
+            const m = line.match(/^##\s+(.+?)\s*$/);
+            if (m) {
+                flush();
+                current = m[1].trim().toUpperCase();
+                continue;
+            }
+            buf.push(line);
+        }
+        flush();
+        return out;
+    };
+
+    const getKeywordCapViolations = (markdown: string, keywords: string[]) => {
+        const ks = dedupeKeywords(keywords);
+        const sections = splitAtsSections(markdown);
+        const overGlobal: Array<{ keyword: string; count: number }> = [];
+        const overSection: Array<{ keyword: string; section: string; count: number }> = [];
+        for (const k of ks) {
+            const globalCount = countKeywordOccurrences(markdown, k);
+            if (globalCount > KEYWORD_CAP_GLOBAL) overGlobal.push({ keyword: k, count: globalCount });
+            for (const [section, content] of Object.entries(sections)) {
+                if (section === 'OTHER') continue;
+                const c = countKeywordOccurrences(content, k);
+                if (c > KEYWORD_CAP_PER_SECTION) overSection.push({ keyword: k, section, count: c });
+            }
+        }
+        return { overGlobal, overSection };
+    };
+
     const extractJobMinYears = (jd: string): number | null => {
         const text = (jd || '').replace(/\s+/g, ' ').trim();
         if (!text) return null;
@@ -420,10 +493,13 @@ export const Editor: React.FC<EditorProps> = ({
                     const minYears = extractJobMinYears(jobDescription);
                     const mustIncludeSkills = getMustIncludeSkills(localResumeText, jobDescription);
                     const missingKeywords = prioritizeKeywords(analysis.missingKeywords || []).slice(0, 18);
+                    const targetKeywords = dedupeKeywords([...missingKeywords, ...mustIncludeSkills]);
+                    const keywordRules = `Keyword rules (ATS-safe): Never keyword-stuff. Avoid unnatural clusters. For any target term below, do not use it more than ${KEYWORD_CAP_GLOBAL} times in the entire resume and no more than ${KEYWORD_CAP_PER_SECTION} time per section.`;
                     const basePrompt = [
                         ATS_OPTIMIZE_DEFAULT_PROMPT,
-                        missingKeywords.length > 0
-                            ? `Strategically incorporate these missing keywords where truthful and natural: ${missingKeywords.join(', ')}.`
+                        keywordRules,
+                        targetKeywords.length > 0
+                            ? `Target terms (use ONLY if supported by the ORIGINAL resume; otherwise omit or use a truthful related phrase without the term): ${targetKeywords.join(', ')}.`
                             : '',
                         mustIncludeSkills.length > 0
                             ? `Ensure these skills/tools (already present in the ORIGINAL resume and mentioned in the JD) appear in the final resume, preferably in ## SKILLS: ${mustIncludeSkills.join(', ')}.`
@@ -438,10 +514,18 @@ export const Editor: React.FC<EditorProps> = ({
 
                     const coverage = getKeywordCoverage(normalized);
                     if (coverage.stillMissing.length > 0) {
+                        const currentViolations = getKeywordCapViolations(normalized, targetKeywords);
+                        const cappedOut = new Set<string>([
+                            ...currentViolations.overGlobal.map(v => v.keyword.toLowerCase())
+                        ]);
+                        const remainingTargets = prioritizeKeywords(coverage.stillMissing)
+                            .filter(k => !cappedOut.has((k || '').toLowerCase()))
+                            .slice(0, 18);
                         const followUpPrompt = [
                             `Second pass ATS keyword injection.`,
-                            `Remaining missing keywords: ${prioritizeKeywords(coverage.stillMissing).slice(0, 18).join(', ')}.`,
-                            `Add ONLY if they plausibly match existing experience/skills. Place them into Skills/Tools/Tech stack lists rather than inventing new work.`,
+                            keywordRules,
+                            remainingTargets.length > 0 ? `Remaining target terms: ${remainingTargets.join(', ')}.` : `No remaining target terms should be forced if it would cause repetition or unsupported claims.`,
+                            `Add ONLY if they plausibly match existing experience/skills. If unsupported, omit the term and use a truthful related phrase. Place terms into Skills/Tools/Tech stack lists rather than inventing new work.`,
                             `Keep formatting tight and ATS-friendly.`,
                             `Return ONLY the resume. Keep headings as: ## SUMMARY, ## EXPERIENCE, ## SKILLS, ## EDUCATION.`
                         ].join('\n');
@@ -454,6 +538,7 @@ export const Editor: React.FC<EditorProps> = ({
                         if (stillMissingSkills.length > 0) {
                             const skillPassPrompt = [
                                 `Final pass: ensure key JD skills that are already in the ORIGINAL resume are present in the final output.`,
+                                keywordRules,
                                 `Missing (but present in resume + JD): ${stillMissingSkills.join(', ')}.`,
                                 `Add them to ## SKILLS (or existing bullets) without inventing any new claims. Keep formatting clean and ATS-friendly.`,
                                 `Return ONLY the resume. Keep headings as: ## SUMMARY, ## EXPERIENCE, ## SKILLS, ## EDUCATION.`
@@ -461,6 +546,23 @@ export const Editor: React.FC<EditorProps> = ({
                             const boosted3 = await refineAtsResumeContent(normalized, skillPassPrompt, jobDescription, localResumeText);
                             normalized = normalizeAtsResumeMarkdown(boosted3);
                         }
+                    }
+
+                    const violations = getKeywordCapViolations(normalized, targetKeywords);
+                    if (violations.overGlobal.length > 0 || violations.overSection.length > 0) {
+                        const cleanupPrompt = [
+                            `ATS-safe cleanup pass: reduce repetition and remove any keyword spam patterns.`,
+                            keywordRules,
+                            violations.overGlobal.length > 0
+                                ? `Over global cap: ${violations.overGlobal.map(v => `${v.keyword} (${v.count})`).join(', ')}.`
+                                : '',
+                            violations.overSection.length > 0
+                                ? `Over section cap: ${violations.overSection.map(v => `${v.keyword} in ${v.section} (${v.count})`).join(', ')}.`
+                                : '',
+                            `Rewrite ONLY enough to meet caps while preserving factual accuracy and readability. Prefer synonyms or a truthful related phrase; do not invent experience. Return ONLY the resume with the same headings.`
+                        ].filter(Boolean).join('\n');
+                        const cleaned = await refineAtsResumeContent(normalized, cleanupPrompt, jobDescription, localResumeText);
+                        normalized = normalizeAtsResumeMarkdown(cleaned);
                     }
                 } catch {}
             }

@@ -725,6 +725,14 @@ export const refineAtsResumeContent = async (
     • ONLY edit bullet points to integrate keywords.
     • Do NOT rewrite bullet points just for style or "impact".
     • Keep the tone authentic to the original resume.
+    
+    ATS-SAFE KEYWORD RULES (NON-NEGOTIABLE):
+    • NEVER keyword-stuff or cluster keywords back-to-back.
+    • ONLY use a JD keyword if the ORIGINAL RESUME supports it (explicitly or clearly implied).
+    • If unsupported, OMIT the keyword and use a truthful related phrase instead.
+    • Frequency caps for any inserted/target JD terms:
+      - Max 2 uses total in the entire resume
+      - Max 1 use per section (SUMMARY, EXPERIENCE, SKILLS, EDUCATION)
 
     OUTPUT FORMAT (ATS-Optimized, One Page):
     - Output ONLY valid Markdown (no HTML).
