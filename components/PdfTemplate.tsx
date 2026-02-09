@@ -216,28 +216,41 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
           .pdf-content-block { transform-origin: top left; }
           
           /* Header */
-          .pdf-contact-header { margin: 0 0 16px 0; display: flex; flex-direction: column; align-items: center; text-align: center; }
+          .pdf-contact-header { 
+            margin: 0 0 ${type === 'cover_letter' ? '30px' : '16px'} 0; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: ${type === 'cover_letter' ? 'flex-start' : 'center'}; 
+            text-align: ${type === 'cover_letter' ? 'left' : 'center'}; 
+            border-bottom: ${type === 'cover_letter' ? '1px solid #e5e7eb' : 'none'};
+            padding-bottom: ${type === 'cover_letter' ? '20px' : '0'};
+          }
           .pdf-contact-name { 
-            font-size: 24pt; 
+            font-size: ${type === 'cover_letter' ? '28pt' : '24pt'}; 
             font-weight: 800; 
             letter-spacing: -0.02em; 
             line-height: 1.1; 
-            margin: 0 0 6px 0; 
-            color: #374151 !important; 
+            margin: 0 0 ${type === 'cover_letter' ? '12px' : '6px'} 0; 
+            color: #111827 !important; 
             text-transform: capitalize;
           }
           .pdf-contact-line { 
-            font-size: 9pt; 
+            font-size: ${type === 'cover_letter' ? '10pt' : '9pt'}; 
             color: #4b5563 !important; 
             margin: 0; 
-            line-height: 1.4;
+            line-height: 1.5;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: ${type === 'cover_letter' ? 'flex-start' : 'center'};
             flex-wrap: wrap;
-            gap: 0;
+            gap: ${type === 'cover_letter' ? '12px' : '0'};
           }
-          .pdf-contact-sep { color: #9ca3af !important; padding: 0 8px; font-size: 8pt; }
+          .pdf-contact-sep { 
+            color: #d1d5db !important; 
+            padding: 0; 
+            font-size: 10pt;
+            display: ${type === 'cover_letter' ? 'inline-block' : 'inline'};
+          }
           .pdf-contact-line a { color: #4b5563 !important; text-decoration: none; }
           
           /* Section Headers */
@@ -245,14 +258,14 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
             display: none; /* We handle name separately */
           }
           .pdf-export-container h2 { 
-            font-size: 11pt; 
+            font-size: 14pt; 
             font-weight: 800; 
-            margin: 18px 0 8px 0; 
-            color: #374151 !important; 
+            margin: 24px 0 12px 0; 
+            color: #111827 !important; 
             text-transform: ${type === 'resume' ? 'uppercase' : 'none'}; 
             letter-spacing: ${type === 'resume' ? '0.05em' : '0.01em'};
-            border-bottom: ${type === 'resume' ? '1.5px solid #374151' : '1px solid #e5e7eb'};
-            padding-bottom: 6px;
+            border-bottom: ${type === 'resume' ? '1.5px solid #374151' : 'none'};
+            padding-bottom: ${type === 'resume' ? '6px' : '0'};
             line-height: 1.3;
           }
           
@@ -265,30 +278,31 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
           
           /* Fallback H3 */
           .pdf-export-container h3 { 
-            font-size: 10.5pt; 
+            font-size: 11pt; 
             font-weight: 700; 
-            margin: 12px 0 4px 0; 
+            margin: 16px 0 8px 0; 
             color: #111827 !important; 
           }
 
           /* Body Text */
           .pdf-export-container p { 
-            margin: 0 0 ${type === 'resume' ? '6px' : type === 'cover_letter' ? '14px' : '12px'} 0; 
+            margin: 0 0 ${type === 'resume' ? '6px' : '18px'} 0; 
             color: #374151 !important; 
             text-align: left;
-            line-height: ${type === 'cover_letter' ? '1.6' : '1.45'};
+            line-height: ${type === 'cover_letter' ? '1.75' : '1.45'};
             font-weight: 400;
+            font-size: ${type === 'cover_letter' ? '11pt' : '10pt'};
           }
           .pdf-export-container ul { 
-            margin: 0 0 10px 0; 
-            padding-left: 16px; 
+            margin: 0 0 16px 0; 
+            padding-left: 20px; 
             list-style-type: disc; 
           }
           .pdf-export-container li { 
-            margin-bottom: 3px; 
+            margin-bottom: 6px; 
             color: #374151 !important; 
-            line-height: 1.45;
-            padding-left: 2px;
+            line-height: 1.6;
+            padding-left: 4px;
           }
           .pdf-export-container strong { 
             font-weight: 700; 
