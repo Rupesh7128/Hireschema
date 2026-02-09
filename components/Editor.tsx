@@ -658,19 +658,56 @@ export const Editor: React.FC<EditorProps> = ({
         return '';
     };
 
+    const normalizeRichText = (raw: string, tab: GeneratorType) => {
+        const input = (raw || '').replace(/\r\n/g, '\n');
+        const trimmed = input.trim();
+        if (!trimmed) return '';
+
+        const looksLikeMarkdown =
+            /(^|\n)\s*#{1,6}\s+\S+/.test(input) ||
+            /(^|\n)\s*([-*+]\s+|\d+\.\s+)\S+/.test(input) ||
+            /```/.test(input);
+
+        if (looksLikeMarkdown) return input;
+        if (tab === GeneratorType.INTERVIEW_PREP) return input;
+
+        const lines = input.split('\n').map((line) => line.replace(/\s+$/g, ''));
+        const out: string[] = [];
+        for (const line of lines) {
+            const t = line.trim();
+            if (!t) {
+                out.push('');
+                continue;
+            }
+            if (/^[•·]\s*/.test(t)) {
+                out.push(`- ${t.replace(/^[•·]\s*/, '')}`);
+                continue;
+            }
+            out.push(t);
+            out.push('');
+        }
+        return out.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+    };
+
     const renderMarkdown = (content: string) => {
         const isCover = activeTab === GeneratorType.COVER_LETTER;
         const isInterview = activeTab === GeneratorType.INTERVIEW_PREP;
         const isGaps = activeTab === GeneratorType.LEARNING_PATH;
 
-        const containerClassName = isCover
-            ? 'text-zinc-900'
-            : 'text-zinc-900';
+        const containerClassName = [
+            'prose prose-zinc max-w-none',
+            'prose-headings:tracking-tight',
+            'prose-p:leading-relaxed',
+            'prose-li:leading-relaxed',
+            'text-zinc-900'
+        ].join(' ');
+
+        const displayContent = normalizeRichText(content, activeTab);
 
         return (
-            <div className={containerClassName}>
+            <article className={containerClassName}>
                 <ReactMarkdown
-                    remarkPlugins={[remarkGfm, remarkBreaks]}
+                    remarkPlugins={isInterview ? [remarkGfm, remarkBreaks] : [remarkGfm]}
                     components={{
                         h1: ({ ...props }) => (
                             <h1
@@ -712,7 +749,7 @@ export const Editor: React.FC<EditorProps> = ({
                             }
                             return (
                                 <p
-                                    className={`${isCover ? 'text-base sm:text-[15px] leading-7 text-zinc-800 mb-6 whitespace-pre-line font-medium' : 'text-sm sm:text-base leading-relaxed text-zinc-800 mb-4'}`}
+                                    className={`${isCover ? 'text-base sm:text-[15px] leading-7 text-zinc-800 mb-6 font-medium' : 'text-sm sm:text-base leading-relaxed text-zinc-800 mb-4'}`}
                                     {...props}
                                 />
                             );
@@ -780,9 +817,9 @@ export const Editor: React.FC<EditorProps> = ({
                         strong: ({ ...props }) => <strong className="font-bold text-black" {...props} />
                     }}
                 >
-                    {content}
+                    {displayContent}
                 </ReactMarkdown>
-            </div>
+            </article>
         );
     };
 
