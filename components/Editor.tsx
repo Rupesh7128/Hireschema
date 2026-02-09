@@ -1001,10 +1001,10 @@ export const Editor: React.FC<EditorProps> = ({
     };
 
     return (
-        <div className="flex flex-col h-full bg-black text-white font-sans overflow-hidden">
+        <div className="flex flex-col h-full bg-transparent text-white font-sans overflow-hidden">
             
             {/* --- TOP BAR --- */}
-            <div className="h-14 border-b border-white/5 flex items-center justify-between px-4 bg-zinc-950/50 backdrop-blur-xl shrink-0">
+            <div className="h-14 border-b border-white/5 flex items-center justify-between px-4 bg-black/20 backdrop-blur-md shrink-0">
                 <div className="flex items-center gap-6">
                     <div className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
@@ -1077,7 +1077,7 @@ export const Editor: React.FC<EditorProps> = ({
 
             <div className="flex-1 flex overflow-hidden">
                 {/* --- MAIN PREVIEW AREA --- */}
-                <div className="flex-1 overflow-y-auto custom-scrollbar p-4 bg-black relative">
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-4 bg-transparent relative">
                     <div className={`${activeTab === GeneratorType.ATS_RESUME ? 'max-w-[900px]' : 'max-w-[700px]'} mx-auto`}>
                         <AnimatePresence mode="wait">
                             <motion.div
@@ -1177,7 +1177,7 @@ export const Editor: React.FC<EditorProps> = ({
                 </div>
 
                 {/* --- RIGHT CONTROL PANEL --- */}
-                <div className="w-[260px] border-l border-white/5 bg-zinc-950 flex flex-col shrink-0">
+                <div className="w-[260px] border-l border-white/5 bg-black/20 backdrop-blur-md flex flex-col shrink-0">
                     <div className="flex-1 p-3 overflow-y-auto custom-scrollbar">
                         <div className="flex items-center justify-between mb-2.5">
                             <h3 className="text-xs font-black text-zinc-500 uppercase tracking-[0.2em]">Insights</h3>

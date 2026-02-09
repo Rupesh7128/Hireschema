@@ -61,7 +61,7 @@ const ScoreRing = ({ value, label, icon: Icon, color = "orange", subtext }: { va
   const strokeDashoffset = circumference - (value / 100) * circumference;
   
   return (
-    <div className="flex items-center gap-4 bg-zinc-900/40 border border-white/5 p-4 rounded-2xl hover:border-white/10 transition-all group">
+    <div className="flex items-center gap-4 bg-black/20 backdrop-blur-md border border-white/5 p-4 rounded-2xl hover:border-white/10 transition-all group">
       <div className="relative w-16 h-16 shrink-0">
         <svg className="w-full h-full transform -rotate-90">
           <circle
@@ -118,7 +118,7 @@ const BulletList = ({ title, items, icon: Icon, color = "zinc" }: { title: strin
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: idx * 0.05 }}
-            className="flex items-start gap-3 p-3 bg-zinc-950/40 border border-white/5 rounded-xl hover:border-white/10 transition-colors group/item"
+            className="flex items-start gap-3 p-3 bg-black/40 border border-white/5 rounded-xl hover:border-white/10 transition-colors group/item"
           >
             <div className={`mt-1.5 w-1 h-1 rounded-full bg-${color}-500 shrink-0 group-hover/item:scale-125 transition-transform`} />
             <p className="text-sm text-zinc-300 leading-relaxed font-medium">{item}</p>
@@ -264,7 +264,7 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-zinc-900/40 border border-white/5 p-4 sm:p-6 rounded-2xl shadow-xl relative overflow-hidden"
+          className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-black/20 backdrop-blur-md border border-white/5 p-4 sm:p-6 rounded-2xl shadow-xl relative overflow-hidden"
         >
           <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/5 blur-[60px] -mr-16 -mt-16" />
           <div className="relative z-10">
@@ -305,7 +305,7 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
         
         {/* Profile Card */}
-        <div className="lg:col-span-5 bg-zinc-900/40 border border-white/5 p-4 rounded-2xl shadow-xl relative overflow-hidden flex flex-col justify-between">
+        <div className="lg:col-span-5 bg-black/20 backdrop-blur-md border border-white/5 p-4 rounded-2xl shadow-xl relative overflow-hidden flex flex-col justify-between">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/[0.01] to-transparent pointer-events-none" />
           
           <div className="relative z-10 flex items-center gap-3">
@@ -441,7 +441,7 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
             />
           </div>
 
-          <div className="p-5 bg-zinc-900/60 border border-white/10 rounded-2xl shadow-xl">
+          <div className="p-5 bg-black/30 backdrop-blur-md border border-white/10 rounded-2xl shadow-xl">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h4 className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-1">ATS Score vs Recruiter Score</h4>
@@ -678,7 +678,7 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
         
         <div className="lg:col-span-5 space-y-4 lg:order-2">
           {/* Missing Keywords */}
-          <div className="bg-zinc-900/40 border border-white/5 p-4 rounded-2xl shadow-xl relative overflow-hidden group">
+          <div className="bg-black/20 backdrop-blur-md border border-white/5 p-4 rounded-2xl shadow-xl relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-24 h-24 bg-orange-500/5 blur-[40px] -mr-10 -mt-10 transition-opacity group-hover:opacity-100 opacity-50" />
             <div className="flex items-center justify-between gap-3 mb-4 relative z-10">
               <div className="flex items-center gap-2">
@@ -711,7 +711,7 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
           </div>
 
           {/* Language Match */}
-          <div className="bg-zinc-900/40 border border-white/5 p-4 rounded-2xl shadow-xl relative overflow-hidden">
+          <div className="bg-black/20 backdrop-blur-md border border-white/5 p-4 rounded-2xl shadow-xl relative overflow-hidden">
             <div className="flex items-center justify-between gap-3 mb-3">
               <h3 className="text-xs font-black text-white uppercase tracking-widest">Language Check</h3>
               <div className="flex items-center gap-2">
@@ -771,7 +771,7 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
           </div>
 
           {/* Technical Risks */}
-          <div ref={risksRef} className="bg-zinc-900/40 border border-white/5 p-4 rounded-2xl shadow-xl">
+          <div ref={risksRef} className="bg-black/20 backdrop-blur-md border border-white/5 p-4 rounded-2xl shadow-xl">
             <div className="flex items-center gap-2 mb-4">
               <ShieldAlert className="w-4 h-4 text-orange-500" />
               <h3 className="text-xs font-black text-white uppercase tracking-widest">Critical Risks</h3>
@@ -796,7 +796,7 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ result, onUpdateP
 
         {/* Deep Analysis Column */}
         <div className="lg:col-span-7 space-y-4 lg:order-1">
-          <div className="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl shadow-xl min-h-full">
+          <div className="bg-black/20 backdrop-blur-md border border-white/5 p-6 rounded-2xl shadow-xl min-h-full">
             <div className="space-y-6">
               <BulletList 
                 title="Strategic Role Fit" 
