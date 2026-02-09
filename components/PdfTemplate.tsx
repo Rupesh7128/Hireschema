@@ -386,9 +386,42 @@ export const PdfTemplate = forwardRef<HTMLDivElement, PdfTemplateProps>(({ conte
           .pdf-export-container pre { margin: 10px 0; padding: 10px; background: #111827; color: #f9fafb; border-radius: 6px; overflow-x: auto; }
           .pdf-export-container code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
           .pdf-export-container :not(pre) > code { background: #f3f4f6; color: #111827; padding: 1px 4px; border-radius: 4px; }
-          .pdf-export-container table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-          .pdf-export-container th { text-align: left; font-weight: 700; font-size: 9pt; padding: 6px 6px; border-bottom: 1px solid #e5e7eb; background: #f9fafb; color: #374151 !important; }
-          .pdf-export-container td { padding: 6px 6px; border-bottom: 1px solid #f3f4f6; color: #374151 !important; vertical-align: top; }
+          .pdf-export-container table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 16px 0; 
+            font-size: 9pt; 
+            border-radius: 6px; 
+            overflow: hidden; 
+            border: 1px solid #fed7aa; /* Light Orange Border */
+          }
+          .pdf-export-container th { 
+            text-align: left; 
+            font-weight: 800; 
+            font-size: 8.5pt; 
+            padding: 12px 10px; 
+            border-bottom: 2px solid #ea580c; 
+            background: #fff7ed; /* Very light orange bg for header */
+            color: #9a3412 !important; /* Dark orange text */
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+          }
+          .pdf-export-container td { 
+            padding: 10px 10px; 
+            border-bottom: 1px solid #ffedd5; 
+            color: #374151 !important; 
+            vertical-align: middle;
+            line-height: 1.4;
+          }
+          .pdf-export-container tr:last-child td { border-bottom: none; }
+          .pdf-export-container tr:nth-child(even) { background-color: #fffaf0; } /* Subtle stripe */
+          
+          /* First column emphasis like the image */
+          .pdf-export-container td:first-child {
+            font-weight: 700;
+            color: #ea580c !important; /* Orange accent for skill name */
+            width: 25%; /* Give first column reasonable space */
+          }
           
           /* Print Safety */
           .pdf-export-container h1, .pdf-export-container h2, .pdf-job-header { 
