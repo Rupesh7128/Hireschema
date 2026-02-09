@@ -15,7 +15,7 @@ import { generateContent, calculateImprovedScore, refineContent, refineAtsResume
 import { normalizeAtsResumeMarkdown } from '../services/atsResumeMarkdown';
 import { saveStateBeforePayment } from '../services/stateService';
 import { includesKeyword, prioritizeKeywords } from '../services/keywordUtils';
-import { validateResumeMarkdown, type ResumeComplianceReport } from '../services/resumeCompliance';
+import { validateResumeMarkdown, type ResumeComplianceReport, type KeywordJustification } from '../services/resumeCompliance';
 import PaymentLock from './PaymentLock';
 import { PdfTemplate } from './PdfTemplate';
 import { LoadingIndicator } from './LoadingIndicator';
@@ -208,6 +208,7 @@ export const Editor: React.FC<EditorProps> = ({
     const [removeRiskyKeywords, setRemoveRiskyKeywords] = useState(false);
     const [complianceReports, setComplianceReports] = useState<Record<string, ResumeComplianceReport | null>>({});
     const [isComplianceOpen, setIsComplianceOpen] = useState(false);
+    const [keywordApplyStatus, setKeywordApplyStatus] = useState<Record<string, boolean>>({});
 
     const pdfRef = useRef<HTMLDivElement>(null);
     const previewPdfRef = useRef<HTMLDivElement>(null);
@@ -466,6 +467,39 @@ export const Editor: React.FC<EditorProps> = ({
 
         setComplianceReports(prev => ({ ...prev, [GeneratorType.ATS_RESUME]: report }));
         return { markdown: current, report };
+    };
+
+    const applyKeywordOnce = async (keyword: KeywordJustification) => {
+        if (!isPaid) return;
+        const currentMarkdown = generatedData[GeneratorType.ATS_RESUME];
+        if (!currentMarkdown) return;
+        const key = (keyword.keyword || '').trim().toLowerCase();
+        if (!key) return;
+        if (keywordApplyStatus[key]) return;
+
+        setKeywordApplyStatus(prev => ({ ...prev, [key]: true }));
+        try {
+            const replacement = keyword.alternative_used ? keyword.alternative_used : '';
+            const evidenceHint = keyword.resume_evidence ? `Resume evidence to anchor on: "${keyword.resume_evidence}".` : '';
+            const instruction = [
+                `One-click keyword apply: integrate "${keyword.keyword}" exactly once into the resume ONLY if supported by the ORIGINAL resume.`,
+                `Do NOT mirror JD sentences. Do NOT keyword-stuff. Tools never lead bullets.`,
+                `If "${keyword.keyword}" is unsupported, DO NOT add it. ${replacement ? `Instead, use this experience-based alternative (once, max): "${replacement}".` : ''}`,
+                evidenceHint,
+                `Preferred placement: ## SKILLS (single, natural mention). If it truly belongs in EXPERIENCE, integrate into an existing bullet without changing meaning or inventing metrics.`,
+                `Hard caps still apply. Return ONLY the resume with the same headings.`
+            ].filter(Boolean).join('\n');
+
+            const updated = await refineAtsResumeContent(currentMarkdown, instruction, jobDescription, localResumeText);
+            let normalized = normalizeAtsResumeMarkdown(updated);
+            const compliance = await runComplianceAndAutofix(normalized);
+            normalized = compliance.markdown;
+            setGeneratedData(prev => ({ ...prev, [GeneratorType.ATS_RESUME]: normalized }));
+            const score = await calculateImprovedScore(normalized, jobDescription);
+            setOptimizedScore(score);
+        } finally {
+            setKeywordApplyStatus(prev => ({ ...prev, [key]: false }));
+        }
     };
 
     const extractJobMinYears = (jd: string): number | null => {
@@ -1415,19 +1449,54 @@ export const Editor: React.FC<EditorProps> = ({
                                     <div className="space-y-2">
                                         {activeCompliance.keyword_justifications.map((k, idx) => (
                                             <div key={idx} className="bg-zinc-950/60 border border-white/10 rounded-lg p-3">
+                                                {(() => {
+                                                    const applyKey = (k.keyword || '').trim().toLowerCase();
+                                                    const isApplying = !!keywordApplyStatus[applyKey];
+                                                    const canApply = !k.used && !!generatedData[GeneratorType.ATS_RESUME] && !isApplying;
+                                                    return (
                                                 <div className="flex items-start justify-between gap-3">
                                                     <div>
-                                                        <div className="text-sm font-black text-white">{k.keyword}</div>
+                                                        <button
+                                                            onClick={() => canApply && applyKeywordOnce(k)}
+                                                            disabled={!canApply}
+                                                            className={`text-sm font-black text-left ${
+                                                                canApply ? 'text-white hover:underline' : 'text-white'
+                                                            } disabled:opacity-80 disabled:cursor-default`}
+                                                            title={canApply ? 'Apply once' : undefined}
+                                                        >
+                                                            {k.keyword}
+                                                        </button>
                                                         <div className="text-[10px] text-zinc-500 font-black uppercase tracking-widest mt-0.5">
                                                             {k.category} • Risk: {k.risk_level} • Freq: {k.frequency}/{k.allowed_frequency}
                                                         </div>
                                                     </div>
-                                                    <div className={`px-2 py-1 rounded-full border text-[10px] font-black uppercase tracking-widest ${
-                                                        k.used ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-zinc-800/40 border-white/10 text-zinc-300'
-                                                    }`}>
-                                                        {k.used ? 'Used' : 'Not Used'}
+                                                    <div className="flex items-center gap-2">
+                                                        <div className={`px-2 py-1 rounded-full border text-[10px] font-black uppercase tracking-widest ${
+                                                            k.used ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-zinc-800/40 border-white/10 text-zinc-300'
+                                                        }`}>
+                                                            {k.used ? 'Used' : 'Not Used'}
+                                                        </div>
+                                                        {!k.used && (
+                                                            <button
+                                                                onClick={() => applyKeywordOnce(k)}
+                                                                disabled={!generatedData[GeneratorType.ATS_RESUME] || isApplying}
+                                                                className="px-2.5 py-1 bg-orange-600 hover:bg-orange-500 disabled:bg-zinc-800 disabled:opacity-60 text-white text-[10px] font-black uppercase tracking-widest rounded-full transition-all flex items-center gap-1.5"
+                                                                title="Apply once"
+                                                            >
+                                                                {isApplying ? (
+                                                                    <>
+                                                                        <Loader2 className="w-3 h-3 animate-spin" />
+                                                                        Applying
+                                                                    </>
+                                                                ) : (
+                                                                    'Apply'
+                                                                )}
+                                                            </button>
+                                                        )}
                                                     </div>
                                                 </div>
+                                                    );
+                                                })()}
                                                 {k.used ? (
                                                     <>
                                                         {k.resume_evidence && <div className="text-xs text-zinc-300 font-medium mt-2 leading-relaxed">Evidence: {k.resume_evidence}</div>}
