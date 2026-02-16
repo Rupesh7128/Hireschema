@@ -729,148 +729,130 @@ export default function App() {
           </motion.div>
         )}
         {view === 'dashboard' && (
-          <motion.div key="dashboard" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex h-screen bg-black text-zinc-100 overflow-hidden font-sans w-full relative selection:bg-orange-500/30">
-            
-            {/* AMBIENT BACKGROUND */}
-            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-orange-600/10 rounded-full blur-[100px] pointer-events-none" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600/5 rounded-full blur-[100px] pointer-events-none" />
-            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none mix-blend-overlay" />
-
+          <motion.div key="dashboard" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex h-screen bg-black text-zinc-100 overflow-hidden font-sans w-full">
             {/* HISTORY SIDEBAR */}
             <AnimatePresence>
               {showHistory && (
-                <>
-                    <motion.div 
-                        key="history-overlay"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={() => setShowHistory(false)}
-                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60]"
-                    />
-                    <motion.div 
-                        key="history-sidebar"
-                        initial={{ x: -300 }}
-                        animate={{ x: 0 }}
-                        exit={{ x: -300 }}
-                        className="fixed inset-y-0 left-0 w-[300px] bg-zinc-950/90 backdrop-blur-xl border-r border-white/5 flex flex-col shadow-2xl z-[61]"
-                    >
-                        <div className="p-5 border-b border-white/5 flex justify-between items-center bg-white/5">
-                            <h2 className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">Scan History</h2>
-                            <button onClick={() => setShowHistory(false)} className="p-1 rounded-md hover:bg-white/10 text-zinc-500 hover:text-white transition-all">
-                                <X className="w-4 h-4" />
+                <div key="history-wrapper" className="fixed inset-0 z-[60]">
+                  <motion.div 
+                    key="history-sidebar"
+                    initial={{ x: -260 }}
+                    animate={{ x: 0 }}
+                    exit={{ x: -260 }}
+                    className="absolute inset-y-0 left-0 w-[260px] bg-zinc-950 border-r border-white/5 flex flex-col shadow-2xl z-[61]"
+                  >
+                    <div className="p-4 border-b border-white/5 flex justify-between items-center">
+                      <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600">History</h2>
+                      <button onClick={() => setShowHistory(false)} className="text-zinc-500 hover:text-white transition-colors">
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-3 space-y-2 custom-scrollbar">
+                      {history.length === 0 ? (
+                        <div className="text-center py-10">
+                          <p className="text-zinc-600 text-xs">No analysis history yet.</p>
+                        </div>
+                      ) : (
+                        history.map((item) => {
+                          const isSelected = selectedHistoryId === item.id;
+                          const paid = isIdPaid(item.id);
+                          return (
+                            <button 
+                              key={item.id}
+                              onClick={async () => {
+                                setSelectedHistoryId(item.id);
+                                setResumeFile(item.resumeFile);
+                                const storedText = item.resumeText || '';
+                                if (storedText.trim().length >= 120) {
+                                  setResumeText(storedText);
+                                } else {
+                                  setResumeText('');
+                                  try {
+                                    const extracted = await extractResumeTextWithFallback(item.resumeFile);
+                                    setResumeText(extracted);
+                                  } catch {
+                                    setResumeText(storedText);
+                                  }
+                                }
+                                setJobDescription(item.jobDescription);
+                                setAnalysisResult(item.analysisResult);
+                                setDashboardView('result');
+                                setResultTab('analysis');
+                                setShowHistory(false);
+                              }}
+                              className={`w-full text-left p-4 rounded-xl border transition-all group ${isSelected ? 'bg-orange-500/10 border-orange-500/50' : 'bg-zinc-900/50 border-white/5 hover:border-white/10'}`}
+                            >
+                              <div className="flex justify-between items-start mb-1">
+                                <span className="text-xs font-mono text-zinc-500">{item.date}</span>
+                                {paid && (
+                                  <div className="flex items-center gap-1 px-1.5 py-0.5 bg-orange-500/10 border border-orange-500/20 rounded text-xs font-black text-orange-500 uppercase">
+                                    PAID
+                                  </div>
+                                )}
+                              </div>
+                              <h4 className={`text-sm font-black leading-tight break-words ${isSelected ? 'text-orange-500' : 'text-white'}`}>{item.jobTitle}</h4>
+                              <p className="text-xs text-zinc-500 leading-tight break-words">{item.company}</p>
+                              <div className="mt-3 flex items-center justify-between">
+                                 <div className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">ATS Score: <span className="text-white">{item.atsScore}%</span></div>
+                                 <span className={`text-xs transition-transform group-hover:translate-x-1 ${isSelected ? 'text-orange-500' : 'text-zinc-700'}`}>→</span>
+                              </div>
                             </button>
-                        </div>
-                        <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
-                            {history.length === 0 ? (
-                                <div className="text-center py-12 px-4 border border-dashed border-white/5 rounded-xl">
-                                    <History className="w-8 h-8 text-zinc-700 mx-auto mb-3" />
-                                    <p className="text-zinc-500 text-xs font-medium">No history yet. Start your first scan!</p>
-                                </div>
-                            ) : (
-                                history.map((item) => {
-                                    const isSelected = selectedHistoryId === item.id;
-                                    const paid = isIdPaid(item.id);
-                                    return (
-                                        <button 
-                                            key={item.id}
-                                            onClick={async () => {
-                                                setSelectedHistoryId(item.id);
-                                                setResumeFile(item.resumeFile);
-                                                const storedText = item.resumeText || '';
-                                                if (storedText.trim().length >= 120) {
-                                                    setResumeText(storedText);
-                                                } else {
-                                                    setResumeText('');
-                                                    try {
-                                                        const extracted = await extractResumeTextWithFallback(item.resumeFile);
-                                                        setResumeText(extracted);
-                                                    } catch {
-                                                        setResumeText(storedText);
-                                                    }
-                                                }
-                                                setJobDescription(item.jobDescription);
-                                                setAnalysisResult(item.analysisResult);
-                                                setDashboardView('result');
-                                                setResultTab('analysis');
-                                                setShowHistory(false);
-                                            }}
-                                            className={`w-full text-left p-4 rounded-xl border transition-all group relative overflow-hidden ${isSelected ? 'bg-orange-500/10 border-orange-500/40' : 'bg-white/5 border-transparent hover:border-white/10 hover:bg-white/10'}`}
-                                        >
-                                            <div className="flex justify-between items-start mb-2 relative z-10">
-                                                <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">{item.date}</span>
-                                                {paid && (
-                                                    <div className="flex items-center gap-1 px-1.5 py-0.5 bg-orange-500/20 border border-orange-500/30 rounded text-[10px] font-black text-orange-400 uppercase tracking-wider shadow-[0_0_10px_rgba(249,115,22,0.2)]">
-                                                        PAID
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <h4 className={`text-sm font-bold leading-tight break-words mb-1 relative z-10 ${isSelected ? 'text-white' : 'text-zinc-200 group-hover:text-white'}`}>{item.jobTitle}</h4>
-                                            <p className="text-xs text-zinc-500 leading-tight break-words mb-3 relative z-10">{item.company}</p>
-                                            <div className="flex items-center justify-between relative z-10">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="h-1 w-12 bg-zinc-800 rounded-full overflow-hidden">
-                                                        <div className="h-full bg-orange-500" style={{ width: `${item.atsScore}%` }} />
-                                                    </div>
-                                                    <span className="text-[10px] font-mono text-zinc-400">{item.atsScore}%</span>
-                                                </div>
-                                                <ArrowRight className={`w-3 h-3 transition-transform ${isSelected ? 'text-orange-500' : 'text-zinc-600 group-hover:translate-x-1 group-hover:text-zinc-300'}`} />
-                                            </div>
-                                        </button>
-                                    );
-                                })
-                            )}
-                        </div>
-                    </motion.div>
-                </>
+                          );
+                        })
+                      )}
+                    </div>
+                  </motion.div>
+                  <motion.div 
+                    key="history-overlay"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    onClick={() => setShowHistory(false)}
+                    className="absolute inset-0 bg-black/60 backdrop-blur-sm z-[60]"
+                  />
+                </div>
               )}
             </AnimatePresence>
 
             {/* GLOBAL OVERLAY: Payment Verification */}
             {isVerifyingPayment && (
-                <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-xl flex flex-col items-center justify-center">
-                    <div className="bg-zinc-900/50 border border-white/10 p-8 rounded-3xl backdrop-blur-md shadow-2xl flex flex-col items-center">
-                        <LoadingIndicator message="Verifying Payment..." size="lg" />
-                    </div>
+                <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex flex-col items-center justify-center">
+                    <LoadingIndicator message="Verifying Payment..." size="lg" />
                 </div>
             )}
             
             {/* Payment Success Toast */}
             {showPaymentSuccess && (
-                <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-3 px-6 py-4 bg-emerald-500/10 border border-emerald-500/20 backdrop-blur-xl text-emerald-400 text-sm font-bold rounded-full shadow-2xl animate-in fade-in slide-in-from-top-4">
+                <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-2 px-4 py-3 bg-orange-600 text-white text-sm font-bold rounded-lg shadow-lg animate-in fade-in slide-in-from-top-2">
                     <CheckCircle className="w-5 h-5" />
                     <span>Payment successful! Premium features unlocked.</span>
                 </div>
             )}
 
             {/* MAIN CONTENT */}
-            <div className="flex-1 flex flex-col min-w-0 z-10 relative">
+            <div className="flex-1 flex flex-col min-w-0 bg-zinc-950">
                {/* HEADER */}
-               <header className="h-16 border-b border-white/5 bg-black/20 backdrop-blur-xl flex items-center justify-between px-6 shrink-0 z-20 sticky top-0">
-                   <div className="cursor-pointer touch-target flex items-center gap-4" onClick={() => { 
+               <header className="h-12 sm:h-14 border-b border-white/5 bg-zinc-950 flex items-center justify-between px-3 sm:px-6 shrink-0 safe-area-inset">
+                   <div className="cursor-pointer touch-target flex items-center scale-90 origin-left" onClick={() => { 
                        setView('landing'); 
                        window.history.pushState({}, '', '/');
                        window.scrollTo(0, 0);
-                   }}>
-                        <AnimatedLogo />
-                   </div>
+                   }}><AnimatedLogo /></div>
                    
-                   <div className="flex items-center gap-3 sm:gap-6">
+                   <div className="flex items-center gap-2 sm:gap-4">
                        <button 
                           onClick={() => setShowHistory(true)}
-                          className="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 transition-all"
+                          className="p-1.5 text-zinc-500 hover:text-white hover:bg-white/5 rounded-lg transition-all flex items-center gap-2"
                           title="View History"
                        >
-                          <History className="w-4 h-4 text-zinc-500 group-hover:text-white transition-colors" />
-                          <span className="text-xs font-bold uppercase tracking-wider text-zinc-500 group-hover:text-white transition-colors hidden sm:inline-block">History</span>
+                          <span className="text-xs font-black uppercase tracking-[0.2em]">History</span>
                        </button>
                        
-                       <div className="h-6 w-[1px] bg-white/10 mx-2 hidden sm:block"></div>
+                       <div className="h-5 w-[1px] bg-white/5 mx-1"></div>
 
                        {isPaid && (
-                           <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-orange-500/10 to-amber-500/10 border border-orange-500/20 rounded-full shadow-[0_0_15px_rgba(249,115,22,0.1)]">
-                               <Sparkles className="w-3 h-3 text-orange-400" />
-                               <span className="text-[10px] font-black text-orange-400 uppercase tracking-widest">Premium Active</span>
+                           <div className="hidden sm:flex items-center gap-2 px-2.5 py-0.5 bg-orange-500/10 border border-orange-500/20 rounded-full">
+                               <span className="text-xs font-black text-orange-500 uppercase tracking-widest">Premium</span>
                            </div>
                        )}
                        <a 
@@ -880,174 +862,184 @@ export default function App() {
                               e.preventDefault();
                               startNewScan();
                           }} 
-                          className="group relative flex items-center gap-2 px-5 py-2.5 bg-zinc-100 hover:bg-white text-black font-bold text-xs uppercase tracking-wide transition-all rounded-full cursor-pointer shadow-lg hover:shadow-xl hover:scale-105 active:scale-95"
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-xs uppercase tracking-wide transition-all rounded-sm cursor-pointer border-none touch-target"
                        >
-                           <Plus className="w-4 h-4" />
                            <span className="hidden xs:inline">New Scan</span>
                        </a>
                    </div>
                </header>
 
                {/* CONTENT */}
-               <main className="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-8 relative">
+               <main className="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 relative">
                    <AnimatePresence mode="wait">
                        {dashboardView === 'scan' ? (
                            <motion.div 
                               key="scan-view"
-                              initial={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
-                              animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-                              exit={{ opacity: 0, scale: 1.05, filter: 'blur(10px)' }}
-                              className="max-w-5xl mx-auto w-full min-h-[70vh] flex flex-col items-center justify-center"
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -10 }}
+                              className="max-w-3xl mx-auto w-full min-h-[70vh] sm:min-h-[calc(100dvh-180px)] flex flex-col items-center justify-center px-2 sm:px-0"
                            >
                                {isAnalyzing ? (
-                                 <div className="w-full max-w-lg mx-auto bg-zinc-900/40 backdrop-blur-xl border border-white/10 rounded-3xl p-12 flex flex-col items-center justify-center text-center shadow-2xl relative overflow-hidden">
-                                      <div className="absolute inset-0 bg-gradient-to-b from-orange-500/5 to-transparent pointer-events-none" />
+                                 <div className="w-full flex flex-col items-center justify-center text-center px-4 py-10">
                                       <LoadingIndicator 
-                                          message={analysisProgress < 30 ? "Reading Resume..." : 
+                                          message={analysisProgress < 30 ? "Analyzing Resume..." : 
                                                    analysisProgress < 60 ? "Extracting Skills..." :
-                                                   analysisProgress < 85 ? "Analyzing Gaps..." : 
-                                                   "Generating Report..."}
+                                                   analysisProgress < 85 ? "Comparing with Job..." : 
+                                                   "Finalizing Insights..."}
                                           size="lg"
                                       />
-                                      <div className="w-full h-1 bg-zinc-800 rounded-full mt-8 overflow-hidden">
-                                        <motion.div 
-                                            className="h-full bg-orange-500" 
-                                            initial={{ width: 0 }} 
-                                            animate={{ width: `${analysisProgress}%` }} 
-                                        />
-                                      </div>
-                                      <p className="text-zinc-500 font-mono text-xs mt-4 tracking-widest">{Math.round(analysisProgress)}% COMPLETE</p>
+                                      <p className="text-zinc-500 font-mono text-xs mt-4">{Math.round(analysisProgress)}% COMPLETE</p>
                                   </div>
                                ) : (
-                                   <div className="w-full space-y-12">
-                                      <div className="text-center space-y-4">
-                                          <motion.div 
-                                            initial={{ y: -20, opacity: 0 }}
-                                            animate={{ y: 0, opacity: 1 }}
-                                            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2"
-                                          >
-                                            <Zap className="w-3 h-3 text-orange-500" />
-                                            <span>AI-Powered Resume Scanner</span>
-                                          </motion.div>
-                                          <h1 className="text-4xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-zinc-200 to-zinc-500 tracking-tight">
-                                              Optimize Your Application
-                                          </h1>
-                                          <p className="text-zinc-400 text-sm sm:text-base font-medium max-w-lg mx-auto leading-relaxed">
-                                              Upload your resume and the job description. We'll identify the gaps and help you fix them instantly.
+                                   <div className="w-full space-y-8 sm:space-y-10 py-4">
+                                      <div className="text-center space-y-2">
+                                          <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight uppercase">Scan Your Resume</h1>
+                                          <p className="text-zinc-500 text-xs sm:text-sm font-medium uppercase tracking-[0.2em]">
+                                              Ready to beat the ATS? Follow these <span className="text-orange-500">2 quick steps</span>.
                                           </p>
                                       </div>
-                                      
-                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch relative">
-                                          {/* Connecting Line (Desktop) */}
-                                          <div className="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-zinc-900 rounded-full border border-white/10 z-20 flex items-center justify-center shadow-xl">
-                                            <ArrowRight className="w-5 h-5 text-zinc-600" />
-                                          </div>
-
+                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-stretch">
                                           {/* Step 1: Resume */}
-                                          <motion.div 
-                                            initial={{ x: -20, opacity: 0 }}
-                                            animate={{ x: 0, opacity: 1 }}
-                                            transition={{ delay: 0.1 }}
-                                            className={`flex flex-col gap-5 group relative p-1 rounded-3xl transition-all duration-500 ${!resumeFile ? 'hover:bg-white/5' : ''}`}
-                                          >
-                                              <div className="flex items-center gap-4 px-2">
-                                                  <div className="w-8 h-8 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center text-sm font-bold text-white shadow-lg group-hover:border-orange-500/50 group-hover:bg-orange-500/20 group-hover:text-orange-500 transition-all">1</div>
-                                                  <h3 className="text-sm font-bold text-zinc-300 uppercase tracking-widest group-hover:text-white transition-colors">Upload Resume</h3>
+                                          <div className={`flex flex-col gap-4 group ${inputWizardStep === 1 ? 'hidden md:flex' : ''}`}>
+                                              <div className="flex items-center gap-3">
+                                                  <div className="w-6 h-6 rounded-full bg-orange-600 flex items-center justify-center text-xs font-black text-white shadow-[0_0_15px_rgba(234,88,12,0.4)]">1</div>
+                                                  <h3 className="text-xs font-black text-white uppercase tracking-widest">Upload Resume</h3>
                                               </div>
                                               
-                                              <div className="flex-1 min-h-[280px] bg-zinc-900/40 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden group-hover:border-white/20 transition-all shadow-2xl hover:shadow-[0_0_30px_rgba(0,0,0,0.3)]">
+                                              <div className="flex-1 min-h-[220px] bg-zinc-900/40 border border-white/5 rounded-2xl p-1 group-hover:border-orange-500/20 transition-all shadow-2xl">
                                                   <Suspense fallback={<div className="h-full flex items-center justify-center"><LoadingIndicator size="sm" message="" /></div>}>
                                                     <ResumeUploader onFileUpload={handleFileUpload} currentFile={resumeFile} />
                                                   </Suspense>
                                               </div>
-                                          </motion.div>
 
+                                              <div className="md:hidden">
+                                                  <button 
+                                                      onClick={() => setInputWizardStep(1)} 
+                                                      disabled={!resumeFile} 
+                                                      className="w-full py-4 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-black text-xs uppercase tracking-[0.2em] rounded-xl transition-all disabled:opacity-30 disabled:grayscale touch-target shadow-lg shadow-orange-900/20"
+                                                  >
+                                                      Next: Target Job
+                                                  </button>
+                                              </div>
+                                          </div>
                                           {/* Step 2: Job Details */}
-                                          <motion.div 
-                                            initial={{ x: 20, opacity: 0 }}
-                                            animate={{ x: 0, opacity: 1 }}
-                                            transition={{ delay: 0.2 }}
-                                            className="flex flex-col gap-5 group relative p-1 rounded-3xl"
-                                          >
-                                               <div className="flex items-center justify-between px-2">
-                                                   <div className="flex items-center gap-4">
-                                                       <div className="w-8 h-8 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center text-sm font-bold text-white shadow-lg group-hover:border-orange-500/50 group-hover:bg-orange-500/20 group-hover:text-orange-500 transition-all">2</div>
-                                                       <h3 className="text-sm font-bold text-zinc-300 uppercase tracking-widest group-hover:text-white transition-colors">Target Job</h3>
+                                          <div className={`flex flex-col gap-4 group ${inputWizardStep === 0 ? 'hidden md:flex' : ''}`}>
+                                               <div className="md:hidden">
+                                                   <button onClick={() => setInputWizardStep(0)} className="text-zinc-500 py-1.5 text-xs font-black uppercase tracking-widest flex items-center gap-2 touch-target">
+                                                       <X className="w-3 h-3" /> Back
+                                                   </button>
+                                               </div>
+                                               
+                                               <div className="flex items-center justify-between">
+                                                   <div className="flex items-center gap-3">
+                                                       <div className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-black text-zinc-400 group-hover:bg-orange-600 group-hover:text-white transition-all">2</div>
+                                                       <h3 className="text-xs font-black text-white uppercase tracking-widest">Target Job</h3>
                                                    </div>
                                                    
-                                                   <div className="flex bg-black/40 p-1 rounded-lg border border-white/10 backdrop-blur-md">
+                                                   <div className="flex bg-zinc-900/80 p-1 rounded-lg border border-white/5">
                                                       <button 
                                                           onClick={() => setJobInputMode('link')} 
-                                                          className={`px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest transition-all ${jobInputMode === 'link' ? 'bg-zinc-800 text-white shadow-lg' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                                          className={`px-3 py-1 rounded-md text-xs font-black uppercase tracking-widest transition-all ${jobInputMode === 'link' ? 'bg-zinc-700 text-white shadow-lg' : 'text-zinc-500 hover:text-zinc-300'}`}
                                                       >
                                                           Link
                                                       </button>
                                                       <button 
                                                           onClick={() => setJobInputMode('text')} 
-                                                          className={`px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest transition-all ${jobInputMode === 'text' ? 'bg-zinc-800 text-white shadow-lg' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                                          className={`px-3 py-1 rounded-md text-xs font-black uppercase tracking-widest transition-all ${jobInputMode === 'text' ? 'bg-zinc-700 text-white shadow-lg' : 'text-zinc-500 hover:text-zinc-300'}`}
                                                       >
                                                           Text
                                                       </button>
                                                    </div>
                                                </div>
 
-                                               <div className="flex-1 min-h-[280px] bg-zinc-900/40 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden group-hover:border-white/20 transition-all shadow-2xl hover:shadow-[0_0_30px_rgba(0,0,0,0.3)] flex flex-col">
+                                               <div className="flex-1 min-h-[220px] bg-zinc-900/40 border border-white/5 rounded-2xl overflow-hidden group-hover:border-orange-500/20 transition-all shadow-2xl">
                                                    {jobInputMode === 'link' ? (
-                                                       <div className="flex-1 p-8 flex flex-col justify-center items-center gap-6 text-center relative">
-                                                           <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                                                           <div className="w-12 h-12 rounded-2xl bg-zinc-800/50 border border-white/10 flex items-center justify-center relative z-10 shadow-inner">
-                                                               <LinkIcon className="w-5 h-5 text-zinc-400 group-hover:text-orange-500 transition-colors" />
+                                                       <div className="h-full p-6 flex flex-col justify-center items-center gap-4 text-center">
+                                                           <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center">
+                                                               <LinkIcon className="w-4 h-4 text-orange-500" />
                                                            </div>
-                                                           <div className="relative z-10">
-                                                               <h4 className="text-white font-bold text-sm uppercase tracking-wider mb-2">Paste Job Link</h4>
-                                                               <p className="text-zinc-500 text-xs font-medium leading-relaxed max-w-[200px] mx-auto">LinkedIn, Indeed, or any company career page.</p>
+                                                           <div>
+                                                               <h4 className="text-white font-black text-xs uppercase tracking-[0.2em] mb-1">Paste Job Link</h4>
+                                                               <p className="text-zinc-500 text-xs font-medium leading-relaxed max-w-[180px]">LinkedIn, Indeed, or any company career page.</p>
                                                            </div>
-                                                           <div className="w-full relative z-10">
-                                                               <input 
-                                                                   type="url" 
-                                                                   inputMode="url" 
-                                                                   value={jobDescription} 
-                                                                   onChange={(e) => setJobDescription(e.target.value)} 
-                                                                   placeholder="https://..." 
-                                                                   className="w-full bg-black/50 border border-white/10 rounded-xl p-4 text-sm text-white placeholder:text-zinc-700 focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20 outline-none transition-all font-mono shadow-inner" 
-                                                               />
-                                                           </div>
+                                                           <input 
+                                                               type="url" 
+                                                               inputMode="url" 
+                                                               value={jobDescription} 
+                                                               onChange={(e) => setJobDescription(e.target.value)} 
+                                                               placeholder="https://..." 
+                                                               className="w-full bg-zinc-950 border border-white/10 rounded-xl p-3.5 text-xs text-white placeholder:text-zinc-700 focus:border-orange-500/50 outline-none transition-all font-mono" 
+                                                           />
                                                        </div>
                                                    ) : (
                                                        <textarea 
                                                            value={jobDescription} 
                                                            onChange={(e) => setJobDescription(e.target.value)} 
                                                            placeholder="Paste the full job description here..." 
-                                                           className="w-full h-full bg-transparent p-6 text-sm text-zinc-300 placeholder:text-zinc-700 focus:outline-none resize-none font-mono leading-relaxed" 
+                                                           className="w-full h-full bg-transparent p-5 text-xs text-zinc-300 placeholder:text-zinc-700 focus:outline-none resize-none font-mono leading-relaxed" 
                                                        />
                                                    )}
                                                </div>
-                                          </motion.div>
+                                          </div>
                                       </div>
 
                                       {error && (
                                           <motion.div 
                                               initial={{ opacity: 0, y: 5 }}
                                               animate={{ opacity: 1, y: 0 }}
-                                              className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-3 text-red-400 text-xs font-bold uppercase tracking-widest max-w-lg mx-auto backdrop-blur-md"
+                                              className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-3 text-red-400 text-xs font-black uppercase tracking-widest"
                                           >
                                               <AlertCircle className="w-4 h-4 shrink-0" />
                                               <span>{error}</span>
                                           </motion.div>
                                       )}
 
-                                      <div className="flex justify-center pt-6">
+                                      <div className="flex justify-center pt-2">
                                           <button 
                                               onClick={handleAnalysis} 
                                               disabled={!resumeFile || isAnalyzing || !jobDescription.trim()} 
-                                              className="group relative px-10 py-5 bg-white text-black font-black text-sm uppercase tracking-wider rounded-full overflow-hidden transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:grayscale disabled:hover:scale-100 shadow-[0_0_40px_rgba(255,255,255,0.3)] hover:shadow-[0_0_60px_rgba(255,255,255,0.5)]"
+                                              className="px-6 sm:px-8 py-3 sm:py-3.5 bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-mono font-bold text-xs sm:text-sm tracking-wide flex items-center justify-center gap-2 sm:gap-2.5 shadow-[3px_3px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none active:shadow-none hover:translate-x-[1.5px] hover:translate-y-[1.5px] active:translate-x-[1.5px] active:translate-y-[1.5px] transition-all rounded-sm cursor-pointer border-none touch-target w-full sm:w-auto relative overflow-hidden group uppercase disabled:opacity-30 disabled:grayscale disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-[3px_3px_0px_0px_rgba(255,255,255,0.2)]"
                                           >
-                                              <span className="relative z-10 flex items-center gap-3">
-                                                  <span>Run Analysis</span>
-                                                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                              <span className="relative z-10 flex items-center gap-2">
+                                                  <span>Scan & Optimize</span>
+                                                  <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                                               </span>
-                                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                                              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                                           </button>
+                                      </div>
+
+                                      {/* Why Scan Section */}
+                                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-8 border-t border-white/5">
+                                          <div className="flex flex-col items-center text-center p-4 space-y-2 group hover:bg-white/5 rounded-2xl transition-all">
+                                              <div className="w-8 h-8 rounded-full bg-orange-500/10 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
+                                                  <Zap className="w-4 h-4 text-orange-500" />
+                                              </div>
+                                              <h4 className="text-xs font-black text-white uppercase tracking-widest">Beat the ATS</h4>
+                                              <p className="text-zinc-500 text-xs font-medium leading-relaxed">
+                                                  75% of resumes are rejected by bots. We ensure yours gets through.
+                                              </p>
+                                          </div>
+                                          
+                                          <div className="flex flex-col items-center text-center p-4 space-y-2 group hover:bg-white/5 rounded-2xl transition-all">
+                                              <div className="w-8 h-8 rounded-full bg-orange-500/10 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
+                                                  <Target className="w-4 h-4 text-orange-500" />
+                                              </div>
+                                              <h4 className="text-xs font-black text-white uppercase tracking-widest">Keyword Match</h4>
+                                              <p className="text-zinc-500 text-xs font-medium leading-relaxed">
+                                                  Instantly identify and inject the specific skills hiring managers look for.
+                                              </p>
+                                          </div>
+
+                                          <div className="flex flex-col items-center text-center p-4 space-y-2 group hover:bg-white/5 rounded-2xl transition-all">
+                                              <div className="w-8 h-8 rounded-full bg-orange-500/10 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
+                                                  <FileText className="w-4 h-4 text-orange-500" />
+                                              </div>
+                                              <h4 className="text-xs font-black text-white uppercase tracking-widest">Role Alignment</h4>
+                                              <p className="text-zinc-500 text-xs font-medium leading-relaxed">
+                                                  Tailor your story to perfectly align with the job responsibilities.
+                                              </p>
+                                          </div>
                                       </div>
                                    </div>
                                )}
@@ -1055,31 +1047,22 @@ export default function App() {
                        ) : (
                            <motion.div 
                               key="result-view"
-                              initial={{ opacity: 0, y: 20 }}
+                              initial={{ opacity: 0, y: 10 }}
                               animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: -20 }}
-                              className="h-full flex flex-col max-w-[1400px] mx-auto"
+                              exit={{ opacity: 0, y: -10 }}
+                              className="h-full flex flex-col"
                            >
                                {analysisResult && resumeFile && (
                                    <>
-                                      <div className="flex justify-between items-center mb-6">
-                                          <div className="flex items-center gap-4">
-                                              <h2 className="text-xl font-bold text-white hidden sm:block">Analysis Results</h2>
-                                              <div className="bg-black/40 p-1 rounded-full border border-white/10 flex gap-1 backdrop-blur-md">
-                                                <button onClick={() => setResultTab('analysis')} className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${resultTab === 'analysis' ? 'bg-white text-black shadow-lg' : 'text-zinc-500 hover:text-zinc-300'}`}>Diagnostic</button>
-                                                <button onClick={() => setResultTab('generator')} className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${resultTab === 'generator' ? 'bg-white text-black shadow-lg' : 'text-zinc-500 hover:text-zinc-300'}`}>Editor</button>
-                                              </div>
-                                          </div>
-                                          <div className="flex items-center gap-2">
-                                              {/* Optional actions */}
-                                          </div>
+                                      <div className="flex justify-center mb-4">
+                                         <div className="bg-zinc-900 p-1 rounded-lg border border-zinc-800 flex gap-1">
+                                           <button onClick={() => setResultTab('analysis')} className={`px-3 py-1.5 rounded text-xs font-bold transition-all ${resultTab === 'analysis' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>Diagnostic</button>
+                                           <button onClick={() => setResultTab('generator')} className={`px-3 py-1.5 rounded text-xs font-bold transition-all ${resultTab === 'generator' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>Editor</button>
+                                         </div>
                                       </div>
-
-                                      <div className="flex-1 bg-zinc-900/40 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl relative">
-                                          <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent pointer-events-none" />
-                                          
+                                      <div className="flex-1 bg-zinc-900/30 border border-white/5 rounded-xl overflow-hidden">
                                          {resultTab === 'analysis' ? (
-                                           <div className="h-full overflow-y-auto p-4 sm:p-8 relative z-10">
+                                           <div className="h-full overflow-y-auto p-4 sm:p-6">
                                              <ErrorBoundary>
                                                <Suspense fallback={<div className="flex items-center justify-center h-64"><LoadingIndicator size="md" message="Loading Analysis..." /></div>}>
                                                  <AnalysisDashboard 

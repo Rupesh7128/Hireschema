@@ -95,7 +95,7 @@ const ResumeUploader: React.FC<ResumeUploaderProps> = ({ onFileUpload, currentFi
                 <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className={`relative group cursor-pointer h-full rounded-xl border-2 border-dashed transition-all duration-500 flex flex-col items-center justify-center gap-4 ${isDragging ? 'border-orange-500 bg-orange-500/10' : error ? 'border-red-500/50 bg-red-950/10' : 'border-white/10 bg-white/5 hover:border-orange-500/30 hover:bg-white/10'}`}
+                    className={`relative group cursor-pointer h-full rounded-xl border-2 border-dashed transition-all duration-500 flex flex-col items-center justify-center gap-4 ${isDragging ? 'border-orange-500 bg-orange-500/10' : error ? 'border-red-500/50 bg-red-950/10' : 'border-zinc-800 bg-zinc-900/50 hover:border-orange-500/30 hover:bg-zinc-900/80'}`}
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
                     onDrop={handleDrop}
@@ -148,7 +148,7 @@ const ResumeUploader: React.FC<ResumeUploaderProps> = ({ onFileUpload, currentFi
             <motion.div 
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="flex flex-col items-center justify-center p-6 bg-black/40 border border-white/10 rounded-xl relative group overflow-hidden h-full"
+              className="flex flex-col items-center justify-center p-6 bg-zinc-900/80 border border-zinc-700/50 rounded-xl relative group overflow-hidden h-full"
             >
               {/* Animated scan line */}
               <div className="absolute top-0 left-0 w-full h-1 bg-orange-500/50 shadow-[0_0_10px_rgba(249,115,22,0.5)] animate-[scan_2s_ease-in-out_infinite]"></div>
