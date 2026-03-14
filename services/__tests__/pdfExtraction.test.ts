@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { extractTextFromPdf } from '../geminiService';
+import { extractTextFromPdf } from '../openaiService';
 
 const base64Of = (value: string) => Buffer.from(value, 'utf8').toString('base64');
 

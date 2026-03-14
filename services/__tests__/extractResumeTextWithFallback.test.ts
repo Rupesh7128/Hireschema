@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { extractResumeTextWithFallback } from '../geminiService';
+import { extractResumeTextWithFallback } from '../openaiService';
 
 describe('extractResumeTextWithFallback', () => {
   it('returns empty string for non-pdf files', async () => {
@@ -11,4 +11,3 @@ describe('extractResumeTextWithFallback', () => {
     expect(text).toBe('');
   });
 });
-

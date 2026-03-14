@@ -9,17 +9,17 @@
 All required environment variables have been configured in `.env.local`:
 
 ### AI Services
-- ✅ `GEMINI_API_KEY` - Google Gemini API for resume analysis
-- ✅ `VITE_GEMINI_API_KEY` - Frontend access to Gemini API
-- ✅ `OPENAI_API_KEY` - OpenAI API for content generation
-- ✅ `VITE_OPENAI_API_KEY` - Frontend access to OpenAI API
+- ✅ `OPENAI_API_KEY` - Server-side ChatGPT API for resume analysis/content generation
 
 ### Dodo Payments
-- ✅ `VITE_DODO_API_KEY` - Frontend payment processing
 - ✅ `VITE_DODO_PRODUCT_ID` - Product ID for payments
 - ✅ `DODO_PAYMENTS_API_KEY` - Backend payment verification
 - ✅ `DODO_ENV` - Payment environment (live)
 - ✅ `VITE_DODO_ENV` - Frontend payment environment (live)
+
+### Blog
+- ✅ `MASSBLOG_URL` - Massblog base URL
+- ✅ `MASSBLOG_API` - Server-side Massblog API key
 
 ## 🚀 Running the App
 
@@ -48,12 +48,12 @@ npm test
 
 - ✅ `.env.local` is in `.gitignore` - your API keys are secure
 - ✅ All sensitive keys are properly configured
-- ✅ Environment variables are properly scoped (VITE_ prefix for frontend)
+- ✅ Sensitive keys stay server-side and are not exposed in client bundles
 
 ## 📱 Features Available
 
-- ✅ Resume analysis with Gemini AI
-- ✅ Content generation with OpenAI
+- ✅ Resume analysis with ChatGPT
+- ✅ Content generation with ChatGPT
 - ✅ Payment processing with Dodo Payments
 - ✅ Roast My Resume feature
 - ✅ ATS optimization

@@ -14,13 +14,8 @@ interface VercelResponse extends ServerResponse {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Accept, Content-Type');
-
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
+    res.status(204).end();
     return;
   }
 
@@ -30,12 +25,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const env = process.env || {};
-  const baseUrl = String(env.VITE_MASSBLOG_URL || env.MASSBLOG_URL || 'https://www.massblogger.com');
-  const apiKeyFromQuery = Array.isArray(req.query.apiKey) ? req.query.apiKey[0] : req.query.apiKey;
-  const apiKey = String(apiKeyFromQuery || env.VITE_MASSBLOG_API || env.MASSBLOG_API || '');
+  const baseUrl = String(env.MASSBLOG_URL || env.VITE_MASSBLOG_URL || 'https://www.massblogger.com');
+  const apiKey = String(env.MASSBLOG_API || env.VITE_MASSBLOG_API || '');
 
   if (!apiKey) {
-    res.status(500).json({ error: 'Missing MASSBLOG_API / VITE_MASSBLOG_API' });
+    res.status(500).json({ error: 'Missing MASSBLOG_API' });
     return;
   }
 
@@ -58,4 +52,3 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(502).json({ error: 'Upstream fetch failed' });
   }
 }
-

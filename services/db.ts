@@ -1,4 +1,5 @@
 import { HistoryItem, FileData, ContactProfile, ApplicationStatus } from '../types';
+import { storageService } from './storageService';
 
 // Storage Keys
 const KEYS = {
@@ -12,58 +13,48 @@ const DELAY = 0;
 
 const wait = () => new Promise(resolve => setTimeout(resolve, DELAY));
 
-// Helper to safe-guard localStorage calls (prevents SecurityError in blocked envs)
-const safeStorage = {
-    getItem: (key: string): string | null => {
-        try {
-            return localStorage.getItem(key);
-        } catch (e) {
-            console.warn("localStorage access denied", e);
-            return null;
-        }
-    },
-    setItem: (key: string, value: string) => {
-        try {
-            localStorage.setItem(key, value);
-        } catch (e) {
-            console.warn("localStorage write denied", e);
-        }
-    }
+const readKey = async <T>(key: string, fallback: T): Promise<T> => {
+    await storageService.migrateFromLocalStorage(key);
+    const value = await storageService.getJSON<T>(key);
+    return value ?? fallback;
+};
+
+const writeKey = async <T>(key: string, value: T): Promise<void> => {
+    await storageService.setJSON(key, value);
 };
 
 export const db = {
     history: {
         getAll: async (): Promise<HistoryItem[]> => {
             await wait();
-            const data = safeStorage.getItem(KEYS.HISTORY);
-            return data ? JSON.parse(data) : [];
+            return readKey<HistoryItem[]>(KEYS.HISTORY, []);
         },
         add: async (item: HistoryItem): Promise<HistoryItem[]> => {
             await wait();
             const current = await db.history.getAll();
             const updated = [item, ...current];
-            safeStorage.setItem(KEYS.HISTORY, JSON.stringify(updated));
+            await writeKey(KEYS.HISTORY, updated);
             return updated;
         },
         update: async (updatedItem: HistoryItem): Promise<HistoryItem[]> => {
             await wait();
             const current = await db.history.getAll();
             const updated = current.map(item => item.id === updatedItem.id ? updatedItem : item);
-            safeStorage.setItem(KEYS.HISTORY, JSON.stringify(updated));
+            await writeKey(KEYS.HISTORY, updated);
             return updated;
         },
         updateStatus: async (id: string, status: ApplicationStatus): Promise<HistoryItem[]> => {
             await wait();
             const current = await db.history.getAll();
             const updated = current.map(item => item.id === id ? { ...item, status } : item);
-            safeStorage.setItem(KEYS.HISTORY, JSON.stringify(updated));
+            await writeKey(KEYS.HISTORY, updated);
             return updated;
         },
         delete: async (id: string): Promise<HistoryItem[]> => {
             await wait();
             const current = await db.history.getAll();
             const updated = current.filter(item => item.id !== id);
-            safeStorage.setItem(KEYS.HISTORY, JSON.stringify(updated));
+            await writeKey(KEYS.HISTORY, updated);
             return updated;
         }
     },
@@ -71,8 +62,7 @@ export const db = {
     resumes: {
         getAll: async (): Promise<FileData[]> => {
             await wait();
-            const data = safeStorage.getItem(KEYS.MASTERS);
-            return data ? JSON.parse(data) : [];
+            return readKey<FileData[]>(KEYS.MASTERS, []);
         },
         add: async (file: FileData): Promise<FileData[]> => {
             await wait();
@@ -82,14 +72,14 @@ export const db = {
             
             const newFile = { ...file, id: Math.random().toString(36).substr(2, 9), uploadDate: new Date().toLocaleDateString() };
             const updated = [...current, newFile];
-            safeStorage.setItem(KEYS.MASTERS, JSON.stringify(updated));
+            await writeKey(KEYS.MASTERS, updated);
             return updated;
         },
         delete: async (name: string): Promise<FileData[]> => {
             await wait();
             const current = await db.resumes.getAll();
             const updated = current.filter(f => f.name !== name);
-            safeStorage.setItem(KEYS.MASTERS, JSON.stringify(updated));
+            await writeKey(KEYS.MASTERS, updated);
             return updated;
         }
     },
@@ -97,12 +87,11 @@ export const db = {
     user: {
         get: async (): Promise<ContactProfile> => {
             await wait();
-            const data = safeStorage.getItem(KEYS.PROFILE);
-            return data ? JSON.parse(data) : { name: '', email: '', phone: '', linkedin: '', location: '', photo: '' };
+            return readKey<ContactProfile>(KEYS.PROFILE, { name: '', email: '', phone: '', linkedin: '', location: '', photo: '' });
         },
         update: async (profile: ContactProfile): Promise<ContactProfile> => {
             await wait();
-            safeStorage.setItem(KEYS.PROFILE, JSON.stringify(profile));
+            await writeKey(KEYS.PROFILE, profile);
             return profile;
         }
     }

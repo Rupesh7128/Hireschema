@@ -6,6 +6,7 @@
  */
 
 import { FileData, AnalysisResult } from '../types';
+import { storageService } from './storageService';
 
 const STATE_KEY = 'hireSchema_pendingState';
 const STATE_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
@@ -27,27 +28,21 @@ export interface PersistedState {
  */
 export function isValidPersistedState(state: any): state is PersistedState {
   if (!state || typeof state !== 'object') {
-    console.log('isValidPersistedState: state is null or not an object');
     return false;
   }
   if (!state.resumeFile || typeof state.resumeFile !== 'object') {
-    console.log('isValidPersistedState: resumeFile missing or invalid');
     return false;
   }
   if (typeof state.resumeText !== 'string') {
-    console.log('isValidPersistedState: resumeText missing or not a string');
     return false;
   }
   if (typeof state.jobDescription !== 'string') {
-    console.log('isValidPersistedState: jobDescription missing or not a string');
     return false;
   }
   if (!state.analysisResult || typeof state.analysisResult !== 'object') {
-    console.log('isValidPersistedState: analysisResult missing or invalid');
     return false;
   }
   if (typeof state.timestamp !== 'number') {
-    console.log('isValidPersistedState: timestamp missing or not a number');
     return false;
   }
   return true;
@@ -66,25 +61,14 @@ export function isStateExpired(state: PersistedState): boolean {
  * 
  * @param state - The state to persist
  */
-export function saveStateBeforePayment(state: Omit<PersistedState, 'timestamp'>): void {
+export async function saveStateBeforePayment(state: Omit<PersistedState, 'timestamp'>): Promise<void> {
   try {
-    if (typeof window === 'undefined' || !window.localStorage) {
-      console.warn('localStorage not available');
-      return;
-    }
-
     const stateWithTimestamp: PersistedState = {
       ...state,
       timestamp: Date.now(),
     };
 
-    localStorage.setItem(STATE_KEY, JSON.stringify(stateWithTimestamp));
-    console.log('State saved before payment redirect:', {
-      hasResumeFile: !!state.resumeFile,
-      resumeTextLength: state.resumeText?.length || 0,
-      jobDescriptionLength: state.jobDescription?.length || 0,
-      hasAnalysisResult: !!state.analysisResult
-    });
+    await storageService.setJSON(STATE_KEY, stateWithTimestamp);
   } catch (e) {
     console.error('Failed to save state before payment:', e);
   }
@@ -96,40 +80,30 @@ export function saveStateBeforePayment(state: Omit<PersistedState, 'timestamp'>)
  * 
  * @returns The restored state or null
  */
-export function restoreStateAfterPayment(): PersistedState | null {
+export async function restoreStateAfterPayment(): Promise<PersistedState | null> {
   try {
-    if (typeof window === 'undefined' || !window.localStorage) {
-      console.log('restoreStateAfterPayment: localStorage not available');
+    await storageService.migrateFromLocalStorage(STATE_KEY);
+    const parsed = await storageService.getJSON<PersistedState>(STATE_KEY);
+    if (!parsed) {
       return null;
     }
 
-    const stored = localStorage.getItem(STATE_KEY);
-    if (!stored) {
-      console.log('restoreStateAfterPayment: no stored state found in localStorage');
-      return null;
-    }
-
-    console.log('restoreStateAfterPayment: found stored state, parsing...');
-    const parsed = JSON.parse(stored);
-    
     if (!isValidPersistedState(parsed)) {
       console.warn('restoreStateAfterPayment: invalid persisted state structure, clearing');
-      console.log('Parsed state keys:', Object.keys(parsed || {}));
-      clearPersistedState();
+      await clearPersistedState();
       return null;
     }
 
     if (isStateExpired(parsed)) {
       console.warn('restoreStateAfterPayment: persisted state expired, clearing');
-      clearPersistedState();
+      await clearPersistedState();
       return null;
     }
 
-    console.log('restoreStateAfterPayment: state restored successfully');
     return parsed;
   } catch (e) {
     console.error('restoreStateAfterPayment: failed to restore state:', e);
-    clearPersistedState();
+    await clearPersistedState();
     return null;
   }
 }
@@ -137,11 +111,9 @@ export function restoreStateAfterPayment(): PersistedState | null {
 /**
  * Clears the persisted state from localStorage.
  */
-export function clearPersistedState(): void {
+export async function clearPersistedState(): Promise<void> {
   try {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      localStorage.removeItem(STATE_KEY);
-    }
+    await storageService.remove(STATE_KEY);
   } catch (e) {
     console.error('Failed to clear persisted state:', e);
   }

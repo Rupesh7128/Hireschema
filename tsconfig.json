@@ -1,4 +1,8 @@
 {
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ],
   "compilerOptions": {
     "target": "ES2022",
     "experimentalDecorators": true,
@@ -16,6 +20,8 @@
     "moduleResolution": "bundler",
     "isolatedModules": true,
     "moduleDetection": "force",
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
     "allowJs": true,
     "jsx": "react-jsx",
     "paths": {
@@ -26,5 +32,8 @@
     "allowImportingTsExtensions": true,
     "noEmit": true
   },
-  "exclude": ["api", "node_modules"]
+  "exclude": [
+    "api",
+    "node_modules"
+  ]
 }

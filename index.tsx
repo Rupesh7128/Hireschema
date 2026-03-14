@@ -1,6 +1,9 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom/client';
-import App from './App';
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.tsx'
+import './index.css'
+import '@fontsource/geist-sans'
+import '@fontsource/geist-mono'
 
 // Ensure React is available globally for libraries that might need it
 if (typeof window !== 'undefined') {

@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { getBlogPosts, getBlogPost, getInternalLinks, BlogPost } from '../services/blogService';
+import { prepareBlogContent } from '../services/blogContent';
 import { LoadingIndicator } from './LoadingIndicator';
 import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
 import { Header } from './Header';
@@ -53,15 +54,7 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onBack, initialSlug, onNavig
         ]);
 
         if (post) {
-          // Process internal links
-          let content = post.content || '';
-          if (internalLinks.length > 0) {
-            internalLinks.forEach(link => {
-              const regex = new RegExp(`\\b(${link.keyword})\\b`, 'gi');
-              content = content.replace(regex, `<a href="${link.url}" class="text-white underline underline-offset-4 font-bold hover:text-zinc-200">$1</a>`);
-            });
-          }
-          post.content = content;
+          post.content = prepareBlogContent(post.content || '', internalLinks);
           
           setCurrentPost(post);
           setPosts(allPosts);
@@ -111,15 +104,7 @@ export const BlogPage: React.FC<BlogPageProps> = ({ onBack, initialSlug, onNavig
       ]);
 
       if (post) {
-         // Process internal links
-         let content = post.content || '';
-         if (internalLinks.length > 0) {
-           internalLinks.forEach(link => {
-             const regex = new RegExp(`\\b(${link.keyword})\\b`, 'gi');
-             content = content.replace(regex, `<a href="${link.url}" class="text-white underline underline-offset-4 font-bold hover:text-zinc-200">$1</a>`);
-           });
-         }
-         post.content = content;
+        post.content = prepareBlogContent(post.content || '', internalLinks);
 
         setCurrentPost(post);
         setView('detail');

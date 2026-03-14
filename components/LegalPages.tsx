@@ -36,7 +36,7 @@ const LegalPages: React.FC<LegalPagesProps> = ({ page, onBack }) => {
             <h3 className="text-xl font-bold text-white mt-6">2. Third-Party Services</h3>
             <p>We use trusted third-party services for specific functions:</p>
             <ul className="list-disc pl-5 space-y-2">
-              <li><strong>Google Gemini API:</strong> For advanced text analysis. Data sent is transient and not used to train models.</li>
+              <li><strong>OpenAI API:</strong> For advanced text analysis. Data sent is transient and not used to train models.</li>
               <li><strong>Dodo Payments:</strong> For secure payment processing. We do not handle or store your credit card information.</li>
             </ul>
 

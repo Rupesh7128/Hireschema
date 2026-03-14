@@ -83,8 +83,27 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
     const effectiveDog: 'muffin' | 'bruno' = canFlip ? activeDog : (muffinReady ? 'muffin' : 'bruno');
 
     return (
-        <div className="flex flex-col items-center justify-center gap-6">
-            <div className="relative flex items-center justify-center" style={{ perspective: 900 }}>
+        <div className="relative flex flex-col items-center justify-center gap-6 px-8 py-7 rounded-2xl border border-white/10 bg-[radial-gradient(circle_at_top,rgba(249,115,22,0.16),transparent_46%),linear-gradient(180deg,rgba(24,24,27,0.95),rgba(9,9,11,0.95))] shadow-[0_24px_80px_rgba(0,0,0,0.45)] overflow-hidden">
+            <motion.div
+                aria-hidden
+                className="absolute -top-10 -left-10 w-36 h-36 rounded-full bg-orange-500/20 blur-3xl"
+                animate={{ x: [0, 20, 0], y: [0, 10, 0], opacity: [0.35, 0.55, 0.35] }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+            />
+            <motion.div
+                aria-hidden
+                className="absolute -bottom-12 -right-10 w-40 h-40 rounded-full bg-zinc-400/20 blur-3xl"
+                animate={{ x: [0, -18, 0], y: [0, -10, 0], opacity: [0.25, 0.45, 0.25] }}
+                transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
+            />
+
+            <div className="relative flex items-center justify-center z-10" style={{ perspective: 900 }}>
+                <motion.div
+                    aria-hidden
+                    className={`absolute ${sizeClasses[size]} rounded-full border border-orange-400/20`}
+                    animate={{ rotate: 360, scale: [1, 1.04, 1] }}
+                    transition={{ rotate: { duration: 5, repeat: Infinity, ease: 'linear' }, scale: { duration: 2.4, repeat: Infinity, ease: 'easeInOut' } }}
+                />
                 <motion.div
                     animate={{ y: [0, -15, 0], scale: [1, 1.05, 1] }}
                     transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
@@ -134,11 +153,11 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
             </div>
 
             {message && (
-                <div className="flex flex-col items-center gap-1.5">
-                    <p className="text-orange-500/80 text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">
+                <div className="flex flex-col items-center gap-1.5 z-10">
+                    <p className="text-orange-300 text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">
                         Please Wait
                     </p>
-                    <p className="text-white text-xs font-black uppercase tracking-widest text-center max-w-[200px] drop-shadow-sm">
+                    <p className="text-white text-xs font-black uppercase tracking-[0.2em] text-center max-w-[240px] drop-shadow-sm">
                         {message}
                     </p>
                 </div>

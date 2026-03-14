@@ -46,18 +46,16 @@ vercel
 Add these in Vercel Dashboard → Project → Settings → Environment Variables:
 
 ```
-VITE_GEMINI_API_KEY=your_gemini_api_key_here
-VITE_OPENAI_API_KEY=your_openai_api_key_here
-VITE_DODO_API_KEY=your_dodo_api_key_here
 VITE_DODO_PRODUCT_ID=your_dodo_product_id_here
 VITE_DODO_ENV=live
 
 # Server-side variables (for API routes)
-GEMINI_API_KEY=your_gemini_api_key_here
 OPENAI_API_KEY=your_openai_api_key_here
 DODO_PAYMENTS_API_KEY=your_dodo_api_key_here
 DODO_PRODUCT_ID=your_dodo_product_id_here
 DODO_ENV=live
+MASSBLOG_URL=https://www.massblogger.com
+MASSBLOG_API=your_massblog_api_key_here
 ```
 
 **Note:** Use the actual API keys from your `.env.local` file when setting up Vercel environment variables.

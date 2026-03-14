@@ -20,10 +20,10 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStart }) => {
         {/* Hero Section */}
         <div className="text-center mb-12">
           <h1 className="text-3xl sm:text-5xl font-black tracking-tighter mb-4">
-            Why pay for <span className="text-orange-500">HireSchema</span>?
+            Unlock Your <span className="text-orange-500">Interview Prep Kit</span>
           </h1>
           <p className="text-base sm:text-lg text-zinc-400 max-w-xl mx-auto leading-relaxed">
-            Generic AI tools write generic resumes. We are purpose-built to beat the Applicant Tracking Systems (ATS) that reject 75% of candidates.
+            Everything you need to get hired, bundled for just $1. Resume, Cover Letter, and Interview Answers.
           </p>
         </div>
 
@@ -37,7 +37,7 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStart }) => {
                 <div className="text-[8px] text-orange-500/60 font-mono uppercase tracking-widest">Purpose Built</div>
               </div>
               <div className="col-span-1 text-center pb-1 opacity-60">
-                <div className="text-sm font-bold text-white mb-0.5">ChatGPT / Gemini</div>
+                <div className="text-sm font-bold text-white mb-0.5">ChatGPT</div>
                 <div className="text-[8px] text-zinc-500 font-mono uppercase tracking-widest">General AI</div>
               </div>
               <div className="col-span-1 text-center pb-1 opacity-60">
@@ -107,93 +107,82 @@ const PricingPage: React.FC<PricingPageProps> = ({ onBack, onStart }) => {
 
         {/* Pricing Details & Addons */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16 max-w-4xl mx-auto">
-             {/* Left: Included */}
-             <div className="bg-zinc-900/30 border border-orange-500/20 rounded-xl p-6 relative overflow-hidden">
-                <div className="absolute top-0 right-0 bg-orange-600 text-white text-[8px] font-bold px-2 py-0.5 rounded-bl-md uppercase tracking-widest">
-                    Unlock
-                </div>
-                <h3 className="text-xl font-bold text-white mb-1.5">Pay As You Go</h3>
-                <div className="flex items-baseline gap-1.5 mb-4">
-                    <span className="text-4xl font-black text-white">$1</span>
-                    <span className="text-zinc-500 text-xs font-medium">/ download</span>
-                </div>
-                <p className="text-zinc-400 text-xs mb-6">
-                    No subscriptions. No hidden fees. Pay only when you are 100% happy with the result.
-                </p>
-                
-                <div className="space-y-3">
-                    <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Everything Included</div>
-                    <ul className="space-y-2">
-                        <li className="flex items-start gap-2.5">
-                            <div className="mt-1 w-1 h-1 rounded-full bg-orange-500 shrink-0" />
-                            <span className="text-zinc-300 text-xs"><strong>ATS-Optimized PDF Resume</strong> <span className="text-zinc-500 block text-[10px]">Formatted to pass the robots.</span></span>
-                        </li>
-                        <li className="flex items-start gap-2.5">
-                            <div className="mt-1 w-1 h-1 rounded-full bg-orange-500 shrink-0" />
-                            <span className="text-zinc-300 text-xs"><strong>Tailored Cover Letter</strong> <span className="text-zinc-500 block text-[10px]">Generated based on the job.</span></span>
-                        </li>
-                        <li className="flex items-start gap-2.5">
-                            <div className="mt-1 w-1 h-1 rounded-full bg-orange-500 shrink-0" />
-                            <span className="text-zinc-300 text-xs"><strong>Interview Prep Kit</strong> <span className="text-zinc-500 block text-[10px]">Questions & STAR answers.</span></span>
-                        </li>
-                    </ul>
-                </div>
-             </div>
+          {/* Paid Tier */}
+          <div className="bg-gradient-to-b from-zinc-900 to-zinc-950 border border-orange-500/30 p-6 rounded-2xl flex flex-col items-center relative shadow-2xl">
+            <div className="absolute top-0 right-0 bg-orange-600 text-white text-xs font-black px-3 py-1 rounded-bl-lg rounded-tr-lg uppercase tracking-widest animate-pulse">
+              Low Availability
+            </div>
+            <span className="text-orange-500 font-black uppercase tracking-[0.2em] text-xs mb-4">Full Access</span>
+            <div className="text-3xl font-black text-white mb-2 uppercase tracking-tighter">$1 <span className="text-sm font-normal text-zinc-600 tracking-normal">/ download</span></div>
 
-             {/* Right: Why Us / Addons */}
-             <div className="space-y-6">
-                <div className="bg-zinc-900/30 border border-white/10 rounded-xl p-6">
-                    <h3 className="text-lg font-bold text-white mb-3">Why HireSchema?</h3>
-                    <ul className="space-y-3">
-                        <li className="flex gap-2.5">
-                            <div>
-                                <h4 className="font-bold text-white text-[10px] uppercase tracking-widest">Time Saver</h4>
-                                <p className="text-[10px] text-zinc-500">Save 10+ hours per application.</p>
-                            </div>
-                        </li>
-                        <li className="flex gap-2.5">
-                            <div>
-                                <h4 className="font-bold text-white text-[10px] uppercase tracking-widest">No AI Fluff</h4>
-                                <p className="text-[10px] text-zinc-500">We remove robotic phrases recruiters hate.</p>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
+            {/* Urgency Triggers */}
+            <div className="mb-6 w-full bg-orange-950/30 border border-orange-500/20 rounded-lg p-2.5 text-center">
+              <p className="text-orange-400 text-xs font-bold uppercase tracking-wide mb-1">🔥 Only 4 spots left</p>
+              <p className="text-zinc-500 text-[10px]">for today's priority batch</p>
+            </div>
 
-                <div className="bg-zinc-900/30 border border-white/10 rounded-xl p-6">
-                    <h3 className="text-lg font-bold text-white mb-3">Premium Add-ons <span className="text-[10px] font-normal text-zinc-500 ml-2">(Free)</span></h3>
-                    <div className="grid grid-cols-1 gap-3">
-                        <div className="flex items-center gap-2.5 p-2.5 bg-zinc-950 border border-zinc-800 rounded-lg">
-                            <div>
-                                <div className="text-[10px] font-bold text-white uppercase tracking-widest">Skill Upgrader</div>
-                                <div className="text-[9px] text-zinc-500">Links to learn missing skills.</div>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-2.5 p-2.5 bg-zinc-950 border border-zinc-800 rounded-lg">
-                            <div>
-                                <div className="text-[10px] font-bold text-white uppercase tracking-widest">LinkedIn Optimizer</div>
-                                <div className="text-[9px] text-zinc-500">Headline & About section generator.</div>
-                            </div>
-                        </div>
-                    </div>
+            <ul className="space-y-3 text-left w-full mb-8 flex-1">
+              <li className="flex items-center gap-2 text-sm text-zinc-200 font-bold uppercase tracking-tight">Interview-Ready Resume PDF</li>
+              <li className="flex items-center gap-2 text-sm text-zinc-200 font-bold uppercase tracking-tight">Persuasive Cover Letter</li>
+              <li className="flex items-center gap-2 text-sm text-zinc-200 font-bold uppercase tracking-tight">Interview Prep Kit</li>
+              <li className="flex items-center gap-2 text-xs text-zinc-600 mt-3 border-t border-white/5 pt-3">Secure payment via Dodo</li>
+            </ul>
+          </div>
+
+          {/* Right: Why Us / Addons */}
+          <div className="space-y-6">
+            <div className="bg-zinc-900/30 border border-white/10 rounded-xl p-6">
+              <h3 className="text-lg font-bold text-white mb-3">Why HireSchema?</h3>
+              <ul className="space-y-3">
+                <li className="flex gap-2.5">
+                  <div>
+                    <h4 className="font-bold text-white text-[10px] uppercase tracking-widest">Time Saver</h4>
+                    <p className="text-[10px] text-zinc-500">Save 10+ hours per application.</p>
+                  </div>
+                </li>
+                <li className="flex gap-2.5">
+                  <div>
+                    <h4 className="font-bold text-white text-[10px] uppercase tracking-widest">No AI Fluff</h4>
+                    <p className="text-[10px] text-zinc-500">We remove robotic phrases recruiters hate.</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <div className="bg-zinc-900/30 border border-white/10 rounded-xl p-6">
+              <h3 className="text-lg font-bold text-white mb-3">Premium Add-ons <span className="text-[10px] font-normal text-zinc-500 ml-2">(Free)</span></h3>
+              <div className="grid grid-cols-1 gap-3">
+                <div className="flex items-center gap-2.5 p-2.5 bg-zinc-950 border border-zinc-800 rounded-lg">
+                  <div>
+                    <div className="text-[10px] font-bold text-white uppercase tracking-widest">Skill Upgrader</div>
+                    <div className="text-[9px] text-zinc-500">Links to learn missing skills.</div>
+                  </div>
                 </div>
-             </div>
+                <div className="flex items-center gap-2.5 p-2.5 bg-zinc-950 border border-zinc-800 rounded-lg">
+                  <div>
+                    <div className="text-[10px] font-bold text-white uppercase tracking-widest">LinkedIn Optimizer</div>
+                    <div className="text-[9px] text-zinc-500">Headline & About section generator.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* CTA */}
         <div className="text-center mt-12">
-           <h2 className="text-xl font-bold text-white mb-4">Ready to get hired?</h2>
-           <a 
-              href="/app"
-              onClick={(e) => {
-                if (e.metaKey || e.ctrlKey) return;
-                e.preventDefault();
-                onStart('scan');
-              }}
-              className={ORANGE_BUTTON_STYLE}
-           >
-              Start Free Scan
-           </a>
+          <h2 className="text-xl font-bold text-white mb-4">Ready to get hired?</h2>
+          <a
+            href="/app"
+            onClick={(e) => {
+              if (e.metaKey || e.ctrlKey) return;
+              e.preventDefault();
+              onStart('scan');
+            }}
+            className={ORANGE_BUTTON_STYLE}
+          >
+            Start Free Scan
+          </a>
         </div>
 
       </main>

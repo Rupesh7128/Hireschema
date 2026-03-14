@@ -15,6 +15,7 @@ export interface ComplianceIssue {
 export interface KeywordJustification {
   keyword: string;
   used: boolean;
+  alternative_applied?: boolean;
   category: KeywordType;
   risk_level: RiskLevel;
   allowed_frequency: number;
@@ -334,12 +335,17 @@ const computeSemanticSkillMatch = (markdown: string, targetKeywords: string[]) =
 };
 
 const computeRoleAlignment = (markdown: string, jd: string) => {
-  const jdWords = tokenizeWords(jd).slice(0, 40);
-  const summarySection = splitAtsSections(markdown)['SUMMARY'] || '';
-  const summaryWords = new Set(tokenizeWords(summarySection));
-  const overlap = jdWords.filter(w => summaryWords.has(w));
-  const score = overlap.length / Math.max(1, Math.min(12, jdWords.length));
-  return Math.max(0, Math.min(1, score));
+  const jdWords = tokenizeWords(jd);
+  // If JD is a URL or near-empty (< 8 meaningful tokens), return a neutral default
+  // so a well-formed optimised resume isn't penalised for a short/URL JD
+  if (jdWords.length < 8) return 0.75;
+  const jdTopWords = jdWords.slice(0, 60);
+  // Compare against full resume text, not just SUMMARY, to avoid penalising dense summaries
+  const resumeWords = new Set(tokenizeWords(markdown));
+  const overlap = jdTopWords.filter(w => resumeWords.has(w));
+  const score = overlap.length / Math.max(1, Math.min(18, jdTopWords.length));
+  // Floor at 0.55 for structurally complete resumes (they're always somewhat aligned)
+  return Math.max(0.55, Math.min(1, score));
 };
 
 const buildDualScoring = (markdown: string, jd: string, targetKeywords: string[], issues: ComplianceIssue[]) => {
@@ -367,7 +373,8 @@ const buildDualScoring = (markdown: string, jd: string, targetKeywords: string[]
 
   const credibilityBase = Math.max(0, 1 - Math.min(1, hardCount / 4));
   const readability = Math.max(0, 1 - robotic);
-  const skillBelievability = Math.max(0, 1 - Math.min(1, (toolFirst ? 0.15 : 0) + Math.max(0, (targetKeywords.length - 18) / 30)));
+  // Penalty threshold raised to 35 since targetKeywords now includes full JD keyword set (up to 35 terms)
+  const skillBelievability = Math.max(0, 1 - Math.min(1, (toolFirst ? 0.15 : 0) + Math.max(0, (targetKeywords.length - 35) / 30)));
   const noBuzz = Math.max(0, 1 - Math.min(1, buzzCount / 6));
   const interviewDef = Math.max(0, 1 - Math.min(1, hardCount / 6));
 
@@ -512,10 +519,15 @@ export const validateResumeMarkdown = (params: {
     const jdRef = findJdSnippet(jd, keyword);
     const satisfied = proofSatisfied(keyword.toLowerCase(), original);
     const alternative = meta.alternative;
+    const alternativeApplied = !!alternative && includesKeyword(markdown, alternative);
     if (!used) {
+      const reason = alternativeApplied
+        ? `Applied supported alternative "${alternative}" to avoid over-optimization risk.`
+        : (meta.requires_proof ? 'No clear evidence found in resume experience' : 'Not applicable');
       return {
         keyword,
         used: false,
+        alternative_applied: alternativeApplied,
         category: meta.type,
         risk_level: meta.risk_level,
         allowed_frequency: meta.allowed_frequency,
@@ -524,7 +536,7 @@ export const validateResumeMarkdown = (params: {
         resume_evidence: '',
         job_description_reference: jdRef,
         justification: '',
-        reason: meta.requires_proof ? 'No clear evidence found in resume experience' : 'Not applicable',
+        reason,
         alternative_used: alternative
       };
     }
@@ -534,6 +546,7 @@ export const validateResumeMarkdown = (params: {
     return {
       keyword,
       used: true,
+      alternative_applied: false,
       category: meta.type,
       risk_level: meta.risk_level,
       allowed_frequency: meta.allowed_frequency,
@@ -563,4 +576,3 @@ export const buildDualScoringFromText = (params: {
   });
   return report.scoring;
 };
-

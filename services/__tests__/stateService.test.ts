@@ -88,16 +88,16 @@ describe('State Service', () => {
    * **Validates: Requirements 3.1, 3.2**
    */
   describe('Property 3: State persistence round-trip', () => {
-    it('saving and restoring returns equivalent state', () => {
-      fc.assert(
-        fc.property(
+    it('saving and restoring returns equivalent state', async () => {
+      await fc.assert(
+        fc.asyncProperty(
           persistedStateInputArb,
-          (stateInput) => {
+          async (stateInput) => {
             // Save state
-            saveStateBeforePayment(stateInput)
+            await saveStateBeforePayment(stateInput)
             
             // Restore state
-            const restored = restoreStateAfterPayment()
+            const restored = await restoreStateAfterPayment()
             
             // Should not be null
             expect(restored).not.toBeNull()
@@ -118,19 +118,19 @@ describe('State Service', () => {
       )
     })
 
-    it('clearing state removes it', () => {
-      fc.assert(
-        fc.property(
+    it('clearing state removes it', async () => {
+      await fc.assert(
+        fc.asyncProperty(
           persistedStateInputArb,
-          (stateInput) => {
+          async (stateInput) => {
             // Save state
-            saveStateBeforePayment(stateInput)
+            await saveStateBeforePayment(stateInput)
             
             // Clear state
-            clearPersistedState()
+            await clearPersistedState()
             
             // Restore should return null
-            const restored = restoreStateAfterPayment()
+            const restored = await restoreStateAfterPayment()
             expect(restored).toBeNull()
           }
         ),

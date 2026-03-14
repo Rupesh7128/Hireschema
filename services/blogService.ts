@@ -2,7 +2,6 @@
 /// <reference types="vite/client" />
 
 const BASE_URL = '/api/massblog';
-const API_KEY = import.meta.env.VITE_MASSBLOG_API;
 
 export interface BlogPost {
   title: string;
@@ -23,9 +22,8 @@ export interface InternalLink {
 }
 
 export const getInternalLinks = async (): Promise<InternalLink[]> => {
-  if (!API_KEY) return [];
   try {
-    const response = await fetch(`${BASE_URL}/internal-links?apiKey=${API_KEY}`, {
+    const response = await fetch(`${BASE_URL}/internal-links`, {
       headers: { Accept: 'application/json' }
     });
     if (!response.ok) return [];
@@ -37,14 +35,9 @@ export const getInternalLinks = async (): Promise<InternalLink[]> => {
 };
 
 export const getBlogPosts = async (): Promise<BlogPost[]> => {
-  if (!API_KEY) {
-    console.warn('VITE_MASSBLOG_API is missing');
-    return [];
-  }
-
   try {
     console.log(`Fetching blog posts via proxy: ${BASE_URL}/blog`);
-    const response = await fetch(`${BASE_URL}/blog?apiKey=${API_KEY}`, { headers: { Accept: 'application/json' } });
+    const response = await fetch(`${BASE_URL}/blog`, { headers: { Accept: 'application/json' } });
     
     if (!response.ok) {
       const text = await response.text();
@@ -69,10 +62,8 @@ export const getBlogPosts = async (): Promise<BlogPost[]> => {
 };
 
 export const getBlogPost = async (slug: string): Promise<BlogPost | null> => {
-  if (!API_KEY) return null;
-
   try {
-    const response = await fetch(`${BASE_URL}/blog?apiKey=${API_KEY}&slug=${encodeURIComponent(slug)}`, {
+    const response = await fetch(`${BASE_URL}/blog?slug=${encodeURIComponent(slug)}`, {
       headers: { Accept: 'application/json' }
     });
     if (!response.ok) throw new Error('Failed to fetch post');
