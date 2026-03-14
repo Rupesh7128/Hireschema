@@ -10,6 +10,8 @@ import aiLanguages from './api/ai-languages';
 import verifyPayment from './api/verify-payment';
 import redeemPromo from './api/redeem-promo';
 
+import { cloudflare } from "@cloudflare/vite-plugin";
+
 export default defineConfig(({ mode }) => {
   const isPlaceholder = (value: unknown) => {
     const v = String(value || '').toLowerCase();
@@ -43,108 +45,105 @@ export default defineConfig(({ mode }) => {
         allow: ['..']
       }
     },
-    plugins: [
-      react(),
-      {
-        name: 'local-api-routes',
-        configureServer(server) {
-          const readBody = (req: any) =>
-            new Promise<string>((resolve) => {
-              let data = '';
-              req.on('data', (chunk: any) => {
-                data += String(chunk);
-              });
-              req.on('end', () => resolve(data));
-              req.on('error', () => resolve(''));
+    plugins: [react(), {
+      name: 'local-api-routes',
+      configureServer(server) {
+        const readBody = (req: any) =>
+          new Promise<string>((resolve) => {
+            let data = '';
+            req.on('data', (chunk: any) => {
+              data += String(chunk);
             });
+            req.on('end', () => resolve(data));
+            req.on('error', () => resolve(''));
+          });
 
-          const enhanceRes = (res: any) => {
-            res.status = (code: number) => {
-              res.statusCode = code;
-              return res;
-            };
-            res.json = (jsonBody: any) => {
-              if (!res.headersSent) res.setHeader('Content-Type', 'application/json; charset=utf-8');
-              res.end(JSON.stringify(jsonBody));
-              return res;
-            };
-            res.send = (body: any) => {
-              if (typeof body === 'object') return res.json(body);
-              res.end(String(body));
-              return res;
-            };
-            res.redirect = (statusOrUrl: string | number, url?: string) => {
-              const status = typeof statusOrUrl === 'number' ? statusOrUrl : 302;
-              const location = typeof statusOrUrl === 'string' ? statusOrUrl : String(url || '/');
-              res.statusCode = status;
-              res.setHeader('Location', location);
-              res.end();
-              return res;
-            };
+        const enhanceRes = (res: any) => {
+          res.status = (code: number) => {
+            res.statusCode = code;
             return res;
           };
+          res.json = (jsonBody: any) => {
+            if (!res.headersSent) res.setHeader('Content-Type', 'application/json; charset=utf-8');
+            res.end(JSON.stringify(jsonBody));
+            return res;
+          };
+          res.send = (body: any) => {
+            if (typeof body === 'object') return res.json(body);
+            res.end(String(body));
+            return res;
+          };
+          res.redirect = (statusOrUrl: string | number, url?: string) => {
+            const status = typeof statusOrUrl === 'number' ? statusOrUrl : 302;
+            const location = typeof statusOrUrl === 'string' ? statusOrUrl : String(url || '/');
+            res.statusCode = status;
+            res.setHeader('Location', location);
+            res.end();
+            return res;
+          };
+          return res;
+        };
 
-          server.middlewares.use(async (req: any, res: any, next: any) => {
-            const url = String(req.url || '');
-            if (!url.startsWith('/api/')) return next();
+        server.middlewares.use(async (req: any, res: any, next: any) => {
+          const url = String(req.url || '');
+          if (!url.startsWith('/api/')) return next();
 
-            try {
-              if (url.startsWith('/api/ai-generate')) {
-                const raw = await readBody(req);
-                req.body = raw || req.body;
-                return aiGenerate(req, enhanceRes(res));
-              }
-
-              if (url.startsWith('/api/ai-resume')) {
-                const raw = await readBody(req);
-                req.body = raw || req.body;
-                return aiResume(req, enhanceRes(res));
-              }
-
-              if (url.startsWith('/api/ai-cover-letter')) {
-                const raw = await readBody(req);
-                req.body = raw || req.body;
-                return aiCoverLetter(req, enhanceRes(res));
-              }
-
-              if (url.startsWith('/api/ai-interview')) {
-                const raw = await readBody(req);
-                req.body = raw || req.body;
-                return aiInterview(req, enhanceRes(res));
-              }
-
-              if (url.startsWith('/api/ai-gaps')) {
-                const raw = await readBody(req);
-                req.body = raw || req.body;
-                return aiGaps(req, enhanceRes(res));
-              }
-
-              if (url.startsWith('/api/ai-languages')) {
-                const raw = await readBody(req);
-                req.body = raw || req.body;
-                return aiLanguages(req, enhanceRes(res));
-              }
-
-              if (url.startsWith('/api/verify-payment')) {
-                const raw = await readBody(req);
-                req.body = raw || req.body;
-                return verifyPayment(req, enhanceRes(res));
-              }
-
-              if (url.startsWith('/api/redeem-promo')) {
-                const raw = await readBody(req);
-                req.body = raw || req.body;
-                return redeemPromo(req, enhanceRes(res));
-              }
-            } catch (e: any) {
-              return enhanceRes(res).status(500).json({ ok: false, reason: String(e?.message || 'Local API error') });
+          try {
+            if (url.startsWith('/api/ai-generate')) {
+              const raw = await readBody(req);
+              req.body = raw || req.body;
+              return aiGenerate(req, enhanceRes(res));
             }
 
-            return next();
-          });
-        },
+            if (url.startsWith('/api/ai-resume')) {
+              const raw = await readBody(req);
+              req.body = raw || req.body;
+              return aiResume(req, enhanceRes(res));
+            }
+
+            if (url.startsWith('/api/ai-cover-letter')) {
+              const raw = await readBody(req);
+              req.body = raw || req.body;
+              return aiCoverLetter(req, enhanceRes(res));
+            }
+
+            if (url.startsWith('/api/ai-interview')) {
+              const raw = await readBody(req);
+              req.body = raw || req.body;
+              return aiInterview(req, enhanceRes(res));
+            }
+
+            if (url.startsWith('/api/ai-gaps')) {
+              const raw = await readBody(req);
+              req.body = raw || req.body;
+              return aiGaps(req, enhanceRes(res));
+            }
+
+            if (url.startsWith('/api/ai-languages')) {
+              const raw = await readBody(req);
+              req.body = raw || req.body;
+              return aiLanguages(req, enhanceRes(res));
+            }
+
+            if (url.startsWith('/api/verify-payment')) {
+              const raw = await readBody(req);
+              req.body = raw || req.body;
+              return verifyPayment(req, enhanceRes(res));
+            }
+
+            if (url.startsWith('/api/redeem-promo')) {
+              const raw = await readBody(req);
+              req.body = raw || req.body;
+              return redeemPromo(req, enhanceRes(res));
+            }
+          } catch (e: any) {
+            return enhanceRes(res).status(500).json({ ok: false, reason: String(e?.message || 'Local API error') });
+          }
+
+          return next();
+        });
       },
-    ],
+    }, cloudflare()],
     build: {
       chunkSizeWarningLimit: 1500,
       target: 'es2020',

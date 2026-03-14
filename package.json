@@ -6,9 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
+    "preview": "npm run build && wrangler dev",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
     "@fontsource/geist-mono": "^5.2.7",
@@ -31,6 +32,7 @@
     "showdown": "^2.1.0"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.28.0",
     "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^22.19.2",
     "@types/react": "^18.3.28",
@@ -43,6 +45,7 @@
     "tailwindcss": "^4.1.18",
     "typescript": "~5.8.2",
     "vite": "^6.2.0",
-    "vitest": "^4.0.15"
+    "vitest": "^4.0.15",
+    "wrangler": "^4.73.0"
   }
 }
